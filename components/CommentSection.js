@@ -1,127 +1,102 @@
-"use client"; // Ensures this runs only on the client side
-import { useEffect, useState, useRef } from "react";
+'use client';
+
+import { useState, useEffect } from 'react';
+import styles from './CommentSection.module.css';
 
 const CommentSection = () => {
-  const [pageUrl, setPageUrl] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [commentsPerPage] = useState(10);
-  const commentInputRef = useRef(null);
-  const imageInputRef = useRef(null);
-  const videoInputRef = useRef(null);
+    const [comments, setComments] = useState([]);
+    const [content, setContent] = useState('');
+    const [image, setImage] = useState(null);
+    const [video, setVideo] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(0);
+    const [limit] = useState(5);
 
-  // Get Page URL and User Info
-  useEffect(() => {
-    setPageUrl(window.location.href.split("#")[0]); // Remove hash fragment
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    setCurrentUser(userInfo ? userInfo.data : null);
-  }, []);
+    const pageUrl = typeof window !== 'undefined' ? window.location.href.split('#')[0] : '';
 
-  // Fetch Comments
-  const fetchComments = async () => {
-    if (!pageUrl) return;
-    try {
-      const response = await fetch(
-        `/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${currentPage}&limit=${commentsPerPage}&userId=${currentUser?.id}`
-      );
-      const data = await response.json();
-      setComments((prev) => (currentPage > 0 ? [...prev, ...data] : data));
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-    }
-  };
+    // Fetch comments
+    useEffect(() => {
+        const fetchComments = async () => {
+            const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+            const data = await response.json();
+            setComments(data);
+        };
 
-  useEffect(() => {
-    if (pageUrl) fetchComments();
-  }, [pageUrl, currentPage]);
+        fetchComments();
+    }, [page, pageUrl, limit]);
 
-  // Format Time Ago
-  const formatTimeAgo = (date) => {
-    const seconds = Math.floor((new Date() - date) / 1000);
-    const intervals = [
-      { label: "year", seconds: 31536000 },
-      { label: "month", seconds: 2592000 },
-      { label: "day", seconds: 86400 },
-      { label: "hour", seconds: 3600 },
-      { label: "minute", seconds: 60 },
-      { label: "second", seconds: 1 },
-    ];
-    for (const { label, seconds: intervalSeconds } of intervals) {
-      const count = Math.floor(seconds / intervalSeconds);
-      if (count >= 1) return `${count} ${label}${count > 1 ? "s" : ""} ago`;
-    }
-    return "just now";
-  };
+    // Handle file selection
+    const handleFileChange = (e, type) => {
+        if (type === 'image') setImage(e.target.files[0]);
+        else setVideo(e.target.files[0]);
+    };
 
-  return (
-    <div>
-      <h1>Comment Section</h1>
-      <textarea ref={commentInputRef} placeholder="Write a comment..." />
-      <div className="file-input-container">
-        <label className="file-input-label">
-          <i className="fas fa-image"></i>
-          <input ref={imageInputRef} type="file" accept="image/*" hidden />
-        </label>
-        <label className="file-input-label">
-          <i className="fas fa-video"></i>
-          <input ref={videoInputRef} type="file" accept="video/*" hidden />
-        </label>
-      </div>
-      <button onClick={() => console.log("Post Comment")}>Post Comment</button>
+    // Post comment
+    const postComment = async () => {
+        if (!content) return alert('Comment cannot be empty');
 
-      <div id="comment-section">
-        {comments.map((comment) => {
-          const userLiked = currentUser && comment.likes.includes(currentUser.id);
-          const isOwner = currentUser && currentUser.id === comment.userId;
-          return (
-            <div key={comment._id} id={`comment-${comment._id}`}>
-              <div>
-                <p>
-                  <img
-                    src={comment.userImage || "default-avatar.png"}
-                    alt={comment.user}
-                    width="60"
-                    height="60"
-                  />
-                  <strong>{comment.user}</strong> - <span className="time-ago">{formatTimeAgo(new Date(comment.createdAt))}</span>
-                </p>
-                <p>{comment.content}</p>
-                {comment.image && <img src={comment.image} alt="Comment Image" width="200" />}
-                {comment.video && <video src={comment.video} controls width="300"></video>}
-                <div>
-                  <span onClick={() => console.log("Toggle Like")} style={{ cursor: "pointer" }}>
-                    {userLiked ? "❤️" : "🤍"} ({comment.likes.length})
-                  </span>
-                  {isOwner && (
-                    <>
-                      <button onClick={() => console.log("Edit Comment")}>Edit</button>
-                      <button onClick={() => console.log("Delete Comment")}>Delete</button>
-                    </>
-                  )}
-                </div>
-                <button onClick={() => console.log("Reply")}>Reply</button>
-                <button onClick={() => console.log("Show Replies")}>View Replies</button>
-              </div>
+        const formData = new FormData();
+        formData.append('pageUrl', pageUrl);
+        formData.append('content', content);
+        formData.append('user', 'John Doe'); // Replace with actual user data
+        formData.append('userId', '12345'); // Replace with actual user ID
+        formData.append('userImage', '/default-avatar.png'); // Replace with actual user image
+        if (image) formData.append('image', image);
+        if (video) formData.append('video', video);
+
+        setLoading(true);
+
+        const response = await fetch('/api/comments', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const newComment = await response.json();
+        setComments([newComment, ...comments]);
+        setContent('');
+        setImage(null);
+        setVideo(null);
+        setLoading(false);
+    };
+
+    return (
+        <div className={styles.commentContainer}>
+            <h1>Comment Section</h1>
+            <textarea
+                className={styles.textarea}
+                placeholder="Write a comment..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+            ></textarea>
+            <div className={styles.fileInputContainer}>
+                <label className={styles.fileInputLabel}>
+                    <i className="fas fa-image"></i>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
+                </label>
+                <label className={styles.fileInputLabel}>
+                    <i className="fas fa-video"></i>
+                    <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
+                </label>
             </div>
-          );
-        })}
-      </div>
-
-      {comments.length === commentsPerPage && (
-        <button onClick={() => setCurrentPage((prev) => prev + 1)}>Load More</button>
-      )}
-
-      {/* Replies Modal */}
-      <div id="replies-modal">
-        <div className="modal-header">Replies</div>
-        <div id="replies-modal-body" className="modal-body"></div>
-        <div className="modal-footer">
-          <button onClick={() => console.log("Close Replies")}>Close</button>
+            <button onClick={postComment} disabled={loading}>
+                {loading ? 'Posting...' : 'Post Comment'}
+            </button>
+            <div className={styles.commentSection}>
+                {comments.map((comment) => (
+                    <div key={comment._id} className={styles.comment}>
+                        <img src={comment.userImage || '/default-avatar.png'} alt={comment.user} width="40" />
+                        <div>
+                            <strong>{comment.user}</strong>
+                            <p>{comment.content}</p>
+                            {comment.image && <img src={comment.image} alt="Comment" width="200" />}
+                            {comment.video && <video src={comment.video} controls width="300"></video>}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <button onClick={() => setPage(page + 1)}>Load More</button>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default CommentSection;
