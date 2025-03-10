@@ -1,12 +1,4 @@
 /* General body styling */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #121212; /* Dark background */
-    margin: 0;
-    padding: 0;
-    color: #e0e0e0; /* Light text color */
-    line-height: 1.6;
-}
 
 /* Comment section container */
 #comment-section {
