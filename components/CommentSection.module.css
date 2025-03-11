@@ -1,43 +1,43 @@
 /* Comment section container */
-#comment-section {
+.comment-section {
     max-width: 800px;
     margin: 20px auto;
     padding: 15px;
-    background: #1e1e1e; /* Darker background for the container */
+    background: #1e1e1e;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* Individual comment styling */
-#comment-section div {
+.comment {
     margin-bottom: 15px;
-    border-bottom: 1px solid #333; /* Lighter border for contrast */
+    border-bottom: 1px solid #333;
     padding-bottom: 10px;
 }
 
-#comment-section div:last-child {
+.comment:last-child {
     border-bottom: none;
 }
 
 /* User info and avatar */
-#comment-section img {
+.comment-avatar {
     border-radius: 50%;
     vertical-align: middle;
     margin-right: 10px;
 }
 
-#comment-section strong {
+.comment-user {
     font-size: 16px;
-    color: #bbbbbb; /* Slightly lighter gray for emphasis */
+    color: #bbbbbb;
 }
 
 .time-ago {
     font-size: 12px;
-    color: #888; /* Dimmed gray for less emphasis */
+    color: #888;
 }
 
 /* Buttons */
-.button {
+.comment-button {
     background: #007BFF;
     color: #ffffff;
     border: none;
@@ -48,27 +48,38 @@
     font-size: 14px;
 }
 
-.button:hover {
+.comment-button:hover {
     background: #0056b3;
 }
 
+/* Like and reply actions */
+.comment-action {
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+    color: #bbbbbb;
+}
+
+.comment-action:hover {
+    color: #007BFF;
+}
 
 /* Reply section */
-#comment-section div div {
+.reply-section {
     margin-left: 20px;
     padding: 10px;
-    background: #2c2c2c; /* Slightly lighter dark background */
+    background: #2c2c2c;
     border-radius: 5px;
     color: #e0e0e0;
 }
 
 /* Modal styling */
-#edit-modal, #reply-modal {
+.modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #1e1e1e; /* Dark modal background */
+    background: #1e1e1e;
     padding: 20px;
     border: 1px solid #444;
     border-radius: 10px;
@@ -79,28 +90,26 @@
     color: #e0e0e0;
 }
 
-#edit-modal textarea, 
-#reply-modal textarea {
+.modal-textarea {
     width: 100%;
     border: 1px solid #555;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
     font-size: 14px;
-    background: #2c2c2c; /* Dark background for text areas */
+    background: #2c2c2c;
     color: #e0e0e0;
 }
 
-/* Media content (images and videos) */
-img[alt="Comment Image"], 
-video {
+/* Media content */
+.comment-media {
     display: block;
     margin-top: 10px;
     border-radius: 8px;
 }
 
 /* Form styling */
-label {
+.comment-label {
     font-size: 14px;
     font-weight: bold;
     display: block;
@@ -108,12 +117,7 @@ label {
     color: #bbbbbb;
 }
 
-input[type="file"] {
-    font-size: 14px;
-    color: #e0e0e0;
-}
-
-#comment-input {
+.comment-input {
     width: calc(100% - 20px);
     padding: 10px;
     margin-bottom: 10px;
@@ -125,7 +129,7 @@ input[type="file"] {
 }
 
 /* Submit button */
-#comment-submit {
+.comment-submit {
     width: 100%;
     background: #28a745;
     border: none;
@@ -137,21 +141,21 @@ input[type="file"] {
     margin-top: 10px;
 }
 
-#comment-submit:hover {
+.comment-submit:hover {
     background: #218838;
 }
 
 /* Like button styles */
-span[style*="cursor: pointer;"] {
+.like-button {
     color: #dc3545;
 }
 
-span[style*="cursor: pointer; color: blue;"] {
+.reply-button {
     color: #17a2b8;
 }
 
-/* Replies modal styling */
-#replies-modal {
+/* Replies modal */
+.replies-modal {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -169,43 +173,55 @@ span[style*="cursor: pointer; color: blue;"] {
     color: #e0e0e0;
 }
 
-#replies-modal .modal-header {
+.replies-modal-header {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #ffffff;
 }
 
-#replies-modal .modal-body {
+.replies-modal-body {
     max-height: 400px;
     overflow-y: auto;
 }
 
-#replies-modal .modal-footer {
+.replies-modal-footer {
     text-align: right;
 }
 
+.replies-modal-button {
+    padding: 5px 10px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
+.replies-modal-button:hover {
+    background: #a71d2a;
+}
 
+/* Spinner */
 .spinner {
-  border: 8px solid #f3f3f3; /* Light gray */
-  border-top: 8px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
