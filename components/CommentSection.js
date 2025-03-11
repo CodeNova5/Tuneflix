@@ -60,14 +60,18 @@ const CommentSection = () => {
     };
 
     return (
-        <div className={styles.commentContainer}>
-            <h1>Comment Section</h1>
+        <div className={styles.commentSection}>
+            <h1 className={styles.commentTitle}>Comment Section</h1>
+
+            {/* Comment Input */}
             <textarea
-                className={styles.textarea}
+                className={styles.commentInput}
                 placeholder="Write a comment..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
             ></textarea>
+
+            {/* File Uploads */}
             <div className={styles.fileInputContainer}>
                 <label className={styles.fileInputLabel}>
                     <i className="fas fa-image"></i>
@@ -78,23 +82,37 @@ const CommentSection = () => {
                     <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
                 </label>
             </div>
-            <button onClick={postComment} disabled={loading}>
+
+            {/* Submit Button */}
+            <button className={styles.submitButton} onClick={postComment} disabled={loading}>
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
-            <div className={styles.commentSection}>
+
+            {/* Comments Display */}
+            <div className={styles.commentContainer}>
                 {comments.map((comment) => (
-                    <div key={comment._id} className={styles.comment}>
-                        <img src={comment.userImage || '/default-avatar.png'} alt={comment.user} width="40" />
-                        <div>
-                            <strong>{comment.user}</strong>
-                            <p>{comment.content}</p>
-                            {comment.image && <img src={comment.image} alt="Comment" width="200" />}
-                            {comment.video && <video src={comment.video} controls width="300"></video>}
+                    <div key={comment._id} className={styles.commentBox}>
+                        <img
+                            src={comment.userImage || '/default-avatar.png'}
+                            alt={comment.user}
+                            className={styles.commentAvatar}
+                        />
+                        <div className={styles.commentContent}>
+                            <strong className={styles.commentUser}>{comment.user}</strong>
+                            <p className={styles.commentText}>{comment.content}</p>
+
+                            {/* Image & Video Attachments */}
+                            {comment.image && <img src={comment.image} alt="Comment" className={styles.commentMedia} />}
+                            {comment.video && <video src={comment.video} controls className={styles.commentMedia}></video>}
                         </div>
                     </div>
                 ))}
             </div>
-            <button onClick={() => setPage(page + 1)}>Load More</button>
+
+            {/* Load More Button */}
+            <button className={styles.loadMoreButton} onClick={() => setPage(page + 1)}>
+                Load More
+            </button>
         </div>
     );
 };
