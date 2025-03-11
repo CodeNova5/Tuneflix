@@ -84,7 +84,7 @@ const CommentSection = () => {
             </div>
 
             {/* Submit Button */}
-            <button className={styles.submitButton} onClick={postComment} disabled={loading}>
+            <button className={styles.button} onClick={postComment} disabled={loading}>
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
 
@@ -110,7 +110,7 @@ const CommentSection = () => {
             </div>
 
             {/* Load More Button */}
-            <button className={styles.loadMoreButton} onClick={() => setPage(page + 1)}>
+            <button className={styles.button} onClick={() => setPage(page + 1)}>
                 Load More
             </button>
         </div>
