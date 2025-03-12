@@ -1,101 +1,102 @@
-const nextConnect = require('next-connect');
-const formidable = require('formidable');
-const mongoose = require('mongoose');
-const Comment = require('../models/Comment');
+'use client';
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
+import { useState, useEffect } from 'react';
+import styles from './CommentSection.module.css';
 
-const handler = nextConnect();
+const CommentSection = () => {
+    const [comments, setComments] = useState([]);
+    const [content, setContent] = useState('');
+    const [image, setImage] = useState(null);
+    const [video, setVideo] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(0);
+    const [limit] = useState(5);
 
-// Use formidable to parse form data
-handler.use((req, res, next) => {
-    const form = new formidable.IncomingForm();
-    form.parse(req, (err, fields, files) => {
-        if (err) {
-            return res.status(500).json({ error: 'File parsing error', details: err });
-        }
-        req.body = fields;
-        req.files = files;
-        next();
-    });
-});
+    const pageUrl = window.location.href.split('#')[0];
 
-// Handle POST request
-handler.post(async (req, res) => {
-    try {
-        const { pageUrl, content, user, userId, userImage, fcmtoken } = req.body;
-        const imagePath = req.files?.image?.[0] ? `/uploads/${req.files.image[0].newFilename}` : null;
-        const videoPath = req.files?.video?.[0] ? `/uploads/${req.files.video[0].newFilename}` : null;
+    // Fetch comments
+    useEffect(() => {
+        const fetchComments = async () => {
+            const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+            const data = await response.json();
+            setComments(data);
+        };
 
-        const newComment = new Comment({
-            pageUrl,
-            content,
-            user,
-            userId,
-            userImage,
-            fcmtoken,
-            image: imagePath,
-            video: videoPath,
-            likes: [],
-            replies: [],
-            createdAt: new Date(),
+        fetchComments();
+    }, [page, pageUrl, limit]);
+
+    // Handle file selection
+    const handleFileChange = (e, type) => {
+        if (type === 'image') setImage(e.target.files[0]);
+        else setVideo(e.target.files[0]);
+    };
+
+    // Post comment
+    const postComment = async () => {
+        if (!content) return alert('Comment cannot be empty');
+
+        const formData = new FormData();
+        formData.append('pageUrl', pageUrl);
+        formData.append('content', content);
+        formData.append('user', 'John Doe'); // Replace with actual user data
+        formData.append('userId', '12345'); // Replace with actual user ID
+        formData.append('userImage', '/default-avatar.png'); // Replace with actual user image
+        if (image) formData.append('image', image);
+        if (video) formData.append('video', video);
+
+        setLoading(true);
+
+        const response = await fetch('/api/comments', {
+            method: 'POST',
+            body: formData,
         });
 
-        await newComment.save();
-        res.status(201).json(newComment);
-    } catch (error) {
-        console.error('Upload Error:', error);
-        res.status(500).json({ message: 'Error saving comment', error });
-    }
-});
+        const newComment = await response.json();
+        setComments([newComment, ...comments]);
+        setContent('');
+        setImage(null);
+        setVideo(null);
+        setLoading(false);
+    };
 
-// Handle GET request to fetch comments
-handler.get(async (req, res) => {
-    try {
-        const { pageUrl, page = 0, limit = 5, userId } = req.query;
-        const skip = parseInt(page) * parseInt(limit);
-
-        const comments = await Comment.aggregate([
-            { $match: { pageUrl } },
-            {
-                $addFields: {
-                    relevanceScore: {
-                        $add: [
-                            { $size: "$replies" },
-                            { $size: "$likes" }
-                        ]
-                    },
-                    isUserComment: { $eq: ["$userId", userId] }
-                }
-            },
-            {
-                $sort: {
-                    isUserComment: -1,
-                    createdAt: -1,
-                    relevanceScore: -1,
-                }
-            },
-            { $skip: skip },
-            { $limit: parseInt(limit) }
-        ]);
-
-        res.status(200).json(comments);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-// Ensure only GET or POST methods are allowed
-handler.all((req, res) => {
-    res.setHeader('Allow', ['GET', 'POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-});
-
-export const config = {
-    api: {
-        bodyParser: false, // Disables Next.js default body parser to handle multipart form data
-    },
+    return (
+        <div className={styles.commentSection}>
+            <h1 className={styles.commentTitle}>Comment Section</h1>
+            <textarea
+                className={styles.commentInput}
+                placeholder="Write a comment..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+            ></textarea>
+            <div className={styles.fileInputContainer}>
+                <label className={styles.commentLabel}>
+                    <i className="fas fa-image"></i>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
+                </label>
+                <label className={styles.commentLabel}>
+                    <i className="fas fa-video"></i>
+                    <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
+                </label>
+            </div>
+            <button className={styles.commentButton} onClick={postComment} disabled={loading}>
+                {loading ? 'Posting...' : 'Post Comment'}
+            </button>
+            <div className={styles.commentContainer}>
+                {comments.map((comment) => (
+                    <div key={comment._id} className={styles.comment}>
+                        <img className={styles.commentAvatar} src={comment.userImage || '/default-avatar.png'} alt={comment.user} width="40" />
+                        <div>
+                            <strong className={styles.commentUser}>{comment.user}</strong>
+                            <p className={styles.commentText}>{comment.content}</p>
+                            {comment.image && <img className={styles.commentMedia} src={comment.image} alt="Comment" width="200" />}
+                            {comment.video && <video className={styles.commentMedia} src={comment.video} controls width="300"></video>}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
+        </div>
+    );
 };
 
-module.exports = handler;
+export default CommentSection;

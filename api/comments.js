@@ -1,8 +1,10 @@
-const nextConnect = require('next-connect');
+import nextConnect from 'next-connect';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Comment from '../models/Comment.js';
 
-const mongoose = require('mongoose');
-const Comment = require('../models/Comment');
-require("dotenv").config();
+dotenv.config();
+
 // MongoDB Connection
 const db = process.env.MONGO_URI;
 mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
