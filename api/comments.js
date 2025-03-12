@@ -9,9 +9,9 @@ dotenv.config();
 const db = process.env.MONGO_URI;
 mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
 
-const handler = createRouter();
+const router = createRouter();
 
-handler.post(async (req, res) => {
+router.post(async (req, res) => {
     try {
         const { pageUrl, content, user, userId, userImage, fcmtoken } = req.body;
         const imagePath = req.files?.image?.[0] ? `/uploads/${req.files.image[0].filename}` : null;
@@ -39,8 +39,7 @@ handler.post(async (req, res) => {
     }
 });
 
-// Handle GET request to fetch comments
-handler.get(async (req, res) => {
+router.get(async (req, res) => {
     try {
         const { pageUrl, page = 0, limit = 5, userId } = req.query;
         const skip = parseInt(page) * parseInt(limit);
@@ -77,16 +76,13 @@ handler.get(async (req, res) => {
     }
 });
 
-// Ensure only GET or POST methods are allowed
-handler.all((req, res) => {
-    res.setHeader('Allow', ['GET', 'POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-});
-
 export const config = {
     api: {
         bodyParser: false, // Disables Next.js default body parser to handle multipart form data
     },
 };
 
-export default handler;
+// Export the function for Next.js API routes
+export default function handler(req, res) {
+    return router.run(req, res);
+}
