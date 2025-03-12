@@ -1,7 +1,7 @@
 const nextConnect = require('next-connect');
 const mongoose = require('mongoose');
 const Comment = require('../models/Comment');
-
+require("dotenv").config();
 // MongoDB Connection
 const db = process.env.MONGO_URI;
 mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
