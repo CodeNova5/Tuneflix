@@ -1,6 +1,6 @@
 const nextConnect = require('next-connect');
 const mongoose = require('mongoose');
-const Comment = require('../../models/Comment');
+const Comment = require('../models/Comment');
 
 // MongoDB Connection
 const db = process.env.MONGO_URI;
