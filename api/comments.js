@@ -9,9 +9,6 @@ mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => c
 
 const handler = nextConnect();
 
-// Handle file upload and comment submission
-handler.use(upload.fields([{ name: 'image' }, { name: 'video' }]));
-
 handler.post(async (req, res) => {
     try {
         const { pageUrl, content, user, userId, userImage, fcmtoken } = req.body;
