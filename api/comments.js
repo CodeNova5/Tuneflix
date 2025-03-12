@@ -1,4 +1,4 @@
-import nextConnect from 'next-connect';
+import { createRouter } from 'next-connect';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Comment from '../models/Comment.js';
@@ -9,7 +9,7 @@ dotenv.config();
 const db = process.env.MONGO_URI;
 mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
 
-const handler = nextConnect();
+const handler = createRouter();
 
 handler.post(async (req, res) => {
     try {
