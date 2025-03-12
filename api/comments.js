@@ -1,4 +1,5 @@
-const nextConnect = require('next-connect').default;
+const nextConnect = require('next-connect');
+
 const mongoose = require('mongoose');
 const Comment = require('../models/Comment');
 require("dotenv").config();
