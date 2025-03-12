@@ -2,7 +2,9 @@ import { createRouter } from 'next-connect';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Comment from '../models/Comment.js';
-import formidable from 'formidable';
+import { IncomingForm } from 'formidable';
+import fs from 'fs/promises';
+
 
 dotenv.config();
 
@@ -10,19 +12,35 @@ dotenv.config();
 const db = process.env.MONGO_URI;
 mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
 
+// Ensure bodyParser is disabled for file uploads
 export const config = {
     api: {
-        bodyParser: false, // Disables Next.js default body parser for file uploads
+        bodyParser: false,
     },
 };
 
 // Helper function to parse form data
 const parseForm = async (req) => {
-    return new Promise((resolve, reject) => {
-        const form = new formidable.IncomingForm({ multiples: true, uploadDir: "./public/uploads", keepExtensions: true });
+    const form = new IncomingForm({ multiples: true, uploadDir: "./public/uploads", keepExtensions: true });
 
-        form.parse(req, (err, fields, files) => {
-            if (err) reject(err);
+    return new Promise((resolve, reject) => {
+        form.parse(req, async (err, fields, files) => {
+            if (err) return reject(err);
+
+            // Move uploaded files to the correct location (if needed)
+            if (files.image) {
+                const oldPath = files.image.filepath;
+                const newPath = `./public/uploads/${files.image.originalFilename}`;
+                await fs.rename(oldPath, newPath);
+                files.image.path = newPath;
+            }
+            if (files.video) {
+                const oldPath = files.video.filepath;
+                const newPath = `./public/uploads/${files.video.originalFilename}`;
+                await fs.rename(oldPath, newPath);
+                files.video.path = newPath;
+            }
+
             resolve({ fields, files });
         });
     });
