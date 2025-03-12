@@ -1,108 +1,107 @@
-import { createRouter } from 'next-connect';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import Comment from '../models/Comment.js';
-import formidable from 'formidable';
-import fs from 'fs';
+'use client';
 
-dotenv.config();
+import { useState, useEffect } from 'react';
+import styles from './CommentSection.module.css';
 
-// MongoDB Connection
-const db = process.env.MONGO_URI;
-mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
+const CommentSection = () => {
+    const [comments, setComments] = useState([]);
+    const [content, setContent] = useState('');
+    const [image, setImage] = useState(null);
+    const [video, setVideo] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(0);
+    const [limit] = useState(5);
+    const [pageUrl, setPageUrl] = useState('');
 
-const handler = createRouter();
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setPageUrl(window.location.href.split('#')[0]);
+        }
+    }, []);
 
-export const config = {
-    api: {
-        bodyParser: false, // Important to disable Next.js body parser
-    },
+    // Fetch comments
+    useEffect(() => {
+        const fetchComments = async () => {
+            const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+            const data = await response.json();
+            setComments(data);
+        };
+
+        fetchComments();
+    }, [page, pageUrl, limit]);
+
+    // Handle file selection
+    const handleFileChange = (e, type) => {
+        if (type === 'image') setImage(e.target.files[0]);
+        else setVideo(e.target.files[0]);
+    };
+
+    // Post comment
+    const postComment = async () => {
+        if (!content) return alert('Comment cannot be empty');
+
+        const formData = new FormData();
+        formData.append('pageUrl', pageUrl);
+        formData.append('content', content);
+        formData.append('user', 'John Doe'); // Replace with actual user data
+        formData.append('userId', '12345'); // Replace with actual user ID
+        formData.append('userImage', '/default-avatar.png'); // Replace with actual user image
+        if (image) formData.append('image', image);
+        if (video) formData.append('video', video);
+
+        setLoading(true);
+
+        const response = await fetch('/api/comments', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const newComment = await response.json();
+        setComments([newComment, ...comments]);
+        setContent('');
+        setImage(null);
+        setVideo(null);
+        setLoading(false);
+    };
+
+    return (
+        <div className={styles.commentSection}>
+            <h1 className={styles.commentTitle}>Comment Section</h1>
+            <textarea
+                className={styles.commentInput}
+                placeholder="Write a comment..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+            ></textarea>
+            <div className={styles.fileInputContainer}>
+                <label className={styles.commentLabel}>
+                    <i className="fas fa-image"></i>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
+                </label>
+                <label className={styles.commentLabel}>
+                    <i className="fas fa-video"></i>
+                    <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
+                </label>
+            </div>
+            <button className={styles.commentButton} onClick={postComment} disabled={loading}>
+                {loading ? 'Posting...' : 'Post Comment'}
+            </button>
+            <div className={styles.commentContainer}>
+                {comments.map((comment) => (
+                    <div key={comment._id} className={styles.comment}>
+                        <img className={styles.commentAvatar} src={comment.userImage || '/default-avatar.png'} alt={comment.user} width="40" />
+                        <div>
+                            <strong className={styles.commentUser}>{comment.user}</strong>
+                            <p className={styles.commentText}>{comment.content}</p>
+                            {comment.image && <img className={styles.commentMedia} src={comment.image} alt="Comment" width="200" />}
+                            {comment.video && <video className={styles.commentMedia} src={comment.video} controls width="300"></video>}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
+        </div>
+    );
 };
 
-// Helper function to parse form data
-const parseForm = (req) => {
-    return new Promise((resolve, reject) => {
-        const form = new formidable.IncomingForm({ multiples: true, uploadDir: "./public/uploads", keepExtensions: true });
-
-        form.parse(req, (err, fields, files) => {
-            if (err) reject(err);
-            resolve({ fields, files });
-        });
-    });
-};
-
-// Handle POST request to create a new comment
-handler.post(async (req, res) => {
-    try {
-        const { fields, files } = await parseForm(req);
-        const { pageUrl, content, user, userId, userImage, fcmtoken } = fields;
-
-        const imagePath = files.image ? `/uploads/${files.image.newFilename}` : null;
-        const videoPath = files.video ? `/uploads/${files.video.newFilename}` : null;
-
-        const newComment = new Comment({
-            pageUrl,
-            content,
-            user,
-            userId,
-            userImage,
-            fcmtoken,
-            image: imagePath,
-            video: videoPath,
-            likes: [],
-            replies: [],
-            createdAt: new Date(),
-        });
-
-        await newComment.save();
-        res.status(201).json(newComment);
-    } catch (error) {
-        console.error('Upload Error:', error);
-        res.status(500).json({ message: 'Error saving comment', error });
-    }
-});
-
-// Handle GET request to fetch comments
-handler.get(async (req, res) => {
-    try {
-        const { pageUrl, page = 0, limit = 5, userId } = req.query;
-        const skip = parseInt(page) * parseInt(limit);
-
-        const comments = await Comment.aggregate([
-            { $match: { pageUrl } },
-            {
-                $addFields: {
-                    relevanceScore: {
-                        $add: [
-                            { $size: "$replies" },
-                            { $size: "$likes" }
-                        ]
-                    },
-                    isUserComment: { $eq: ["$userId", userId] }
-                }
-            },
-            {
-                $sort: {
-                    isUserComment: -1,
-                    createdAt: -1,
-                    relevanceScore: -1
-                }
-            },
-            { $skip: skip },
-            { $limit: parseInt(limit) }
-        ]);
-
-        res.status(200).json(comments);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-// Ensure only GET or POST methods are allowed
-handler.all((req, res) => {
-    res.setHeader('Allow', ['GET', 'POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-});
-
-export default handler;
+export default CommentSection;
