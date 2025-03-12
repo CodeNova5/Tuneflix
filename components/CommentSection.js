@@ -11,8 +11,13 @@ const CommentSection = () => {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [limit] = useState(5);
+    const [pageUrl, setPageUrl] = useState('');
 
-    const pageUrl = window.location.href.split('#')[0];
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setPageUrl(window.location.href.split('#')[0]);
+        }
+    }, []);
 
     // Fetch comments
     useEffect(() => {
