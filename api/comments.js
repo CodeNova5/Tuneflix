@@ -1,16 +1,42 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Comment from '../models/Comment.js';
-
+import formidable from 'formidable';
 dotenv.config();
 
 // MongoDB Connection
 const db = process.env.MONGO_URI;
 mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
 
+export const config = {
+    api: {
+        bodyParser: false, // Disable bodyParser to handle FormData manually
+    },
+};
+
 // API route handler
 const handler = async (req, res) => {
     if (req.method === 'POST') {
+        const form = new formidable.IncomingForm();
+
+        form.parse(req, (err, fields, files) => {
+            if (err) {
+                console.error('Form parsing error:', err);
+                return res.status(500).json({ error: 'Error parsing form data' });
+            }
+
+            console.log('Parsed fields:', fields); // Debugging: Check if `pageUrl` exists
+
+            const { pageUrl, content, user, userId, userImage } = fields;
+
+            if (!pageUrl) {
+                return res.status(400).json({ error: 'pageUrl is required' });
+            }
+
+            // Proceed with saving comment
+            res.status(200).json({ message: 'Comment posted successfully' });
+        });
+
         try {
             const { pageUrl, content, user, userId, userImage, fcmtoken } = req.body;
 
