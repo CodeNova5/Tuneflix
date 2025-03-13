@@ -17,36 +17,27 @@ export const config = {
 // API route handler
 const handler = async (req, res) => {
     if (req.method === 'POST') {
-        const form = new formidable.IncomingForm();
+        const form = formidable({ multiples: true });
 
-        form.parse(req, (err, fields, files) => {
-            if (err) {
-                console.error('Form parsing error:', err);
-                return res.status(500).json({ error: 'Error parsing form data' });
-            }
+        try {
+            const [fields, files] = await form.parse(req);
 
             console.log('Parsed fields:', fields); // Debugging: Check if `pageUrl` exists
 
-            const { pageUrl, content, user, userId, userImage } = fields;
+            const { pageUrl, content, user, userId, userImage, fcmtoken } = fields;
 
             if (!pageUrl) {
                 return res.status(400).json({ error: 'pageUrl is required' });
             }
 
             // Proceed with saving comment
-            res.status(200).json({ message: 'Comment posted successfully' });
-        });
-
-        try {
-            const { pageUrl, content, user, userId, userImage, fcmtoken } = req.body;
-
             const newComment = new Comment({
-                pageUrl,
-                content,
-                user,
-                userId,
-                userImage,
-                fcmtoken,
+                pageUrl: pageUrl[0], // Since Formidable returns arrays
+                content: content[0],
+                user: user[0],
+                userId: userId[0],
+                userImage: userImage[0],
+                fcmtoken: fcmtoken ? fcmtoken[0] : null,
                 likes: [],
                 replies: [],
                 createdAt: new Date(),
