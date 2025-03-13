@@ -12,10 +12,16 @@ const CommentSection = () => {
     const [page, setPage] = useState(0);
     const [limit] = useState(5);
     const [pageUrl, setPageUrl] = useState('');
+    const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            setPageUrl(window.location.href.split('#')[0]);
+            setPageUrl('https://next-xi-opal.vercel.app'); // Set to static URL
+
+
+            // Fetch user info from localStorage
+            const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+            setCurrentUser(userInfo.data || {});
         }
     }, []);
 
@@ -39,14 +45,15 @@ const CommentSection = () => {
     // Post comment
     const postComment = async () => {
         if (!content) return alert('Comment cannot be empty');
+        if (!currentUser) return alert('User not found');
 
         const formData = new FormData();
         formData.append('pageUrl', pageUrl);
         formData.append('content', content);
-        formData.append('user', 'John Doe'); // Replace with actual user data
-        formData.append('userId', '12345'); // Replace with actual user ID
-        formData.append('userImage', '/default-avatar.png'); // Replace with actual user image
-        if (image) formData.append('image', image);
+        formData.append('user', currentUser.name || 'Guest');
+        formData.append('userId', currentUser.sub || currentUser.id || '');
+        formData.append('userImage', currentUser.picture);
+      if (image) formData.append('image', image);
         if (video) formData.append('video', video);
 
         setLoading(true);
