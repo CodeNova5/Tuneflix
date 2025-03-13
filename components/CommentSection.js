@@ -16,60 +16,74 @@ const CommentSection = () => {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            setPageUrl('https://next-xi-opal.vercel.app'); // Set to static URL
-
-
+            const url = 'https://next-xi-opal.vercel.app'; // Static URL
+            setPageUrl(url);
+    
             // Fetch user info from localStorage
             const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
             setCurrentUser(userInfo.data || {});
         }
     }, []);
-
-    // Fetch comments
+    
     useEffect(() => {
+        if (!pageUrl) return; // Prevent fetching when pageUrl is undefined
+    
         const fetchComments = async () => {
-            const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
-            const data = await response.json();
-            setComments(data);
+            try {
+                const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+                if (!response.ok) throw new Error('Failed to fetch comments');
+                const data = await response.json();
+                setComments(data);
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+            }
         };
-
+    
         fetchComments();
     }, [page, pageUrl, limit]);
-
+    
     // Handle file selection
     const handleFileChange = (e, type) => {
         if (type === 'image') setImage(e.target.files[0]);
         else setVideo(e.target.files[0]);
     };
-
-    // Post comment
     const postComment = async () => {
         if (!content) return alert('Comment cannot be empty');
         if (!currentUser) return alert('User not found');
-
+        if (!pageUrl) return alert('Page URL not found'); // Ensure pageUrl is set
+    
         const formData = new FormData();
         formData.append('pageUrl', pageUrl);
         formData.append('content', content);
         formData.append('user', currentUser.name || 'Guest');
         formData.append('userId', currentUser.sub || currentUser.id || '');
-        formData.append('userImage', currentUser.picture);
-      if (image) formData.append('image', image);
+        formData.append('userImage', currentUser.picture || '/default-avatar.png');
+        if (image) formData.append('image', image);
         if (video) formData.append('video', video);
-
+    
         setLoading(true);
-
-        const response = await fetch('/api/comments', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const newComment = await response.json();
-        setComments([newComment, ...comments]);
-        setContent('');
-        setImage(null);
-        setVideo(null);
+    
+        try {
+            const response = await fetch('/api/comments', {
+                method: 'POST',
+                body: formData,
+            });
+    
+            if (!response.ok) throw new Error('Failed to post comment');
+    
+            const newComment = await response.json();
+            setComments([newComment, ...comments]);
+            setContent('');
+            setImage(null);
+            setVideo(null);
+        } catch (error) {
+            console.error('Error posting comment:', error);
+            alert('Error posting comment');
+        }
+    
         setLoading(false);
     };
+    
 
     return (
         <div className={styles.commentSection}>
