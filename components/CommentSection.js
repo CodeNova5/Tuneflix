@@ -13,7 +13,10 @@ const CommentSection = () => {
     const [limit] = useState(5);
     const [pageUrl, setPageUrl] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
-
+    useEffect(() => {
+        window.alert("window.alert from client component");
+    }, []);
+    
     useEffect(() => {
       
             const url = 'https://next-xi-opal.vercel.app'; // Static URL
