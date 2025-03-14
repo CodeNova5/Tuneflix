@@ -15,14 +15,14 @@ const CommentSection = () => {
     const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
+      
             const url = 'https://next-xi-opal.vercel.app'; // Static URL
             setPageUrl(url);
     
             // Fetch user info from localStorage
             const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
             setCurrentUser(userInfo.data || {});
-        }
+
     }, []);
     
     useEffect(() => {
