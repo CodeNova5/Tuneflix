@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google and Facebook Login Demo</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function handleCredentialResponse(response) {
+            if (response.credential) {
+                const data = parseJwt(response.credential);
+                console.log('Decoded Google JWT:', data);
+
+                // Save Google user information in a unified local storage
+                saveUserInfo('google', data);
+
+                // Display Google user info
+                displayGoogleUserInfo(data);
+            } else {
+                console.error("Error: No Google credential received.");
+            }
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+                atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+            );
+            return JSON.parse(jsonPayload);
+        }
+
+        function displayGoogleUserInfo(data) {
+            document.getElementById('google-name').innerText = `Name: ${data.name}`;
+            document.getElementById('google-email').innerText = `Email: ${data.email}`;
+            document.getElementById('google-id').innerText = `Google ID: ${data.sub}`;
+            document.getElementById('google-profile-img').src = data.picture;
+        }
+
+        function saveUserInfo(provider, data) {
+            const userInfo = { provider, data };
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        }
+
+        function checkLocalStorage() {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (userInfo) {
+                if (userInfo.provider === 'google') {
+                    displayGoogleUserInfo(userInfo.data);
+                } else if (userInfo.provider === 'facebook') {
+                    displayFacebookUserInfo(userInfo.data);
+                }
+            }
+        }
+
+        function loginWithGoogle() {
+            google.accounts.id.prompt();
+        }
+
+        window.onload = function () {
+            checkLocalStorage();
+
+            // Initialize Google One Tap login
+            google.accounts.id.initialize({
+                client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62', // Replace with your Google client ID
+                callback: handleCredentialResponse,
+                cancel_on_tap_outside: false,
+            });
+        };
+    </script>
+</head>
+<body>
+    <h1>Google and Facebook Login Demo</h1>
+
+    <!-- Google Login Section -->
+    <h2>Google Login</h2>
+    <button onclick="loginWithGoogle()">Login with Google</button>
+    <div>
+        <p id="google-name">Name: </p>
+        <p id="google-email">Email: </p>
+        <p id="google-id">Google ID: </p>
+        <img id="google-profile-img" alt="Google Profile Image">
+    </div>
+
+    <!-- Facebook Login Section -->
+    <h2>Facebook Login</h2>
+    <button onclick="loginWithFacebook()">Login with Facebook</button>
+    <div>
+        <p id="facebook-name">Name: </p>
+        <p id="facebook-email">Email: </p>
+        <p id="facebook-id">Facebook ID: </p>
+        <img id="facebook-profile-img" alt="Facebook Profile Image">
+    </div>
+</body>
+</html>
