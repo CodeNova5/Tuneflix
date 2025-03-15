@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
-import { useLocation } from "react-router-dom";
-const location = useLocation();
+import { useRouter } from "next/navigation";
 const CommentSection = () => {
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
@@ -15,11 +14,13 @@ const CommentSection = () => {
     const [pageUrl, setPageUrl] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
     useEffect(() => {
+        
         window.alert("window.alert from client component");
     }, []);
     
     useEffect(() => {
-           
+        const router = useRouter();
+        const currentURL = typeof window !== "undefined" ? window.location.href : "";
             const url = 'https://next-xi-opal.vercel.app'; // Static URL
             setPageUrl(url);
     
@@ -92,7 +93,7 @@ const CommentSection = () => {
     return (
         
         <div className={styles.commentSection}>
-            <p>Current URL: {window.location.origin + location.pathname}</p>
+                  <p>Current URL: {currentURL}</p>
             <h1 className={styles.commentTitle}>Comment Section</h1>
             <textarea
                 className={styles.commentInput}
