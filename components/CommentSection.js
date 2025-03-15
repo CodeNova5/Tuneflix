@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
-import { useRouter } from "next/navigation";
+import { usePathname } from 'next/navigation';
 const CommentSection = () => {
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
@@ -12,6 +12,8 @@ const CommentSection = () => {
     const [page, setPage] = useState(0);
     const [limit] = useState(5);
     const [pageUrl, setPageUrl] = useState('');
+    const pathname = usePathname(); // Get the current path in Next.js
+
     const [currentUser, setCurrentUser] = useState(null);
     useEffect(() => {
         
@@ -19,11 +21,13 @@ const CommentSection = () => {
     }, []);
     
     useEffect(() => {
-        const router = useRouter();
-        const currentURL = typeof window !== "undefined" ? window.location.href : "";
-            const url = 'https://next-xi-opal.vercel.app'; // Static URL
-            setPageUrl(url);
+        if (typeof window !== 'undefined') {
+            setPageUrl(window.location.href); // Set full URL dynamically
+        }
+    }, [pathname]); // Run effect when pathname changes
+
     
+    useEffect(() => {
             // Fetch user info from localStorage
             const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
             setCurrentUser(userInfo.data || {});
@@ -93,7 +97,7 @@ const CommentSection = () => {
     return (
         
         <div className={styles.commentSection}>
-                  <p>Current URL: {currentURL}</p>
+                  <p>Current URL: {pageUrl}</p>
             <h1 className={styles.commentTitle}>Comment Section</h1>
             <textarea
                 className={styles.commentInput}
