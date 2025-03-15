@@ -1,85 +1,72 @@
+
+
 /* Comment section container */
 .comment-section {
     max-width: 800px;
     margin: 20px auto;
     padding: 15px;
-    background: #1e1e1e;
+    background: #1e1e1e; /* Darker background for the container */
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* Individual comment styling */
-.comment {
+.comment-section div {
     margin-bottom: 15px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #333; /* Lighter border for contrast */
     padding-bottom: 10px;
 }
 
-.comment:last-child {
+.comment-section div:last-child {
     border-bottom: none;
 }
 
 /* User info and avatar */
-.comment-avatar {
+.comment-section img {
     border-radius: 50%;
     vertical-align: middle;
     margin-right: 10px;
 }
 
-.comment-user {
+.comment-section strong {
     font-size: 16px;
-    color: #bbbbbb;
+    color: #bbbbbb; /* Slightly lighter gray for emphasis */
 }
 
 .time-ago {
     font-size: 12px;
-    color: #888;
+    color: #888; /* Dimmed gray for less emphasis */
 }
 
-/* Buttons */
-.comment-button {
-    background: #007BFF;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin-right: 5px;
-    font-size: 14px;
-}
-
-.comment-button:hover {
-    background: #0056b3;
-}
 
 /* Like and reply actions */
-.comment-action {
+.span {
     cursor: pointer;
     font-size: 14px;
     margin-right: 10px;
     color: #bbbbbb;
 }
 
-.comment-action:hover {
+.span:hover {
     color: #007BFF;
 }
 
 /* Reply section */
-.reply-section {
+.comment-section div div {
     margin-left: 20px;
     padding: 10px;
-    background: #2c2c2c;
+    background: #2c2c2c; /* Slightly lighter dark background */
     border-radius: 5px;
     color: #e0e0e0;
 }
 
 /* Modal styling */
-.modal {
+#edit-modal, #reply-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #1e1e1e;
+    background: #1e1e1e; /* Dark modal background */
     padding: 20px;
     border: 1px solid #444;
     border-radius: 10px;
@@ -90,31 +77,24 @@
     color: #e0e0e0;
 }
 
-.modal-textarea {
+#edit-modal textarea, 
+#reply-modal textarea {
     width: 100%;
     border: 1px solid #555;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
     font-size: 14px;
-    background: #2c2c2c;
+    background: #2c2c2c; /* Dark background for text areas */
     color: #e0e0e0;
 }
 
-/* Media content */
-.comment-media {
+/* Media content (images and videos) */
+.img[alt="Comment Image"], 
+.video {
     display: block;
     margin-top: 10px;
     border-radius: 8px;
-}
-
-/* Form styling */
-.comment-label {
-    font-size: 14px;
-    font-weight: bold;
-    display: block;
-    margin: 10px 0 5px;
-    color: #bbbbbb;
 }
 
 .comment-input {
@@ -145,17 +125,9 @@
     background: #218838;
 }
 
-/* Like button styles */
-.like-button {
-    color: #dc3545;
-}
 
-.reply-button {
-    color: #17a2b8;
-}
-
-/* Replies modal */
-.replies-modal {
+/* Replies modal styling */
+#replies-modal {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -173,23 +145,23 @@
     color: #e0e0e0;
 }
 
-.replies-modal-header {
+#replies-modal .modal-header {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #ffffff;
 }
 
-.replies-modal-body {
+#replies-modal .modal-body {
     max-height: 400px;
     overflow-y: auto;
 }
 
-.replies-modal-footer {
+#replies-modal .modal-footer {
     text-align: right;
 }
 
-.replies-modal-button {
+#replies-modal button {
     padding: 5px 10px;
     background: #dc3545;
     color: white;
@@ -198,30 +170,29 @@
     cursor: pointer;
 }
 
-.replies-modal-button:hover {
+#replies-modal button:hover {
     background: #a71d2a;
 }
 
-/* Spinner */
 .spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
+  border: 8px solid #f3f3f3; /* Light gray */
+  border-top: 8px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
