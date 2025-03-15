@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
-
+import { useLocation } from "react-router-dom";
+const location = useLocation();
 const CommentSection = () => {
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
@@ -18,7 +19,7 @@ const CommentSection = () => {
     }, []);
     
     useEffect(() => {
-      
+           
             const url = 'https://next-xi-opal.vercel.app'; // Static URL
             setPageUrl(url);
     
@@ -58,9 +59,9 @@ const CommentSection = () => {
         const formData = new FormData();
         formData.append('pageUrl', pageUrl);
         formData.append('content', content);
-        formData.append('user', currentUser.name || 'Guest');
-        formData.append('userId', currentUser.sub || currentUser.id || '');
-        formData.append('userImage', currentUser.picture || '/default-avatar.png');
+        formData.append('user', currentUser.name);
+        formData.append('userId', currentUser.sub || currentUser.id);
+        formData.append('userImage', currentUser.picture);
         if (image) formData.append('image', image);
         if (video) formData.append('video', video);
     
@@ -89,7 +90,9 @@ const CommentSection = () => {
     
 
     return (
+        
         <div className={styles.commentSection}>
+            <p>Current URL: {window.location.origin + location.pathname}</p>
             <h1 className={styles.commentTitle}>Comment Section</h1>
             <textarea
                 className={styles.commentInput}
