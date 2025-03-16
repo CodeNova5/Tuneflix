@@ -6,6 +6,7 @@ export default function FileUpload() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
 
+  // Handle file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -13,6 +14,7 @@ export default function FileUpload() {
     }
   };
 
+  // Upload function
   const uploadImage = async () => {
     if (!selectedFile) {
       setMessage('Please select a file first.');
@@ -22,26 +24,41 @@ export default function FileUpload() {
     setUploading(true);
     setMessage('');
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
+    // Convert the file to Base64
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedFile);
+    reader.onload = async () => {
+      const base64String = reader.result.split(',')[1]; // Remove data prefix
 
-    try {
-      const response = await fetch('/api/uploadImage', {
-        method: 'POST',
-        body: formData,
-      });
+      try {
+        const response = await fetch('/api/uploadImage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileName: selectedFile.name,
+            fileContent: base64String,
+          }),
+        });
 
-      const data = await response.json();
-      if (response.ok) {
-        setMessage('Upload successful!');
-      } else {
-        setMessage(`Upload failed: ${data.message}`);
+        const data = await response.json();
+        if (response.ok) {
+          setMessage('Upload successful!');
+        } else {
+          setMessage(`Upload failed: ${data.message}`);
+        }
+      } catch (error) {
+        setMessage('Error uploading file.');
       }
-    } catch (error) {
-      setMessage('Error uploading file.');
-    }
 
-    setUploading(false);
+      setUploading(false);
+    };
+
+    reader.onerror = () => {
+      setMessage('Error reading file.');
+      setUploading(false);
+    };
   };
 
   return (
@@ -51,6 +68,25 @@ export default function FileUpload() {
         {uploading ? 'Uploading...' : 'Upload'}
       </button>
       {message && <p>{message}</p>}
+
+      <style jsx>{`
+        .upload-container {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          width: 300px;
+        }
+        button {
+          background-color: #0070f3;
+          color: white;
+          padding: 10px;
+          border: none;
+          cursor: pointer;
+        }
+        button:disabled {
+          background-color: #ccc;
+        }
+      `}</style>
     </div>
   );
 }
