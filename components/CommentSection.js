@@ -65,6 +65,33 @@ const CommentSection = () => {
         if (pageUrl) fetchComments();
     }, [page, pageUrl, limit]);
     
+    async function deleteComment(commentId) {
+        const confirmDelete = confirm("Are you sure you want to delete this comment and all its replies?");
+        if (!confirmDelete) return;
+      
+        try {
+          const response = await fetch(`/api/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),
+          });
+      
+          const data = await response.json();
+      
+          if (!response.ok) {
+            throw new Error(data.message || "Failed to delete the comment.");
+          }
+      
+          alert('Comment deleted successfully.');
+          fetchComments(); // Refresh the comments after deletion
+        } catch (error) {
+          console.error('Error deleting comment:', error);
+          alert(error.message);
+        }
+      }
+      
     const saveEdit = async () => {
         if (!editContent.trim()) {
             alert("Comment cannot be empty.");
