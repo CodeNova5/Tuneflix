@@ -146,39 +146,43 @@ const CommentSection = () => {
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
 
-            <div className={styles.commentList}>
+            <div className={styles.commentSection}>
                 {formattedComments.map((comment) => {
                     const isOwner =
                         currentUser &&
                         (currentUser.sub === comment.userId || currentUser.id === comment.userId);
 
                     return (
-                        <div key={comment._id}>
-                            <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} width="40" />
-                            <div>
+                        <div key={comment._id} className={styles.commentContainer}>
+                        <div className={styles.commentHeader}>
+                            <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} />
+                            <div className={styles.commentDetails}>
                                 <strong className={styles.commentUser}>{comment.user}</strong>
-                                - <span className={styles.commentDate}>{comment.timeAgo}</span>
-                                <p className={styles.commentText}>{comment.content}</p>
-                                {comment.image && <img className={styles.img} src={comment.image} alt="Comment" width="200" />}
-                                {comment.video && <video className={styles.video} src={comment.video} controls width="300"></video>}
-                                <div className={styles.commentActions}>
-                                    <span className={styles.span} onClick={() => toggleLike(comment._id, comment.userLiked)}>
-                                        {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
-                                    </span>
-
-                                    {isOwner && (
-                                        <>
-                                            <button className={styles.editButton} onClick={() => editComment(comment._id, comment.content)}>Edit</button>
-                                            <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
-                                        </>
-                                    )}
-                                </div>
-                                <div className={styles.replyActions}>
-                                    <button className={styles.replyButton} onClick={() => replyToComment(comment._id)}>Reply</button>
-                                    <button className={styles.viewRepliesButton} onClick={() => showReplies(comment._id)}>View Replies</button>
-                                </div>
+                                <span className={styles.timeAgo}>{comment.timeAgo}</span>
                             </div>
                         </div>
+                        <p className={styles.commentText}>{comment.content}</p>
+                        {comment.image && <img className={styles.commentImage} src={comment.image} alt="Comment" />}
+                        {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
+                        
+                        <div className={styles.commentActions}>
+                            <span className={styles.likeButton} onClick={() => toggleLike(comment._id, comment.userLiked)}>
+                                {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
+                            </span>
+                            {isOwner && (
+                                <>
+                                    <button className={styles.editButton} onClick={() => editComment(comment._id, comment.content)}>Edit</button>
+                                    <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
+                                </>
+                            )}
+                        </div>
+                        
+                        <div className={styles.replyActions}>
+                            <button className={styles.replyButton} onClick={() => replyToComment(comment._id)}>Reply</button>
+                            <button className={styles.viewRepliesButton} onClick={() => showReplies(comment._id)}>View Replies</button>
+                        </div>
+                    </div>
+                    
                     );
                 })}
             </div>

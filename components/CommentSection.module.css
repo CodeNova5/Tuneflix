@@ -1,63 +1,63 @@
-
-
-/* Comment section container */
-.comment-section {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 15px;
-    background: #1e1e1e; /* Darker background for the container */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+.commentContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
 }
 
-/* Individual comment styling */
-.comment-section div {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #333; /* Lighter border for contrast */
-    padding-bottom: 10px;
+.commentHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.comment-section div:last-child {
-    border-bottom: none;
-}
-
-/* User info and avatar */
-.comment-section img {
+.commentAvatar {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    vertical-align: middle;
-    margin-right: 10px;
 }
 
-.comment-section strong {
-    font-size: 16px;
-    color: #bbbbbb; /* Slightly lighter gray for emphasis */
+.commentDetails {
+    display: flex;
+    flex-direction: column;
 }
 
-.time-ago {
-    font-size: 12px;
-    color: #888; /* Dimmed gray for less emphasis */
+.commentUser {
+    font-weight: bold;
 }
 
-
-/* Like and reply actions */
-.span {
-    cursor: pointer;
-    font-size: 14px;
-    margin-right: 10px;
-    color: #bbbbbb;
+.timeAgo {
+    font-size: 0.9em;
+    color: #777;
 }
 
-.span:hover {
-    color: #007BFF;
+.commentText {
+    margin: 5px 0;
 }
 
-/* Reply section */
-.comment-section div div {
-    margin-left: 20px;
-    padding: 10px;
-    background: #2c2c2c; /* Slightly lighter dark background */
+.commentImage, .commentVideo {
+    max-width: 100%;
     border-radius: 5px;
-    color: #e0e0e0;
+}
+
+.commentActions, .replyActions {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.likeButton, .editButton, .deleteButton, .replyButton, .viewRepliesButton {
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 5px;
+    border: none;
+    background: none;
+    color: #007bff;
+}
+
+.editButton:hover, .deleteButton:hover, .replyButton:hover, .viewRepliesButton:hover {
+    text-decoration: underline;
 }
 
 /* Modal styling */
