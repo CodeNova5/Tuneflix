@@ -19,24 +19,8 @@ const CommentSection = () => {
     const [editingComment, setEditingComment] = useState(null);
     const [editContent, setEditContent] = useState("");
 
-    useEffect(() => {
-        if (!pageUrl) return; // Prevent fetching when pageUrl is undefined
 
-        const fetchComments = async () => {
-            try {
-                const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
-                if (!response.ok) throw new Error('Failed to fetch comments');
-                const data = await response.json();
-                setComments(data);
-            } catch (error) {
-                console.error('Error fetching comments:', error);
-            }
-        };
 
-        fetchComments();
-    }, [page, pageUrl, limit]);
-
-    
     // Function to format the time ago
     const formatTimeAgo = (date) => {
         const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -64,41 +48,56 @@ const CommentSection = () => {
         setEditingComment(comment);  // Store the full comment object
         setEditContent(comment.content);  // Set the text area value
     };
-;    
-    
-const saveEdit = async () => {
-    if (!editContent.trim()) {
-        alert("Comment cannot be empty.");
-        return;
-    }
+    ;
 
-    try {
-        const response = await fetch(`/api/comments/${editingComment._id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userId: currentUser.sub || currentUser.id,
-                content: editContent,
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+    const fetchComments = async () => {
+        try {
+            const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+            if (!response.ok) throw new Error('Failed to fetch comments');
+            const data = await response.json();
+            setComments(data);
+        } catch (error) {
+            console.error('Error fetching comments:', error);
         }
-
-        alert("Comment updated successfully.");
-        setEditingComment(null);
-
-        // Fetch updated comments
-        await fetchComments();
-    } catch (error) {
-        console.error("Error updating comment:", error);
-        alert("Failed to update the comment.");
-    }
-};
-
+    };
+    
+    useEffect(() => {
+        if (pageUrl) fetchComments();
+    }, [page, pageUrl, limit]);
+    
+    const saveEdit = async () => {
+        if (!editContent.trim()) {
+            alert("Comment cannot be empty.");
+            return;
+        }
+    
+        try {
+            const response = await fetch(`/api/comments/${editingComment._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    userId: currentUser.sub || currentUser.id,
+                    content: editContent,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            alert("Comment updated successfully.");
+            setEditingComment(null);
+    
+            // Fetch updated comments
+            await fetchComments();
+        } catch (error) {
+            console.error("Error updating comment:", error);
+            alert("Failed to update the comment.");
+        }
+    };
+    
     useEffect(() => {
         setFormattedComments(
             comments.map((comment) => ({
