@@ -18,6 +18,25 @@ const CommentSection = () => {
     const [formattedComments, setFormattedComments] = useState([]);
     const [editingComment, setEditingComment] = useState(null);
     const [editContent, setEditContent] = useState("");
+
+    useEffect(() => {
+        if (!pageUrl) return; // Prevent fetching when pageUrl is undefined
+
+        const fetchComments = async () => {
+            try {
+                const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+                if (!response.ok) throw new Error('Failed to fetch comments');
+                const data = await response.json();
+                setComments(data);
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+            }
+        };
+
+        fetchComments();
+    }, [page, pageUrl, limit]);
+
+    
     // Function to format the time ago
     const formatTimeAgo = (date) => {
         const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -101,22 +120,6 @@ const saveEdit = async () => {
         setCurrentUser(userInfo.data ? userInfo.data : null);
     }, []);
 
-    useEffect(() => {
-        if (!pageUrl) return; // Prevent fetching when pageUrl is undefined
-
-        const fetchComments = async () => {
-            try {
-                const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
-                if (!response.ok) throw new Error('Failed to fetch comments');
-                const data = await response.json();
-                setComments(data);
-            } catch (error) {
-                console.error('Error fetching comments:', error);
-            }
-        };
-
-        fetchComments();
-    }, [page, pageUrl, limit]);
 
     // Handle file selection
     const handleFileChange = (e, type) => {
