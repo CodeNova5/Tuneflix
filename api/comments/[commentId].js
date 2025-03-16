@@ -4,6 +4,14 @@ import Comment from '../../models/Comment';
 export default async function handler(req, res) {
   await dbConnect(); // Ensure the database connection is established
 
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins (change to specific domains if needed)
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end(); // Preflight request response
+  }
+
   const { commentId } = req.query; // Extract commentId from the URL
 
   if (req.method === 'PUT') {
