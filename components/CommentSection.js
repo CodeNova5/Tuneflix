@@ -16,6 +16,14 @@ const CommentSection = () => {
 
     const [formattedComments, setFormattedComments] = useState([]);
 
+    useEffect(() => {
+      setFormattedComments(
+        comments.map((comment) => ({
+          ...comment,
+          timeAgo: formatTimeAgo(new Date(comment.createdAt)),
+        }))
+      );
+    }, [comments]);
     // Function to format the time ago
     const formatTimeAgo = (date) => {
       const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -45,14 +53,6 @@ const CommentSection = () => {
             setPageUrl(window.location.href); // Set full URL dynamically
         }
     }, [pathname]); // Run effect when pathname changes
-
-    useEffect(() => {
-        const formatted = comments.map(comment => ({
-          ...comment,
-          timeAgo: formatTimeAgo(comment.date),  // Add formatted date here
-        }));
-        setFormattedComments(formatted);
-      }, [comments]);
 
     useEffect(() => {
         // Fetch user info from localStorage
@@ -146,7 +146,7 @@ const CommentSection = () => {
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
             <div className={styles.commentSection}>
-                {comments.map((comment) => (
+                 {formattedComments.map((comment) => (
                     <div key={comment._id}>
                         <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} width="40" />
                         <div>
