@@ -24,7 +24,7 @@ const handler = async (req, res) => {
 
             console.log('Parsed fields:', fields); // Debugging: Check if `pageUrl` and other fields exist
 
-            const { pageUrl, content, user, userId, userImage, fcmtoken, image, video } = fields;
+            const { pageUrl, content, user, userId, userImage, fcmtoken, imagePath, videoPath } = fields;
 
             if (!pageUrl) {
                 return res.status(400).json({ error: 'pageUrl is required' });

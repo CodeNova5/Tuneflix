@@ -216,8 +216,8 @@ const CommentSection = () => {
     }
 
     // Add the file paths to the form data before submitting
-    if (uploadedImagePath) formData.append('image', uploadedImagePath);
-    if (uploadedVideoPath) formData.append('video', uploadedVideoPath);
+    if (uploadedImagePath) formData.append('imagePath', uploadedImagePath);
+    if (uploadedVideoPath) formData.append('videoPath', uploadedVideoPath);
 
     setLoading(true);
 
