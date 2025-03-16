@@ -1,11 +1,40 @@
-import Comment from '../../models/Comment';
 import mongoose from 'mongoose';
 
-export default async function handler(req, res) {
 const db = process.env.MONGO_URI;
 mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
 
-  const { commentId } = req.query; // Extract commentId from the URL
+// Define the Comment schema directly
+// Reply schema
+const replySchema = new mongoose.Schema({
+    content: { type: String },
+    replyTo: { type: String, required: true },
+    user: { type: String, required: true },
+    userId: { type: String, required: true },
+    userImage: { type: String },
+    createdAt: { type: Date, default: Date.now },
+    replies: [nestedReplySchema1], // Replies to replies
+    likes: [{ type: String }],
+    media: { type: String },
+});
+
+// Main comment schema
+const commentSchema = new mongoose.Schema({
+    pageUrl: { type: String, required: true, index: true },
+    content: { type: String },
+    user: { type: String, required: true },
+    userId: { type: String, required: true },
+    userImage: { type: String },
+    fcmtoken: { type: String },
+    createdAt: { type: Date, default: Date.now },
+    replies: [replySchema], // Replies to the main comment
+    likes: [{ type: String }],
+    image: { type: String }, // Path to uploaded image
+    video: { type: String },
+});
+const Comment = mongoose.models.Comment || mongoose.model('Comment', CommentSchema);
+
+export default async function handler(req, res) {
+  const { commentId } = req.query;
 
   if (req.method === 'PUT') {
     const { userId, content } = req.body;
