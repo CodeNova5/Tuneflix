@@ -53,7 +53,7 @@ const CommentSection = () => {
         }
     
         try {
-          await fetch(`https://netdot12-github-io.vercel.app/comments/${editingComment._id}`, {
+          await fetch(`https://netdot12-github-io.vercel.app/api/comments/${editingComment._id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
