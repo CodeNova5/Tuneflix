@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
     const owner = 'Netdot12';
     const repo = 'next';
-    const path = `/comment/${fileName}`;
+    const path = `public/comment/${fileName}`;
 
     let sha;
     try {
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       message: 'File uploaded successfully',
       data: response.data,
-      path: `/public/comment/${fileName}`,
+      path: `/comment/${fileName}`,
     });
   } catch (error) {
     console.error('Error uploading file:', error);
