@@ -119,9 +119,13 @@ const CommentSection = () => {
 
         setLoading(false);
     };
+    const isOwner =
+    currentUser &&
+    (currentUser.sub === comment.userId || currentUser.id === comment.userId);
 
 
     return (
+        
 
         <div className={styles.commentSection}>
 
@@ -145,13 +149,15 @@ const CommentSection = () => {
             <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
+
             <div className={styles.commentSection}>
                  {formattedComments.map((comment) => (
+                    
                     <div key={comment._id}>
                         <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} width="40" />
                         <div>
                             <strong className={styles.commentUser}>{comment.user}</strong>
-                            <span className={styles.commentDate}>{comment.timeAgo}</span>
+                           -  <span className={styles.commentDate}>{comment.timeAgo}</span>
                             <p className={styles.commentText}>{comment.content}</p>
                             {comment.image && <img className={styles.img} src={comment.image} alt="Comment" width="200" />}
                             {comment.video && <video className={styles.video} src={comment.video} controls width="300"></video>}
