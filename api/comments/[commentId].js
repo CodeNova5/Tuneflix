@@ -1,8 +1,9 @@
-import dbConnect from '../../lib/mongodb';
 import Comment from '../../models/Comment';
+import mongoose from 'mongoose';
 
 export default async function handler(req, res) {
-  await dbConnect(); // Ensure the database connection is established
+const db = process.env.MONGO_URI;
+mongoose.connect(db).then(() => console.log('MongoDB connected')).catch(err => console.error(err));
 
   const { commentId } = req.query; // Extract commentId from the URL
 
