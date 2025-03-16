@@ -15,7 +15,9 @@ const CommentSection = () => {
     const [pageUrl, setPageUrl] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
     const pathname = usePathname(); // Get the current path in Next.js
-
+    const [formattedComments, setFormattedComments] = useState([]);
+    const [editingComment, setEditingComment] = useState(null);
+    const [editContent, setEditContent] = useState("");
     // Function to format the time ago
     const formatTimeAgo = (date) => {
         const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -39,8 +41,37 @@ const CommentSection = () => {
 
         return "Just now";
     };
-
-    const [formattedComments, setFormattedComments] = useState([]);
+    const handleEdit = (comment) => {
+        setEditingComment(comment);
+        setEditContent(comment.content);
+      };
+    
+      const saveEdit = async () => {
+        if (!editContent.trim()) {
+          alert("Comment cannot be empty.");
+          return;
+        }
+    
+        try {
+          await fetch(`https://netdot12-github-io.vercel.app/comments/${editingComment._id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: currentUser.sub || currentUser.id,
+              content: editContent,
+            }),
+          });
+    
+          alert("Comment updated successfully.");
+          setEditingComment(null);
+          fetchComments(); // Refresh comments
+        } catch (error) {
+          console.error("Error updating comment:", error);
+          alert("Failed to update the comment.");
+        }
+      };
 
     useEffect(() => {
         setFormattedComments(
@@ -151,7 +182,7 @@ const CommentSection = () => {
                     const isOwner =
                         currentUser &&
                         (currentUser.sub === comment.userId || currentUser.id === comment.userId);
-
+                        
                     return (
                         <div key={comment._id} className={styles.commentContainer}>
                         <div className={styles.commentHeader}>
@@ -188,6 +219,23 @@ const CommentSection = () => {
             </div>
 
             <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
+         {/* Edit Comment Modal */}
+      {editingComment && (
+        <div className={styles.editModal}>
+          <div className={styles.editModalContent}>
+            <h3>Edit Comment</h3>
+            <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className={styles.editTextarea}></textarea>
+            <div className={styles.editButtons}>
+              <button onClick={saveEdit} className={styles.saveEditButton}>
+                Save
+              </button>
+              <button onClick={() => setEditingComment(null)} className={styles.cancelEditButton}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
         </div>
     );
 };
