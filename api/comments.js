@@ -22,9 +22,9 @@ const handler = async (req, res) => {
         try {
             const [fields, files] = await form.parse(req);
 
-            console.log('Parsed fields:', fields); // Debugging: Check if `pageUrl` exists
+            console.log('Parsed fields:', fields); // Debugging: Check if `pageUrl` and other fields exist
 
-            const { pageUrl, content, user, userId, userImage, fcmtoken } = fields;
+            const { pageUrl, content, user, userId, userImage, fcmtoken, image, video } = fields;
 
             if (!pageUrl) {
                 return res.status(400).json({ error: 'pageUrl is required' });
@@ -38,6 +38,8 @@ const handler = async (req, res) => {
                 userId: userId[0],
                 userImage: userImage[0],
                 fcmtoken: fcmtoken ? fcmtoken[0] : null,
+                image: imagePath ? imagePath[0] : null,
+                video: videoPath ? videoPath[0] : null,
                 likes: [],
                 replies: [],
                 createdAt: new Date(),
