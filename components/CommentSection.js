@@ -47,32 +47,38 @@ const CommentSection = () => {
     };
 ;    
     
-      const saveEdit = async () => {
-        if (!editContent.trim()) {
-          alert("Comment cannot be empty.");
-          return;
-        }
-    
-        try {
-          await fetch(`/api/comments/${editingComment._id}`, {
+const saveEdit = async () => {
+    if (!editContent.trim()) {
+        alert("Comment cannot be empty.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/comments/${editingComment._id}`, {
             method: "PUT",
             headers: {
-              "Content-Type": "application/json",
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              userId: currentUser.sub || currentUser.id,
-              content: editContent,
+                userId: currentUser.sub || currentUser.id,
+                content: editContent,
             }),
-          });
-    
-          alert("Comment updated successfully.");
-          setEditingComment(null);
-          fetchComments(); // Refresh comments
-        } catch (error) {
-          console.error("Error updating comment:", error);
-          alert("Failed to update the comment.");
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      };
+
+        alert("Comment updated successfully.");
+        setEditingComment(null);
+
+        // Fetch updated comments
+        await fetchComments();
+    } catch (error) {
+        console.error("Error updating comment:", error);
+        alert("Failed to update the comment.");
+    }
+};
 
     useEffect(() => {
         setFormattedComments(
