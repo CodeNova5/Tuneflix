@@ -12,7 +12,7 @@ const replySchema = new mongoose.Schema({
     userId: { type: String, required: true },
     userImage: { type: String },
     createdAt: { type: Date, default: Date.now },
-    replies: [nestedReplySchema1], // Replies to replies
+    replies: [], // Replies to replies
     likes: [{ type: String }],
     media: { type: String },
 });
