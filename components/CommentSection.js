@@ -202,7 +202,7 @@ const CommentSection = () => {
                             </span>
                             {isOwner && (
                                 <>
-                                    <button className={styles.editButton} onClick={() => editComment(comment._id, comment.content)}>Edit</button>
+                                    <button className={styles.editButton} onClick={() => handleEdit(comment._id, comment.content)}>Edit</button>
                                     <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
                                 </>
                             )}
