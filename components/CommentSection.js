@@ -42,9 +42,10 @@ const CommentSection = () => {
         return "Just now";
     };
     const handleEdit = (comment) => {
-        setEditingComment(comment);
-        setEditContent(comment.content);
-      };
+        setEditingComment(comment);  // Store the full comment object
+        setEditContent(comment.content);  // Set the text area value
+    };
+;    
     
       const saveEdit = async () => {
         if (!editContent.trim()) {
@@ -202,7 +203,7 @@ const CommentSection = () => {
                             </span>
                             {isOwner && (
                                 <>
-                                    <button className={styles.editButton} onClick={() => handleEdit(comment._id, comment.content)}>Edit</button>
+                                    <button className={styles.editButton} onClick={() => handleEdit(comment)}>Edit</button>
                                     <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
                                 </>
                             )}
