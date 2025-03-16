@@ -158,7 +158,7 @@ const CommentSection = () => {
           const reader = new FileReader();
           reader.readAsDataURL(file);
           reader.onload = () => {
-            const base64String = reader.result.split(',')[1]; // Remove the "data:image/png;base64," prefix
+            const base64String = reader.result.split(',')[1]; // Remove the "data:image/png;base64," prefix ok
             resolve(base64String);
           };
           reader.onerror = error => reject(error);
