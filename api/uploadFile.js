@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
     const owner = 'Netdot12';
     const repo = 'next';
-    const path = `images/${fileName}`;
+    const path = `public/comment/${fileName}`;
 
     let sha;
     try {
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       console.log('File does not exist and will be created.');
     }
 
-    const commitMessage = sha ? 'Update image file' : 'Add new image file';
+    const commitMessage = sha ? 'Update file' : 'Add new file';
 
     const response = await octokit.rest.repos.createOrUpdateFileContents({
       owner,
@@ -39,8 +39,9 @@ export default async function handler(req, res) {
     });
 
     return res.status(200).json({
-      message: 'Image uploaded successfully',
+      message: 'File uploaded successfully',
       data: response.data,
+      path: `/public/comment/${fileName}`,
     });
   } catch (error) {
     console.error('Error uploading file:', error);

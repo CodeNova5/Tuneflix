@@ -64,7 +64,7 @@ const CommentSection = () => {
     useEffect(() => {
         if (pageUrl) fetchComments();
     }, [page, pageUrl, limit]);
-    
+
     async function deleteComment(commentId) {
         const confirmDelete = confirm("Are you sure you want to delete this comment and all its replies?");
         if (!confirmDelete) return;
@@ -153,42 +153,84 @@ const CommentSection = () => {
         else setVideo(e.target.files[0]);
     };
 
-    const postComment = async () => {
-        if (!content) return alert('Comment cannot be empty');
-        if (!currentUser) return alert('User not found');
-        if (!pageUrl) return alert('Page URL not found'); // Ensure pageUrl is set
 
-        const formData = new FormData();
-        formData.append('pageUrl', pageUrl);
-        formData.append('content', content);
-        formData.append('user', currentUser.name);
-        formData.append('userId', currentUser.sub || currentUser.id);
-        formData.append('userImage', currentUser.picture);
-        if (image) formData.append('image', image);
-        if (video) formData.append('video', video);
-
-        setLoading(true);
-
-        try {
-            const response = await fetch('/api/comments', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) throw new Error('Failed to post comment');
-
-            const newComment = await response.json();
-            setComments([newComment, ...comments]);
-            setContent('');
-            setImage(null);
-            setVideo(null);
-        } catch (error) {
-            console.error('Error posting comment:', error);
-            alert('Error posting comment');
+    async function uploadFileToGitHub(file, type) {
+        // Convert file to base64
+        const base64Content = await convertFileToBase64(file);
+    
+        const fileName = file.name;
+        // Call the GitHub upload API (from your previous code)
+        const uploadResponse = await fetch('/api/uploadFile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fileName: fileName,
+                fileContent: base64Content
+            })
+        });
+    
+        const uploadData = await uploadResponse.json();
+    
+        if (!uploadResponse.ok) {
+            throw new Error('Failed to upload file to GitHub');
         }
+    
+        return uploadData.path;  // Assuming the GitHub API response contains the download URL
+    }
+    
+    const postComment = async () => {
+    if (!content) return alert('Comment cannot be empty');
+    if (!currentUser) return alert('User not found');
+    if (!pageUrl) return alert('Page URL not found'); // Ensure pageUrl is set
 
-        setLoading(false);
-    };
+    const formData = new FormData();
+    formData.append('pageUrl', pageUrl);
+    formData.append('content', content);
+    formData.append('user', currentUser.name);
+    formData.append('userId', currentUser.sub || currentUser.id);
+    formData.append('userImage', currentUser.picture);
+
+    // Handle file upload to GitHub if an image or video is selected
+    let uploadedImagePath = '';
+    let uploadedVideoPath = '';
+
+    if (image) {
+        const imagePath = await uploadFileToGitHub(image, 'image'); // Call your previous upload function for image
+        uploadedImagePath = imagePath;  // Get the path from the upload function
+    }
+
+    if (video) {
+        const videoPath = await uploadFileToGitHub(video, 'video'); // Call your previous upload function for video
+        uploadedVideoPath = videoPath; // Get the path from the upload function
+    }
+
+    // Add the file paths to the form data before submitting
+    if (uploadedImagePath) formData.append('image', uploadedImagePath);
+    if (uploadedVideoPath) formData.append('video', uploadedVideoPath);
+
+    setLoading(true);
+
+    try {
+        const response = await fetch('/api/comments', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) throw new Error('Failed to post comment');
+
+        const newComment = await response.json();
+        setComments([newComment, ...comments]);
+        setContent('');
+        setImage(null);
+        setVideo(null);
+    } catch (error) {
+        console.error('Error posting comment:', error);
+        alert('Error posting comment');
+    }
+
+    setLoading(false);
+};
+
 
     return (
         <div className={styles.commentSection}>
