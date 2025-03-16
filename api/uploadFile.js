@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
     const owner = 'Netdot12';
     const repo = 'next';
-    const path = `public/comment/${fileName}`;
+    const path = `/comment/${fileName}`;
 
     let sha;
     try {
