@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
+
 const CommentSection = () => {
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
@@ -12,42 +13,44 @@ const CommentSection = () => {
     const [page, setPage] = useState(0);
     const [limit] = useState(5);
     const [pageUrl, setPageUrl] = useState('');
+    const [currentUser, setCurrentUser] = useState(null);
     const pathname = usePathname(); // Get the current path in Next.js
+
+    // Function to format the time ago
+    const formatTimeAgo = (date) => {
+        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+        let interval = Math.floor(seconds / 31536000);
+        if (interval >= 1) return interval === 1 ? "1 year ago" : `${interval} years ago`;
+
+        interval = Math.floor(seconds / 2592000);
+        if (interval >= 1) return interval === 1 ? "1 month ago" : `${interval} months ago`;
+
+        interval = Math.floor(seconds / 604800);
+        if (interval >= 1) return interval === 1 ? "1 week ago" : `${interval} weeks ago`;
+
+        interval = Math.floor(seconds / 86400);
+        if (interval >= 1) return interval === 1 ? "1 day ago" : `${interval} days ago`;
+
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) return interval === 1 ? "1 hour ago" : `${interval} hours ago`;
+
+        interval = Math.floor(seconds / 60);
+        if (interval >= 1) return interval === 1 ? "1 minute ago" : `${interval} minutes ago`;
+
+        return "Just now";
+    };
 
     const [formattedComments, setFormattedComments] = useState([]);
 
     useEffect(() => {
-      setFormattedComments(
-        comments.map((comment) => ({
-          ...comment,
-          timeAgo: formatTimeAgo(new Date(comment.createdAt)),
-        }))
-      );
+        setFormattedComments(
+            comments.map((comment) => ({
+                ...comment,
+                timeAgo: formatTimeAgo(new Date(comment.createdAt)),
+            }))
+        );
     }, [comments]);
-    // Function to format the time ago
-    const formatTimeAgo = (date) => {
-      const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-      let interval = Math.floor(seconds / 31536000);
-      if (interval >= 1) return interval === 1 ? "1 year ago" : `${interval} years ago`;
-  
-      interval = Math.floor(seconds / 2592000);
-      if (interval >= 1) return interval === 1 ? "1 month ago" : `${interval} months ago`;
-  
-      interval = Math.floor(seconds / 604800);
-      if (interval >= 1) return interval === 1 ? "1 week ago" : `${interval} weeks ago`;
-  
-      interval = Math.floor(seconds / 86400);
-      if (interval >= 1) return interval === 1 ? "1 day ago" : `${interval} days ago`;
-  
-      interval = Math.floor(seconds / 3600);
-      if (interval >= 1) return interval === 1 ? "1 hour ago" : `${interval} hours ago`;
-  
-      interval = Math.floor(seconds / 60);
-      if (interval >= 1) return interval === 1 ? "1 minute ago" : `${interval} minutes ago`;
-  
-      return "Just now";
-    };
-    const [currentUser, setCurrentUser] = useState(null);
+
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setPageUrl(window.location.href); // Set full URL dynamically
@@ -57,8 +60,7 @@ const CommentSection = () => {
     useEffect(() => {
         // Fetch user info from localStorage
         const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
-        setCurrentUser(userInfo.data || {});
-
+        setCurrentUser(userInfo.data ? userInfo.data : null);
     }, []);
 
     useEffect(() => {
@@ -83,6 +85,7 @@ const CommentSection = () => {
         if (type === 'image') setImage(e.target.files[0]);
         else setVideo(e.target.files[0]);
     };
+
     const postComment = async () => {
         if (!content) return alert('Comment cannot be empty');
         if (!currentUser) return alert('User not found');
@@ -119,16 +122,9 @@ const CommentSection = () => {
 
         setLoading(false);
     };
-    const isOwner =
-    currentUser &&
-    (currentUser.sub === comment.userId || currentUser.id === comment.userId);
-
 
     return (
-        
-
         <div className={styles.commentSection}>
-
             <h1 className={styles.commentTitle}>Comment Section</h1>
             <textarea
                 className={styles.commentInput}
@@ -150,37 +146,41 @@ const CommentSection = () => {
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
 
-            <div className={styles.commentSection}>
-                 {formattedComments.map((comment) => (
-                    
-                    <div key={comment._id}>
-                        <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} width="40" />
-                        <div>
-                            <strong className={styles.commentUser}>{comment.user}</strong>
-                           -  <span className={styles.commentDate}>{comment.timeAgo}</span>
-                            <p className={styles.commentText}>{comment.content}</p>
-                            {comment.image && <img className={styles.img} src={comment.image} alt="Comment" width="200" />}
-                            {comment.video && <video className={styles.video} src={comment.video} controls width="300"></video>}
-                            <div className={styles.commentActions}>
-                                <span className={styles.span} onClick={() => toggleLike(comment._id, comment.userLiked)}>
-                                    {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
-                                </span>
+            <div className={styles.commentList}>
+                {formattedComments.map((comment) => {
+                    const isOwner =
+                        currentUser &&
+                        (currentUser.sub === comment.userId || currentUser.id === comment.userId);
 
-                                {comment.isOwner && (
-                                    <>
-                                        <button className={styles.editButton} onClick={() => editComment(comment._id, comment.content)}>Edit</button>
-                                        <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
-                                    </>
-                                )}
-                            </div>
+                    return (
+                        <div key={comment._id}>
+                            <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} width="40" />
+                            <div>
+                                <strong className={styles.commentUser}>{comment.user}</strong>
+                                - <span className={styles.commentDate}>{comment.timeAgo}</span>
+                                <p className={styles.commentText}>{comment.content}</p>
+                                {comment.image && <img className={styles.img} src={comment.image} alt="Comment" width="200" />}
+                                {comment.video && <video className={styles.video} src={comment.video} controls width="300"></video>}
+                                <div className={styles.commentActions}>
+                                    <span className={styles.span} onClick={() => toggleLike(comment._id, comment.userLiked)}>
+                                        {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
+                                    </span>
 
-                            <div className={styles.replyActions}>
-                                <button className={styles.replyButton} onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}>Reply</button>
-                                <button className={styles.viewRepliesButton} onClick={() => showReplies(comment._id)}>View Replies</button>
+                                    {isOwner && (
+                                        <>
+                                            <button className={styles.editButton} onClick={() => editComment(comment._id, comment.content)}>Edit</button>
+                                            <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
+                                        </>
+                                    )}
+                                </div>
+                                <div className={styles.replyActions}>
+                                    <button className={styles.replyButton} onClick={() => replyToComment(comment._id)}>Reply</button>
+                                    <button className={styles.viewRepliesButton} onClick={() => showReplies(comment._id)}>View Replies</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
