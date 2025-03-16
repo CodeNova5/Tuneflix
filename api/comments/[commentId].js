@@ -31,7 +31,9 @@ const commentSchema = new mongoose.Schema({
     image: { type: String }, // Path to uploaded image
     video: { type: String },
 });
-const Comment = mongoose.models.Comment || mongoose.model('Comment', CommentSchema);
+
+// Correcting the schema reference here
+const Comment = mongoose.models.Comment || mongoose.model('Comment', commentSchema);
 
 export default async function handler(req, res) {
   const { commentId } = req.query;
