@@ -215,10 +215,13 @@ const CommentSection = () => {
         uploadedVideoPath = videoPath; // Get the path from the upload function
     }
 
-    // Add the file paths to the form data before submitting
-    if (uploadedImagePath) formData.append('imagePath', uploadedImagePath);
-    if (uploadedVideoPath) formData.append('videoPath', uploadedVideoPath);
+    // Ensure fresh paths by appending a timestamp
+const freshImagePath = uploadedImagePath ? `${uploadedImagePath}?timestamp=${Date.now()}` : null;
+const freshVideoPath = uploadedVideoPath ? `${uploadedVideoPath}?timestamp=${Date.now()}` : null;
 
+// Add the file paths to the form data before submitting
+if (freshImagePath) formData.append('imagePath', freshImagePath);
+if (freshVideoPath) formData.append('videoPath', freshVideoPath);
     setLoading(true);
 
     try {
@@ -282,9 +285,6 @@ const CommentSection = () => {
                             </div>
                         </div>
                         <p className={styles.commentText}>{comment.content}</p>
-                        const freshImagePath = `${uploadedImagePath}?timestamp=${Date.now()}`;
-                        <img src={freshImagePath} alt="Uploaded Image" />
-
                         {comment.image && <img className={styles.commentImage} src={comment.image} alt="Comment" />}
 
                         {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
