@@ -247,8 +247,7 @@ if (freshVideoPath) formData.append('videoPath', freshVideoPath);
     finally {
         // Clear input fields
         setContent('');
-        setImage(null);
-        setVideo(null);
+
     }
 
     setLoading(false);
