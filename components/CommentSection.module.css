@@ -235,3 +235,14 @@
     transform: rotate(360deg);
   }
 }
+
+.preview-image {
+    height: 100px;
+    max-width: 150px;
+    margin-top: 10px;
+  }
+  .preview-video {
+    height: 100px;
+    max-width: 150px;
+    margin-top: 10px;
+  }
