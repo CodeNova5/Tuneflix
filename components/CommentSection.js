@@ -277,7 +277,7 @@ const [file, setFile] = useState(null);
         const video = document.createElement('video');
         video.src = URL.createObjectURL(selectedFile);
         video.controls = true; // Add controls to the video element
-        video.classList.add('preview-video'); // Add class for styling
+        video.classList.add('preview-video'); // Add class for styling b
         previewContainer.appendChild(video);
       }
     }
