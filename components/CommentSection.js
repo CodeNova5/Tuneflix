@@ -282,7 +282,11 @@ const CommentSection = () => {
                             </div>
                         </div>
                         <p className={styles.commentText}>{comment.content}</p>
+                        const freshImagePath = `${uploadedImagePath}?timestamp=${Date.now()}`;
+                        <img src={freshImagePath} alt="Uploaded Image" />
+
                         {comment.image && <img className={styles.commentImage} src={comment.image} alt="Comment" />}
+
                         {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
                         
                         <div className={styles.commentActions}>

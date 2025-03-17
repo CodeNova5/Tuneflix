@@ -128,8 +128,9 @@
 }
 
 /* Media content (images and videos) */
-.img[alt="Comment Image"], 
-.video {
+.commentImage { 
+    height: auto;
+    width: 200px;
     display: block;
     margin-top: 10px;
     border-radius: 8px;
