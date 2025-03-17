@@ -5,191 +5,190 @@ import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
 
 const CommentSection = () => {
-    const [comments, setComments] = useState([]);
-    const [content, setContent] = useState('');
-    const [image, setImage] = useState(null);
-    const [video, setVideo] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(0);
-    const [limit] = useState(5);
-    const [pageUrl, setPageUrl] = useState('');
-    const [currentUser, setCurrentUser] = useState(null);
-    const pathname = usePathname(); // Get the current path in Next.js
-    const [formattedComments, setFormattedComments] = useState([]);
-    const [editingComment, setEditingComment] = useState(null);
-    const [editContent, setEditContent] = useState("");
+  const [comments, setComments] = useState([]);
+  const [content, setContent] = useState('');
+  const [image, setImage] = useState(null);
+  const [video, setVideo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [limit] = useState(5);
+  const [pageUrl, setPageUrl] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  const pathname = usePathname(); // Get the current path in Next.js
+  const [formattedComments, setFormattedComments] = useState([]);
+  const [editingComment, setEditingComment] = useState(null);
+  const [editContent, setEditContent] = useState("");
 
 
 
-    // Function to format the time ago
-    const formatTimeAgo = (date) => {
-        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-        let interval = Math.floor(seconds / 31536000);
-        if (interval >= 1) return interval === 1 ? "1 year ago" : `${interval} years ago`;
+  // Function to format the time ago
+  const formatTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) return interval === 1 ? "1 year ago" : `${interval} years ago`;
 
-        interval = Math.floor(seconds / 2592000);
-        if (interval >= 1) return interval === 1 ? "1 month ago" : `${interval} months ago`;
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) return interval === 1 ? "1 month ago" : `${interval} months ago`;
 
-        interval = Math.floor(seconds / 604800);
-        if (interval >= 1) return interval === 1 ? "1 week ago" : `${interval} weeks ago`;
+    interval = Math.floor(seconds / 604800);
+    if (interval >= 1) return interval === 1 ? "1 week ago" : `${interval} weeks ago`;
 
-        interval = Math.floor(seconds / 86400);
-        if (interval >= 1) return interval === 1 ? "1 day ago" : `${interval} days ago`;
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) return interval === 1 ? "1 day ago" : `${interval} days ago`;
 
-        interval = Math.floor(seconds / 3600);
-        if (interval >= 1) return interval === 1 ? "1 hour ago" : `${interval} hours ago`;
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) return interval === 1 ? "1 hour ago" : `${interval} hours ago`;
 
-        interval = Math.floor(seconds / 60);
-        if (interval >= 1) return interval === 1 ? "1 minute ago" : `${interval} minutes ago`;
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) return interval === 1 ? "1 minute ago" : `${interval} minutes ago`;
 
-        return "Just now";
-    };
-    const handleEdit = (comment) => {
-        setEditingComment(comment);  // Store the full comment object
-        setEditContent(comment.content);  // Set the text area value
-    };
-    ;
+    return "Just now";
+  };
+  const handleEdit = (comment) => {
+    setEditingComment(comment); // Store the full comment object
+    setEditContent(comment.content); // Set the text area value
+  };;
 
-    const fetchComments = async () => {
-        try {
-            const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
-            if (!response.ok) throw new Error('Failed to fetch comments');
-            const data = await response.json();
-            setComments(data);
-        } catch (error) {
-            console.error('Error fetching comments:', error);
-        }
-    };
-    
-    useEffect(() => {
-        if (pageUrl) fetchComments();
-    }, [page, pageUrl, limit]);
-
-    async function deleteComment(commentId) {
-        const confirmDelete = confirm("Are you sure you want to delete this comment and all its replies?");
-        if (!confirmDelete) return;
-      
-        try {
-          const response = await fetch(`/api/comments/${commentId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),
-          });
-      
-          const data = await response.json();
-      
-          if (!response.ok) {
-            throw new Error(data.message || "Failed to delete the comment.");
-          }
-      
-          alert('Comment deleted successfully.');
-          fetchComments(); // Refresh the comments after deletion
-        } catch (error) {
-          console.error('Error deleting comment:', error);
-          alert(error.message);
-        }
-      }
-      
-    const saveEdit = async () => {
-        if (!editContent.trim()) {
-            alert("Comment cannot be empty.");
-            return;
-        }
-    
-        try {
-            const response = await fetch(`/api/comments/${editingComment._id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    userId: currentUser.sub || currentUser.id,
-                    content: editContent,
-                }),
-            });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-    
-            alert("Comment updated successfully.");
-            setEditingComment(null);
-    
-            // Fetch updated comments
-            await fetchComments();
-        } catch (error) {
-            console.error("Error updating comment:", error);
-            alert("Failed to update the comment.");
-        }
-    };
-    
-    useEffect(() => {
-        setFormattedComments(
-            comments.map((comment) => ({
-                ...comment,
-                timeAgo: formatTimeAgo(new Date(comment.createdAt)),
-            }))
-        );
-    }, [comments]);
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setPageUrl(window.location.href); // Set full URL dynamically
-        }
-    }, [pathname]); // Run effect when pathname changes
-
-    useEffect(() => {
-        // Fetch user info from localStorage
-        const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
-        setCurrentUser(userInfo.data ? userInfo.data : null);
-    }, []);
-
-
-    // Handle file selection
-    const handleFileChange = (e, type) => {
-        if (type === 'image') setImage(e.target.files[0]);
-        else setVideo(e.target.files[0]);
-    };
-
-    async function convertFileToBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => {
-            const base64String = reader.result.split(',')[1]; // Remove the "data:image/png;base64," prefix ok
-            resolve(base64String);
-          };
-          reader.onerror = error => reject(error);
-        });
-      }
-      
-    async function uploadFileToGitHub(file, type) {
-        // Convert file to base64
-        const base64Content = await convertFileToBase64(file);
-    
-        const fileName = file.name;
-        // Call the GitHub upload API (from your previous code)
-        const uploadResponse = await fetch('/api/uploadFile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                fileName: fileName,
-                fileContent: base64Content
-            })
-        });
-    
-        const uploadData = await uploadResponse.json();
-    
-        if (!uploadResponse.ok) {
-            throw new Error('Failed to upload file to GitHub');
-        }
-    
-        return uploadData.path;  // Assuming the GitHub API response contains the download URL
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+      if (!response.ok) throw new Error('Failed to fetch comments');
+      const data = await response.json();
+      setComments(data);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
     }
-    
-    const postComment = async () => {
+  };
+
+  useEffect(() => {
+    if (pageUrl) fetchComments();
+  }, [page, pageUrl, limit]);
+
+  async function deleteComment(commentId) {
+    const confirmDelete = confirm("Are you sure you want to delete this comment and all its replies?");
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`/api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete the comment.");
+      }
+
+      alert('Comment deleted successfully.');
+      fetchComments(); // Refresh the comments after deletion
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      alert(error.message);
+    }
+  }
+
+  const saveEdit = async () => {
+    if (!editContent.trim()) {
+      alert("Comment cannot be empty.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/comments/${editingComment._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: currentUser.sub || currentUser.id,
+          content: editContent,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      alert("Comment updated successfully.");
+      setEditingComment(null);
+
+      // Fetch updated comments
+      await fetchComments();
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      alert("Failed to update the comment.");
+    }
+  };
+
+  useEffect(() => {
+    setFormattedComments(
+      comments.map((comment) => ({
+        ...comment,
+        timeAgo: formatTimeAgo(new Date(comment.createdAt)),
+      }))
+    );
+  }, [comments]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPageUrl(window.location.href); // Set full URL dynamically
+    }
+  }, [pathname]); // Run effect when pathname changes
+
+  useEffect(() => {
+    // Fetch user info from localStorage
+    const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+    setCurrentUser(userInfo.data ? userInfo.data : null);
+  }, []);
+
+
+  // Handle file selection
+  const handleFileChange = (e, type) => {
+    if (type === 'image') setImage(e.target.files[0]);
+    else setVideo(e.target.files[0]);
+  };
+
+  async function convertFileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result.split(',')[1]; // Remove the "data:image/png;base64," prefix ok
+        resolve(base64String);
+      };
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  async function uploadFileToGitHub(file, type) {
+    // Convert file to base64
+    const base64Content = await convertFileToBase64(file);
+
+    const fileName = file.name;
+    // Call the GitHub upload API (from your previous code)
+    const uploadResponse = await fetch('/api/uploadFile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileName: fileName,
+        fileContent: base64Content
+      })
+    });
+
+    const uploadData = await uploadResponse.json();
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload file to GitHub');
+    }
+
+    return uploadData.path; // Assuming the GitHub API response contains the download URL
+  }
+
+  const postComment = async () => {
     if (!content) return alert('Comment cannot be empty');
     if (!currentUser) return alert('User not found');
     if (!pageUrl) return alert('Page URL not found'); // Ensure pageUrl is set
@@ -209,51 +208,51 @@ const CommentSection = () => {
     let uploadedVideoPath = '';
 
     if (image) {
-        const imagePath = await uploadFileToGitHub(image, 'image'); // Call your previous upload function for image
-        uploadedImagePath = imagePath;  // Get the path from the upload function
+      const imagePath = await uploadFileToGitHub(image, 'image'); // Call your previous upload function for image
+      uploadedImagePath = imagePath; // Get the path from the upload function
     }
 
     if (video) {
-        const videoPath = await uploadFileToGitHub(video, 'video'); // Call your previous upload function for video
-        uploadedVideoPath = videoPath; // Get the path from the upload function
+      const videoPath = await uploadFileToGitHub(video, 'video'); // Call your previous upload function for video
+      uploadedVideoPath = videoPath; // Get the path from the upload function
     }
 
     // Ensure fresh paths by appending a timestamp
-const freshImagePath = uploadedImagePath ? `${uploadedImagePath}?timestamp=${Date.now()}` : null;
-const freshVideoPath = uploadedVideoPath ? `${uploadedVideoPath}?timestamp=${Date.now()}` : null;
+    const freshImagePath = uploadedImagePath ? `${uploadedImagePath}?timestamp=${Date.now()}` : null;
+    const freshVideoPath = uploadedVideoPath ? `${uploadedVideoPath}?timestamp=${Date.now()}` : null;
 
-// Add the file paths to the form data before submitting
-if (freshImagePath) formData.append('imagePath', freshImagePath);
-if (freshVideoPath) formData.append('videoPath', freshVideoPath);
+    // Add the file paths to the form data before submitting
+    if (freshImagePath) formData.append('imagePath', freshImagePath);
+    if (freshVideoPath) formData.append('videoPath', freshVideoPath);
     setLoading(true);
 
     try {
-        const response = await fetch('/api/comments', {
-            method: 'POST',
-            body: formData,
-        });
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        body: formData,
+      });
 
-        if (!response.ok) throw new Error('Failed to post comment');
+      if (!response.ok) throw new Error('Failed to post comment');
 
-        const newComment = await response.json();
-        setComments([newComment, ...comments]);
-        setContent('');
-        setImage(null);
-        setVideo(null);
+      const newComment = await response.json();
+      setComments([newComment, ...comments]);
+      setContent('');
+      setImage(null);
+      setVideo(null);
     } catch (error) {
-        console.error('Error posting comment:', error);
-        alert('Error posting comment');
+      console.error('Error posting comment:', error);
+      alert('Error posting comment');
     }
     finally {
-        // Clear input fields
-        setContent('');
+      // Clear input fields
+      setContent('');
 
     }
 
     setLoading(false);
-};
+  };
 
-const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null);
 
   const handleFileSelect = (event) => {
     const selectedFile = event.target.files[0];
@@ -281,8 +280,8 @@ const [file, setFile] = useState(null);
       }
     }
   };
-    return (
-        <div className={styles.commentSection}>
+  return (
+    <div className={styles.commentSection}>
             <div id='spinner'></div>
             <h1 className={styles.commentTitle}>Comment Section</h1>
             <textarea
@@ -295,11 +294,11 @@ const [file, setFile] = useState(null);
             <div id="previewContainer"></div>
                 <label className={styles.commentLabel}>
                     <i className="fas fa-image"></i>
-                    <input type="file" accept="image/*" onChange={handleFileSelect} />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')}/>
                 </label>
                 <label className={styles.commentLabel}>
                     <i className="fas fa-video"></i>
-                    <input type="file" accept="video/*" onChange={handleFileSelect}  />
+                    <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
                 </label>
             </div>
             <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
@@ -367,7 +366,7 @@ const [file, setFile] = useState(null);
         </div>
       )}
         </div>
-    );
+  );
 };
 
 export default CommentSection;
