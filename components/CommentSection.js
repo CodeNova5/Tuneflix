@@ -284,7 +284,7 @@ const [file, setFile] = useState(null);
   };
     return (
         <div className={styles.commentSection}>
-            <div id='spinner' style="display :none;"></div>
+            <div id='spinner'></div>
             <h1 className={styles.commentTitle}>Comment Section</h1>
             <textarea
                 className={styles.commentInput}
