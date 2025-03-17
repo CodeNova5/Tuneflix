@@ -31,12 +31,18 @@
     }
 
     function displayGoogleUserInfo(data) {
-        document.getElementById('google-name').innerText = Name: ${data.name};
-        document.getElementById('google-email').innerText = Email: ${data.email};
-        document.getElementById('google-id').innerText = Google ID: ${data.sub};
-        document.getElementById('google-profile-img').src = data.picture;
-    }
+    document.getElementById('google-name').innerText = `Name: ${data.name}`;
+    document.getElementById('google-email').innerText = `Email: ${data.email}`;
+    document.getElementById('google-id').innerText = `Google ID: ${data.sub}`;
+    document.getElementById('google-profile-img').src = data.picture;
+}
 
+function displayFacebookUserInfo(data) {
+    document.getElementById('facebook-name').innerText = `Name: ${data.name}`;
+    document.getElementById('facebook-email').innerText = `Email: ${data.email}`;
+    document.getElementById('facebook-id').innerText = `Facebook ID: ${data.id}`;
+    document.getElementById('facebook-profile-img').src = data.picture.data.url;
+}
     function saveUserInfo(provider, data) {
         const userInfo = { provider, data };
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
