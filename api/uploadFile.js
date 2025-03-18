@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       message: 'File uploaded successfully',
       data: response.data,
-      path: `/comment/${fileName}`,
+      path: `https://raw.githubusercontent.com/Netdot12/next/refs/heads/main/public/comment/${fileName}`,
     });
   } catch (error) {
     console.error('Error uploading file:', error);
