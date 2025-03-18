@@ -431,7 +431,7 @@ function showReplies(commentId, highlightReplyId = null) {
 
 
        
-function RenderReplies({ replies, commentId, currentUser }) {
+function renderReplies({ replies, commentId, currentUser }) {
   // Sort replies by date (most recent first)
   const sortedReplies = [...replies].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
