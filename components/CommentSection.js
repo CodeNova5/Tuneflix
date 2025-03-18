@@ -244,13 +244,10 @@ const CommentSection = () => {
       uploadedVideoPath = videoPath; // Get the path from the upload function
     }
 
-    // Ensure fresh paths by appending a timestamp
-    const freshImagePath = uploadedImagePath ? `${uploadedImagePath}?timestamp=${Date.now()}` : null;
-    const freshVideoPath = uploadedVideoPath ? `${uploadedVideoPath}?timestamp=${Date.now()}` : null;
 
-    // Add the file paths to the form data before submitting
-    if (freshImagePath) formData.append('imagePath', freshImagePath);
-    if (freshVideoPath) formData.append('videoPath', freshVideoPath);
+    formData.append('imagePath', uploadedImagePath);
+
+    formData.append('videoPath', uploadedVideoPath);
     setLoading(true);
 
     try {
@@ -367,7 +364,7 @@ const CommentSection = () => {
                 onChange={(e) => setContent(e.target.value)}
             ></textarea>
             <div className={styles.fileInputContainer}>
-            <div id="previewContainer"></div>
+            <div id="previewContainer" class="previewContainer" ></div>
                 <label className={styles.commentLabel}>
                     <i className="fas fa-image"></i>
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')}/>
