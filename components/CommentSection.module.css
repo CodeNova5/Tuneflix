@@ -239,10 +239,12 @@
 .preview-image {
     height: 100px;
     max-width: 150px;
+    width:150px;
     margin-top: 10px;
   }
   .preview-video {
     height: 100px;
+    width:150px;
     max-width: 150px;
     margin-top: 10px;
   }
