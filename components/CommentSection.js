@@ -278,35 +278,6 @@ const CommentSection = () => {
 
     setLoading(false);
   };
-
-  const [file, setFile] = useState(null);
-
-  const handleFileSelect = (event) => {
-    const selectedFile = event.target.files[0];
-    const previewContainer = document.getElementById('previewContainer');
-
-    // Clear any existing preview
-    previewContainer.innerHTML = '';
-
-    if (selectedFile) {
-      const fileType = selectedFile.type;
-
-      if (fileType.startsWith('image/')) {
-        // Handle image preview
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(selectedFile);
-        img.classList.add('preview-image'); // Add class for styling
-        previewContainer.appendChild(img);
-      } else if (fileType.startsWith('video/')) {
-        // Handle video preview
-        const video = document.createElement('video');
-        video.src = URL.createObjectURL(selectedFile);
-        video.controls = true; // Add controls to the video element
-        video.classList.add('preview-video'); // Add class for styling b
-        previewContainer.appendChild(video);
-      }
-    }
-  };
   return (
     <div className={styles.commentSection}>
             <div id='spinner'></div>
