@@ -55,6 +55,7 @@ const CommentSection = () => {
       if (!response.ok) throw new Error('Failed to fetch comments');
       const data = await response.json();
       setComments(data);
+      currentReplies = data;
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
