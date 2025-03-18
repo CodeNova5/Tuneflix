@@ -278,6 +278,84 @@ const CommentSection = () => {
 
     setLoading(false);
   };
+  async function replyToComment(commentId, replyId, commentOwner, commentOwnerId) {
+    let modal = document.getElementById('reply-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'reply-modal';
+        modal.style.position = 'fixed';
+        modal.style.top = '50%';
+        modal.style.left = '50%';
+        modal.style.transform = 'translate(-50%, -50%)';
+        modal.style.background = 'white';
+        modal.style.padding = '20px';
+        modal.style.border = '1px solid #ccc';
+        modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        modal.style.zIndex = 1000;
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <form id="reply-form">
+            <h3>Reply to ${commentOwner}</h3>
+            <textarea id="reply-content" placeholder="Write your reply..." rows="4" style="width: 100%;"></textarea>
+            <br><br>
+            <button type="submit">Submit Reply</button>
+            <button type="button" id="close-modal">Cancel</button>
+        </form>
+        <p id="reply-error" style="color: red; display: none;">Error submitting reply. Please try again.</p>
+    `;
+
+    const form = document.getElementById('reply-form');
+    const errorMsg = document.getElementById('reply-error');
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+
+        if (!currentUser) {
+            alert("Please log in to reply.");
+            return;
+        }
+
+        const replyContent = document.getElementById('reply-content').value.trim();
+        if (!replyContent) {
+            alert("Reply content cannot be empty.");
+            return;
+        }
+
+        const formData = {
+            content: replyContent,
+            replyTo: commentOwner,
+            user: currentUser.name,
+            userId: currentUser.sub || currentUser.id,
+            commentOwnerId: commentOwnerId,
+            userImage: currentUser.picture,
+            fcmtoken: localStorage.getItem('fcmToken'),
+            replyId: replyId,
+        };
+
+        const url = `/api/comments/${commentId}/reply`;
+
+        try {
+            await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(formData) 
+            });
+            fetchComments();
+            modal.style.display = 'none';
+        } catch (error) {
+            errorMsg.style.display = 'block';
+        }
+    };
+
+    document.getElementById('close-modal').onclick = () => {
+        modal.style.display = 'none';
+    };
+
+    modal.style.display = 'block';
+}
+
   return (
     <div className={styles.commentSection}>
             <div id='spinner'></div>
@@ -336,8 +414,8 @@ const CommentSection = () => {
                         </div>
                         
                         <div className={styles.replyActions}>
-                            <button className={styles.replyButton} onClick={() => replyToComment(comment._id)}>Reply</button>
-                            <button className={styles.viewRepliesButton} onClick={() => showReplies(comment._id)}>View Replies</button>
+                        <button onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}> Reply</button>
+                        <button className={styles.viewRepliesButton} onClick={() => showReplies(comment._id)}>View Replies</button>
                         </div>
                     </div>
                     
