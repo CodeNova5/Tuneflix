@@ -491,7 +491,9 @@ function RenderReplies({ replies, commentId, currentUser }) {
 }
 
 
-
+const closeRepliesModal = () => {
+  document.getElementById('replies-modal').style.display = 'none';
+};
   return (
     <div className={styles.commentSection}>
             <div id='spinner'></div>
@@ -516,7 +518,13 @@ function RenderReplies({ replies, commentId, currentUser }) {
             <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
-            
+            <div id="replies-modal">
+      <div className="modal-header">Replies</div>
+      <div id="replies-modal-body" className="modal-body"></div>
+      <div className="modal-footer">
+        <button onClick={closeRepliesModal}>Close</button>
+      </div>
+    </div>
             <div className={styles.commentSection}>
                 {formattedComments.map((comment) => {
                     const isOwner =
