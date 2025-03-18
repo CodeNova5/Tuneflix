@@ -352,7 +352,6 @@ const CommentSection = () => {
 
     modal.style.display = 'block';
 }
-
 let currentReplies = []; // Store replies for the current comment
 
 function showReplies(commentId, highlightReplyId = null) {
@@ -429,71 +428,60 @@ function showReplies(commentId, highlightReplyId = null) {
     repliesModal.style.display = 'block';
 }
 
+const closeRepliesModal = () => {
+    document.getElementById('replies-modal').style.display = 'none';
+};
 
-       
-function renderReplies({ replies, commentId, currentUser }) {
-  // Sort replies by date (most recent first)
-  const sortedReplies = [...replies].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+function renderReplies(replies, commentId) {
+    // Sort replies by date (most recent first)
+    const sortedReplies = [...replies].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  return (
-      <div>
-          {sortedReplies.map((reply) => {
-              const isOwner = currentUser && (currentUser.sub === reply.userId || currentUser.id === reply.userId);
-              const timeAgo = formatTimeAgo(new Date(reply.createdAt));
-              const isLiked = (reply.likes || []).includes(currentUser?.id);
+    return `
+        <div>
+            ${sortedReplies.map(reply => {
+                const isOwner = currentUser && (currentUser.sub === reply.userId || currentUser.id === reply.userId);
+                const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+                const isLiked = (reply.likes || []).includes(currentUser?.id);
 
-              return (
-                  <div key={reply._id} id={`reply-${reply._id}`}>
-                      <p>
-                          ↳ 
-                          <img 
-                              src={reply.userImage || 'default-avatar.png'} 
-                              alt={reply.user} 
-                              width="20" 
-                              height="20"
-                          />
-                          <strong>{reply.user}</strong> - <span className="time-ago">{timeAgo}</span> <br />
-                          <span style={{ color: 'blue' }}>@{reply.replyTo || 'unknown'}</span>
-                          {reply.content}
-                      </p>
-
-                      <div 
-                          id="likeReply"
-                          onClick={() => toggleReplyLike(commentId, reply._id, isLiked)}
-                          style={{ cursor: 'pointer', color: isLiked ? 'blue' : 'gray' }}
-                      >
-                          ❤️ {reply.likes?.length || 0} Like
-                      </div>
-
-                      {isOwner && (
-                          <>
-                              <button onClick={() => editReply(commentId, reply._id, reply.content)}>Edit</button>
-                              <button onClick={() => deleteReply(commentId, reply._id)}>Delete</button>
-                          </>
-                      )}
-
-                      {reply.media && renderMedia(reply.media)}
-
-                      <div>
-                          <button onClick={() => replyToComment(commentId, reply._id, reply.user, reply.userId)}>Reply</button>
-                      </div>
-
-                      <div style={{ marginLeft: '20px' }}>
-                          <RenderReplies replies={reply.replies || []} commentId={commentId} currentUser={currentUser} />
-                      </div>
-
-                      <br />
-                  </div>
-              );
-          })}
-      </div>
-  );
+                return `
+                    <div key=${reply._id} id="reply-${reply._id}">
+                        <p>
+                            ↳ 
+                            <img 
+                                src=${reply.userImage || 'default-avatar.png'} 
+                                alt=${reply.user} 
+                                width="20" 
+                                height="20"
+                            />
+                            <strong>${reply.user}</strong> - <span class="time-ago">${timeAgo}</span> <br />
+                            <span style="color: blue;">@${reply.replyTo || 'unknown'}</span>
+                            ${reply.content}
+                        </p>
+                        <div 
+                            id="likeReply"
+                            onClick="toggleReplyLike('${commentId}', '${reply._id}', ${isLiked})"
+                            style="cursor: pointer; color: ${isLiked ? 'blue' : 'gray'}"
+                        >
+                            ❤️ ${reply.likes?.length || 0} Like
+                        </div>
+                        ${isOwner ? `
+                            <button onClick="editReply('${commentId}', '${reply._id}', '${reply.content}')">Edit</button>
+                            <button onClick="deleteReply('${commentId}', '${reply._id}')">Delete</button>
+                        ` : ''}
+                        ${reply.media ? renderMedia(reply.media) : ''}
+                        <div>
+                            <button onClick="replyToComment('${commentId}', '${reply._id}', '${reply.user}', '${reply.userId}')">Reply</button>
+                        </div>
+                        <div style="margin-left: 20px;">
+                            ${renderReplies(reply.replies || [], commentId)}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
 }
 
-
-const closeRepliesModal = () => {
-  document.getElementById('replies-modal').style.display = 'none';
-};
   return (
     <div className={styles.commentSection}>
             <div id='spinner'></div>
