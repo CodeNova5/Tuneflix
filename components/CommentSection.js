@@ -286,7 +286,7 @@ const CommentSection = () => {
                 onChange={(e) => setContent(e.target.value)}
             ></textarea>
             <div className={styles.fileInputContainer}>
-            <div id="previewContainer"></div>
+            <div id="previewContainer" class="previewContainer" ></div>
                 <label className={styles.commentLabel}>
                     <i className="fas fa-image"></i>
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')}/>
