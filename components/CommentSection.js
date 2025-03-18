@@ -244,10 +244,8 @@ const CommentSection = () => {
       uploadedVideoPath = videoPath; // Get the path from the upload function
     }
 
-    // Ensure fresh paths by appending a timestamp
-    const freshImagePath = uploadedImagePath ? `${uploadedImagePath}?timestamp=${Date.now()}` : null;
-    const freshVideoPath = uploadedVideoPath ? `${uploadedVideoPath}?timestamp=${Date.now()}` : null;
-
+    const freshImagePath = uploadedImagePath ? `${uploadedImagePath}?v=${Date.now()}` : null;
+const freshVideoPath = uploadedVideoPath ? `${uploadedVideoPath}?v=${Date.now()}` : null;
     // Add the file paths to the form data before submitting
     if (freshImagePath) formData.append('imagePath', freshImagePath);
     if (freshVideoPath) formData.append('videoPath', freshVideoPath);
