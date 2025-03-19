@@ -427,19 +427,14 @@ const closeRepliesModal = () => {
             <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
-            <div id="replies-modal">
-      <div className="modal-header">Replies</div>
-      <div id="replies-modal-body" className="modal-body"></div>
-      <div className="modal-footer">
-        <button onClick={closeRepliesModal}>Close</button>
-      </div>
-    </div>
+           
             <div className={styles.commentSection}>
                 {formattedComments.map((comment) => {
                     const isOwner =
                         currentUser &&
                         (currentUser.sub === comment.userId || currentUser.id === comment.userId);
-                        
+                  
+      
                     return (
                         <div key={comment._id} className={styles.commentContainer}>
                         <div className={styles.commentHeader}>
@@ -475,7 +470,17 @@ const closeRepliesModal = () => {
                     );
                 })}
             </div>
-
+<div className={styles.modal} id="replies-modal">
+  <div className={styles.modalContent}>
+    <div className={styles.modalHeader}>
+      <h3>Replies</h3>
+      <button className={styles.closeButton} onClick={closeRepliesModal}>✖</button>
+    </div>
+    <div className={styles.modalBody} id="replies-modal-body">
+      <p>Loading replies...</p>
+    </div>
+  </div>
+</div>
             <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
          {/* Edit Comment Modal */}
       {editingComment && (
