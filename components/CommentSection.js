@@ -473,7 +473,7 @@ const closeRepliesModal = () => {
                     );
                 })}
             </div>
-<div className={styles.modal} id="replies-modal">
+<div style={{ display:"none" }} className={styles.modal} id="replies-modal">
   <div className={styles.modalContent}>
     <div className={styles.modalHeader}>
       <h3>Replies</h3>
