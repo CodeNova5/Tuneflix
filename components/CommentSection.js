@@ -438,7 +438,13 @@ const closeRepliesModal = () => {
                     const isOwner =
                         currentUser &&
                         (currentUser.sub === comment.userId || currentUser.id === comment.userId);
-                  
+                   <div id="replies-modal">  
+      <div className="modal-header">Replies</div>  
+      <div id="replies-modal-body" className="modal-body"></div>  
+      <div className="modal-footer">  
+        <button onClick={closeRepliesModal}>Close</button>  
+      </div>  
+    </div>  
       
                     return (
                         <div key={comment._id} className={styles.commentContainer}>
