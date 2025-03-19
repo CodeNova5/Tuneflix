@@ -363,7 +363,8 @@ const showReplies = async (commentId) => {
     modal.style.display = 'block';
 
     try {
-        const response = await fetch(`/api/replies?commentId=${commentId}`);
+       
+        const response = await fetch(`/api/comments/${commentId}/reply`);
         const replies = await response.json();
 
         if (replies.length === 0) {
