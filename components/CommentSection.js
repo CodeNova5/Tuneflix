@@ -388,8 +388,8 @@ const showReplies = async (commentId) => {
                         <span class="reply-time">${timeAgo}</span>
                     </div>
                 </div>
+${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
                 <p class="reply-text">
-                    ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
                     ${reply.content}
                 </p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
@@ -475,17 +475,7 @@ const closeRepliesModal = () => {
                     );
                 })}
             </div>
-<div className={styles.modal} id="replies-modal">
-  <div className={styles.modalContent}>
-    <div className={styles.modalHeader}>
-      <h3>Replies</h3>
-      <button className={styles.closeButton} onClick={closeRepliesModal}>✖</button>
-    </div>
-    <div className={styles.modalBody} id="replies-modal-body">
-      
-    </div>
-  </div>
-</div>
+
             <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
          {/* Edit Comment Modal */}
       {editingComment && (
