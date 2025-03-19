@@ -482,7 +482,7 @@ const closeRepliesModal = () => {
       <button className={styles.closeButton} onClick={closeRepliesModal}>✖</button>
     </div>
     <div className={styles.modalBody} id="replies-modal-body">
-      <p>Loading replies...</p>
+      
     </div>
   </div>
 </div>
