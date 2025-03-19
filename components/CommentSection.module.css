@@ -166,46 +166,7 @@
 
 
 
-#replies-modal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
-    z-index: 1000;
-    width: 80%;
-    max-width: 500px;
-}
 
-.modal-header {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.modal-body {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.modal-footer {
-    text-align: right;
-    margin-top: 10px;
-}
-
-.reply-container {
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-}
-
-.reply-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
 .spinner {
   border: 8px solid #f3f3f3; /* Light gray */
   border-top: 8px solid #3498db; /* Blue */
