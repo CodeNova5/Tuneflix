@@ -55,7 +55,6 @@ const CommentSection = () => {
       if (!response.ok) throw new Error('Failed to fetch comments');
       const data = await response.json();
       setComments(data);
-      currentReplies = data;
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
@@ -366,17 +365,38 @@ const showReplies = async (commentId) => {
         const response = await fetch(`/api/comments/${commentId}/reply`);
         const replies = await response.json();
 
-        if (replies.length === 0) {
-            modalBody.innerHTML = '<p>No replies yet.</p>';
-            return;
-        }
+        // Fetch the original comment
+        const commentResponse = await fetch(`/api/comments/${commentId}`);
+        const comment = await commentResponse.json();
 
         // Clear previous content
         modalBody.innerHTML = '';
 
+        // Display the original comment
+        const commentElement = document.createElement('div');
+        commentElement.classList.add('comment-container');
+        commentElement.innerHTML = `
+            <div class="comment-header">
+                <img class="comment-avatar" src="${comment.userImage}" alt="${comment.user}" />
+                <div class="comment-details">
+                    <strong class="comment-user">${comment.user}</strong>
+                    <span class="comment-time">${formatTimeAgo(new Date(comment.createdAt))}</span>
+                </div>
+            </div>
+            <p class="comment-text">${comment.content}</p>
+            ${comment.image ? `<img class="comment-image" src="${comment.image}" alt="Comment Image" />` : ''}
+            ${comment.video ? `<video class="comment-video" src="${comment.video}" controls></video>` : ''}
+        `;
+        modalBody.appendChild(commentElement);
+
+        if (replies.length === 0) {
+            modalBody.innerHTML += '<p>No replies yet.</p>';
+            return;
+        }
+
         replies.forEach(reply => {
-            const timeAgo = formatTimeAgo(new Date(reply.createdAt)); // Format time
-            const replyTo = reply.replyTo || 'unknown'; // Fallback to 'unknown' if no replyTo
+            const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+            const replyTo = reply.replyTo || 'unknown';
 
             const replyElement = document.createElement('div');
             replyElement.classList.add('reply-container');
@@ -388,12 +408,14 @@ const showReplies = async (commentId) => {
                         <span class="reply-time">${timeAgo}</span>
                     </div>
                 </div>
-                  ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
-                <p class="reply-text">
-                    ${reply.content}
-                </p>
+                ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
+                <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
+                <div class="reply-actions">
+                    <button class="edit-reply-button" onclick="handleEditReply('${reply._id}')">Edit</button>
+                    <button class="delete-reply-button" onclick="deleteReply('${reply._id}')">Delete</button>
+                </div>
             `;
             modalBody.appendChild(replyElement);
         });
