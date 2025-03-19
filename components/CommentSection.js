@@ -363,7 +363,6 @@ const showReplies = async (commentId) => {
     modal.style.display = 'block';
 
     try {
-       
         const response = await fetch(`/api/comments/${commentId}/reply`);
         const replies = await response.json();
 
@@ -376,8 +375,8 @@ const showReplies = async (commentId) => {
         modalBody.innerHTML = '';
 
         replies.forEach(reply => {
-
-const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+            const timeAgo = formatTimeAgo(new Date(reply.createdAt)); // Format time
+            const replyTo = reply.replyTo || 'unknown'; // Fallback to 'unknown' if no replyTo
 
             const replyElement = document.createElement('div');
             replyElement.classList.add('reply-container');
@@ -386,10 +385,13 @@ const timeAgo = formatTimeAgo(new Date(reply.createdAt));
                     <img class="reply-avatar" src="${reply.userImage}" alt="${reply.user}" />
                     <div class="reply-details">
                         <strong class="reply-user">${reply.user}</strong>
-                        <span class="reply-time">${reply.timeAgo}</span>
+                        <span class="reply-time">${timeAgo}</span>
                     </div>
                 </div>
-                <p class="reply-text">${reply.content}</p>
+                <p class="reply-text">
+                    ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
+                    ${reply.content}
+                </p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
             `;
