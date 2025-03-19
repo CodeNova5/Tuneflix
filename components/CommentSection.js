@@ -51,7 +51,7 @@ const CommentSection = () => {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`/api/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
+      const response = await fetch(`/api/comments/comments?pageUrl=${encodeURIComponent(pageUrl)}&page=${page}&limit=${limit}`);
       if (!response.ok) throw new Error('Failed to fetch comments');
       const data = await response.json();
       setComments(data);
@@ -251,7 +251,7 @@ const CommentSection = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/comments', {
+      const response = await fetch('/api/comments/comments', {
         method: 'POST',
         body: formData,
       });

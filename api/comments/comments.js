@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Comment from '../models/Comment.js';
+import Comment from '../../models/Comment.js';
 import formidable from 'formidable';
 dotenv.config();
 
