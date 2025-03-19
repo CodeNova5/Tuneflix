@@ -376,6 +376,9 @@ const showReplies = async (commentId) => {
         modalBody.innerHTML = '';
 
         replies.forEach(reply => {
+
+const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+
             const replyElement = document.createElement('div');
             replyElement.classList.add('reply-container');
             replyElement.innerHTML = `
