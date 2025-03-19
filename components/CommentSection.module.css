@@ -245,6 +245,7 @@
 
 /* Reply Text */
 .reply-text {
+  margin: 10px;
   font-size: 14px;
 }
 
