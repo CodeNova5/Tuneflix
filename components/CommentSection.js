@@ -354,6 +354,54 @@ const CommentSection = () => {
     modal.style.display = 'block';
 }
 
+const showReplies = async (commentId) => {
+    const modal = document.getElementById('replies-modal');
+    const modalBody = document.getElementById('replies-modal-body');
+
+    // Show loading indicator
+    modalBody.innerHTML = '<p>Loading replies...</p>';
+    modal.style.display = 'block';
+
+    try {
+        const response = await fetch(`/api/replies?commentId=${commentId}`);
+        const replies = await response.json();
+
+        if (replies.length === 0) {
+            modalBody.innerHTML = '<p>No replies yet.</p>';
+            return;
+        }
+
+        // Clear previous content
+        modalBody.innerHTML = '';
+
+        replies.forEach(reply => {
+            const replyElement = document.createElement('div');
+            replyElement.classList.add('reply-container');
+            replyElement.innerHTML = `
+                <div class="reply-header">
+                    <img class="reply-avatar" src="${reply.userImage}" alt="${reply.user}" />
+                    <div class="reply-details">
+                        <strong class="reply-user">${reply.user}</strong>
+                        <span class="reply-time">${reply.timeAgo}</span>
+                    </div>
+                </div>
+                <p class="reply-text">${reply.content}</p>
+                ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
+                ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
+            `;
+            modalBody.appendChild(replyElement);
+        });
+    } catch (error) {
+        modalBody.innerHTML = `<p>Error loading replies.</p>`;
+        console.error('Error fetching replies:', error);
+    }
+};
+
+// Close Modal Function
+const closeRepliesModal = () => {
+    document.getElementById('replies-modal').style.display = 'none';
+};
+
   return (
     <div className={styles.commentSection}>
             <div id='spinner'></div>
