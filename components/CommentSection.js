@@ -363,6 +363,7 @@ const showReplies = async (commentId) => {
     modal.style.display = 'block';
 
     try {
+       
         const response = await fetch(`/api/comments/${commentId}/reply`);
         const replies = await response.json();
 
@@ -375,8 +376,8 @@ const showReplies = async (commentId) => {
         modalBody.innerHTML = '';
 
         replies.forEach(reply => {
-            const timeAgo = formatTimeAgo(new Date(reply.createdAt)); // Format time
-            const replyTo = reply.replyTo || 'unknown'; // Fallback to 'unknown' if no replyTo
+
+const timeAgo = formatTimeAgo(new Date(reply.createdAt));
 
             const replyElement = document.createElement('div');
             replyElement.classList.add('reply-container');
@@ -385,13 +386,10 @@ const showReplies = async (commentId) => {
                     <img class="reply-avatar" src="${reply.userImage}" alt="${reply.user}" />
                     <div class="reply-details">
                         <strong class="reply-user">${reply.user}</strong>
-                        <span class="reply-time">${timeAgo}</span>
+                        <span class="reply-time">${reply.timeAgo}</span>
                     </div>
                 </div>
-${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
-                <p class="reply-text">
-                    ${reply.content}
-                </p>
+                <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
             `;
@@ -438,17 +436,7 @@ const closeRepliesModal = () => {
                     const isOwner =
                         currentUser &&
                         (currentUser.sub === comment.userId || currentUser.id === comment.userId);
-                   <div className={styles.modal} id="replies-modal">
-  <div className={styles.modalContent}>
-    <div className={styles.modalHeader}>
-      <h3>Replies</h3>
-      <button className={styles.closeButton} onClick={closeRepliesModal}>✖</button>
-    </div>
-    <div className={styles.modalBody} id="replies-modal-body">
-      <p>Loading replies...</p>
-    </div>
-  </div>
-</div>
+                  
       
                     return (
                         <div key={comment._id} className={styles.commentContainer}>
@@ -485,7 +473,17 @@ const closeRepliesModal = () => {
                     );
                 })}
             </div>
-
+<div className={styles.modal} id="replies-modal">
+  <div className={styles.modalContent}>
+    <div className={styles.modalHeader}>
+      <h3>Replies</h3>
+      <button className={styles.closeButton} onClick={closeRepliesModal}>✖</button>
+    </div>
+    <div className={styles.modalBody} id="replies-modal-body">
+      <p>Loading replies...</p>
+    </div>
+  </div>
+</div>
             <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
          {/* Edit Comment Modal */}
       {editingComment && (
