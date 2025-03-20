@@ -19,8 +19,6 @@ const CommentSection = () => {
   const [editingComment, setEditingComment] = useState(null);
   const [editContent, setEditContent] = useState("");
 
-
-
   // Function to format the time ago
   const formatTimeAgo = (date) => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -145,7 +143,6 @@ const CommentSection = () => {
     setCurrentUser(userInfo.data ? userInfo.data : null);
   }, []);
 
-
   // Handle file selection
   const handleFileChange = (e, type) => {
     if (type === 'image') setImage(e.target.files[0]);
@@ -175,8 +172,6 @@ const CommentSection = () => {
         previewContainer.appendChild(video);
       }
     }
-
-
   };
 
   async function convertFileToBase64(file) {
@@ -244,7 +239,6 @@ const CommentSection = () => {
       uploadedVideoPath = videoPath; // Get the path from the upload function
     }
 
-
     formData.append('imagePath', uploadedImagePath);
 
     formData.append('videoPath', uploadedVideoPath);
@@ -270,7 +264,6 @@ const CommentSection = () => {
     finally {
       // Clear input fields
       setContent('');
-
     }
 
     setLoading(false);
@@ -353,9 +346,10 @@ const CommentSection = () => {
 
     modal.style.display = 'block';
   }
-  // Function to edit a reply  
+
+  // Function to edit a reply
   function editReply(commentId, replyId, currentContent) {
-    // Create an edit modal  
+    // Create an edit modal
     const modal = document.createElement('div');
     modal.id = 'edit-reply-modal';
     modal.style.position = 'fixed';
@@ -368,17 +362,17 @@ const CommentSection = () => {
     modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
     modal.style.zIndex = 1000;
 
-    modal.innerHTML = `  
-        <h3>Edit Reply</h3>  
-        <textarea id="edit-reply-content" style="width: 100%; height: 80px;">${currentContent}</textarea>  
-        <br>  
-        <button id="save-reply-edit">Save</button>  
-        <button id="cancel-reply-edit">Cancel</button>  
+    modal.innerHTML = `
+        <h3>Edit Reply</h3>
+        <textarea id="edit-reply-content" style="width: 100%; height: 80px;">${currentContent}</textarea>
+        <br>
+        <button id="save-reply-edit">Save</button>
+        <button id="cancel-reply-edit">Cancel</button>
     `;
 
     document.body.appendChild(modal);
 
-    // Handle save action  
+    // Handle save action
     document.getElementById('save-reply-edit').onclick = async () => {
       const updatedContent = document.getElementById('edit-reply-content').value;
 
@@ -401,14 +395,14 @@ const CommentSection = () => {
 
         alert('Reply updated successfully.');
         document.body.removeChild(modal);
-        fetchComments(); // Refresh the comments after editing  
+        fetchComments(); // Refresh the comments after editing
       } catch (error) {
         console.error('Error updating reply:', error);
         alert('Failed to update the reply.');
       }
     };
 
-    // Handle cancel action  
+    // Handle cancel action
     document.getElementById('cancel-reply-edit').onclick = () => {
       document.body.removeChild(modal);
     };
@@ -548,7 +542,6 @@ const CommentSection = () => {
             currentUser &&
             (currentUser.sub === comment.userId || currentUser.id === comment.userId);
 
-
           return (
             <div key={comment._id} className={styles.commentContainer}>
               <div className={styles.commentHeader}>
@@ -580,7 +573,6 @@ const CommentSection = () => {
                 <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
               </div>
             </div>
-
           );
         })}
       </div>
