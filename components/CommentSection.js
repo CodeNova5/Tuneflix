@@ -275,6 +275,7 @@ const CommentSection = () => {
 
     setLoading(false);
   };
+
   async function replyToComment(commentId, replyId, commentOwner, commentOwnerId) {
     let modal = document.getElementById('reply-modal');
     if (!modal) {
@@ -352,6 +353,93 @@ const CommentSection = () => {
 
     modal.style.display = 'block';
 }
+// Function to edit a reply  
+function editReply(commentId, replyId, currentContent) {  
+    // Create an edit modal  
+    const modal = document.createElement('div');  
+    modal.id = 'edit-reply-modal';  
+    modal.style.position = 'fixed';  
+    modal.style.top = '50%';  
+    modal.style.left = '50%';  
+    modal.style.transform = 'translate(-50%, -50%)';  
+    modal.style.background = 'white';  
+    modal.style.padding = '20px';  
+    modal.style.border = '1px solid #ccc';  
+    modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';  
+    modal.style.zIndex = 1000;  
+  
+    modal.innerHTML = `  
+        <h3>Edit Reply</h3>  
+        <textarea id="edit-reply-content" style="width: 100%; height: 80px;">${currentContent}</textarea>  
+        <br>  
+        <button id="save-reply-edit">Save</button>  
+        <button id="cancel-reply-edit">Cancel</button>  
+    `;  
+  
+    document.body.appendChild(modal);  
+  
+    // Handle save action  
+    document.getElementById('save-reply-edit').onclick = async () => {  
+        const updatedContent = document.getElementById('edit-reply-content').value;  
+  
+        if (!updatedContent.trim()) {  
+            alert('Reply cannot be empty.');  
+            return;  
+        }  
+  
+        try {  
+            await fetch(`/api/comments/${commentId}/replies/${replyId}`, {  
+                method: 'PUT',  
+                headers: {  
+                    'Content-Type': 'application/json',  
+                },  
+                body: JSON.stringify({  
+                    userId: currentUser.sub || currentUser.id,  
+                    content: updatedContent,  
+                }),  
+            });  
+  
+            alert('Reply updated successfully.');  
+            document.body.removeChild(modal);  
+            fetchComments(); // Refresh the comments after editing  
+        } catch (error) {  
+            console.error('Error updating reply:', error);  
+            alert('Failed to update the reply.');  
+        }  
+    };  
+  
+    // Handle cancel action  
+    document.getElementById('cancel-reply-edit').onclick = () => {  
+        document.body.removeChild(modal);  
+    };  
+}  
+  
+// Function to delete a reply  
+async function deleteReply(commentId, replyId) {  
+    if (!currentUser) {  
+        alert("Please log in to delete a reply.");  
+        return;  
+    }  
+  
+    const confirmDelete = confirm("Are you sure you want to delete this reply and all its nested replies?");  
+    if (!confirmDelete) return;  
+  
+    try {  
+        await fetch(`/api/comments/${commentId}/replies/${replyId}`, {  
+            method: 'DELETE',  
+            headers: {  
+                'Content-Type': 'application/json',  
+            },  
+            body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),  
+        });  
+  
+        alert('Reply deleted successfully.');  
+        fetchComments(); // Refresh the comments after deletion  
+    } catch (error) {  
+        console.error('Error deleting reply:', error);  
+        alert('Failed to delete the reply.');  
+    }  
+}  
 
 const showReplies = async (commentId) => {
     const modal = document.getElementById('replies-modal');
@@ -413,8 +501,8 @@ const showReplies = async (commentId) => {
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
                 <div class="reply-actions">
-                    <button class="edit-reply-button" onclick="handleEditReply('${reply._id}')">Edit</button>
-                    <button class="delete-reply-button" onclick="deleteReply('${reply._id}')">Delete</button>
+     <button onClick={() => editReply(commentId,      reply._id, reply.content)}>Edit</button>  
+<button onClick={() => deleteReply(commentId, reply._id)}>Delete</button>
                 </div>
             `;
             modalBody.appendChild(replyElement);
