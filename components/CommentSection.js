@@ -500,10 +500,8 @@ const showReplies = async (commentId) => {
                 <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
-                <div class="reply-actions">
-    <button onClick={() => editReply(commentId, reply._id, reply.content)}>Edit</button>
-<button onClick="deleteReply('${commentId}', '${reply._id}')">Delete</button>
-                </div>
+    <button onClick="editReply('${commentId}', '${reply._id}', '${reply.content}')">Edit</button> <button onClick="deleteReply('${commentId}', '${reply._id}')">Delete</button>
+             
             `;
             modalBody.appendChild(replyElement);
         });
