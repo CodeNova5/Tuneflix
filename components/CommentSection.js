@@ -279,18 +279,18 @@ const CommentSection = () => {
   async function replyToComment(commentId, replyId, commentOwner, commentOwnerId) {
     let modal = document.getElementById('reply-modal');
     if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'reply-modal';
-        modal.style.position = 'fixed';
-        modal.style.top = '50%';
-        modal.style.left = '50%';
-        modal.style.transform = 'translate(-50%, -50%)';
-        modal.style.background = 'white';
-        modal.style.padding = '20px';
-        modal.style.border = '1px solid #ccc';
-        modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-        modal.style.zIndex = 1000;
-        document.body.appendChild(modal);
+      modal = document.createElement('div');
+      modal.id = 'reply-modal';
+      modal.style.position = 'fixed';
+      modal.style.top = '50%';
+      modal.style.left = '50%';
+      modal.style.transform = 'translate(-50%, -50%)';
+      modal.style.background = 'white';
+      modal.style.padding = '20px';
+      modal.style.border = '1px solid #ccc';
+      modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+      modal.style.zIndex = 1000;
+      document.body.appendChild(modal);
     }
 
     modal.innerHTML = `
@@ -308,140 +308,140 @@ const CommentSection = () => {
     const errorMsg = document.getElementById('reply-error');
 
     form.onsubmit = async (e) => {
-        e.preventDefault();
+      e.preventDefault();
 
-        if (!currentUser) {
-            alert("Please log in to reply.");
-            return;
-        }
+      if (!currentUser) {
+        alert("Please log in to reply.");
+        return;
+      }
 
-        const replyContent = document.getElementById('reply-content').value.trim();
-        if (!replyContent) {
-            alert("Reply content cannot be empty.");
-            return;
-        }
+      const replyContent = document.getElementById('reply-content').value.trim();
+      if (!replyContent) {
+        alert("Reply content cannot be empty.");
+        return;
+      }
 
-        const formData = {
-            content: replyContent,
-            replyTo: commentOwner,
-            user: currentUser.name,
-            userId: currentUser.sub || currentUser.id,
-            commentOwnerId: commentOwnerId,
-            userImage: currentUser.picture,
-            fcmtoken: localStorage.getItem('fcmToken'),
-            replyId: replyId,
-        };
+      const formData = {
+        content: replyContent,
+        replyTo: commentOwner,
+        user: currentUser.name,
+        userId: currentUser.sub || currentUser.id,
+        commentOwnerId: commentOwnerId,
+        userImage: currentUser.picture,
+        fcmtoken: localStorage.getItem('fcmToken'),
+        replyId: replyId,
+      };
 
-        const url = `/api/comments/${commentId}/reply`;
+      const url = `/api/comments/${commentId}/reply`;
 
-        try {
-            await fetch(url, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(formData) 
-            });
-            fetchComments();
-            modal.style.display = 'none';
-        } catch (error) {
-            errorMsg.style.display = 'block';
-        }
+      try {
+        await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        fetchComments();
+        modal.style.display = 'none';
+      } catch (error) {
+        errorMsg.style.display = 'block';
+      }
     };
 
     document.getElementById('close-modal').onclick = () => {
-        modal.style.display = 'none';
+      modal.style.display = 'none';
     };
 
     modal.style.display = 'block';
-}
-// Function to edit a reply  
-function editReply(commentId, replyId, currentContent) {  
+  }
+  // Function to edit a reply  
+  function editReply(commentId, replyId, currentContent) {
     // Create an edit modal  
-    const modal = document.createElement('div');  
-    modal.id = 'edit-reply-modal';  
-    modal.style.position = 'fixed';  
-    modal.style.top = '50%';  
-    modal.style.left = '50%';  
-    modal.style.transform = 'translate(-50%, -50%)';  
-    modal.style.background = 'white';  
-    modal.style.padding = '20px';  
-    modal.style.border = '1px solid #ccc';  
-    modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';  
-    modal.style.zIndex = 1000;  
-  
+    const modal = document.createElement('div');
+    modal.id = 'edit-reply-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.background = 'white';
+    modal.style.padding = '20px';
+    modal.style.border = '1px solid #ccc';
+    modal.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    modal.style.zIndex = 1000;
+
     modal.innerHTML = `  
         <h3>Edit Reply</h3>  
         <textarea id="edit-reply-content" style="width: 100%; height: 80px;">${currentContent}</textarea>  
         <br>  
         <button id="save-reply-edit">Save</button>  
         <button id="cancel-reply-edit">Cancel</button>  
-    `;  
-  
-    document.body.appendChild(modal);  
-  
-    // Handle save action  
-    document.getElementById('save-reply-edit').onclick = async () => {  
-        const updatedContent = document.getElementById('edit-reply-content').value;  
-  
-        if (!updatedContent.trim()) {  
-            alert('Reply cannot be empty.');  
-            return;  
-        }  
-  
-        try {  
-            await fetch(`/api/comments/${commentId}/replies/${replyId}`, {  
-                method: 'PUT',  
-                headers: {  
-                    'Content-Type': 'application/json',  
-                },  
-                body: JSON.stringify({  
-                    userId: currentUser.sub || currentUser.id,  
-                    content: updatedContent,  
-                }),  
-            });  
-  
-            alert('Reply updated successfully.');  
-            document.body.removeChild(modal);  
-            fetchComments(); // Refresh the comments after editing  
-        } catch (error) {  
-            console.error('Error updating reply:', error);  
-            alert('Failed to update the reply.');  
-        }  
-    };  
-  
-    // Handle cancel action  
-    document.getElementById('cancel-reply-edit').onclick = () => {  
-        document.body.removeChild(modal);  
-    };  
-}  
-  
-// Function to delete a reply  
-async function deleteReply(commentId, replyId) {  
-    if (!currentUser) {  
-        alert("Please log in to delete a reply.");  
-        return;  
-    }  
-  
-    const confirmDelete = confirm("Are you sure you want to delete this reply and all its nested replies?");  
-    if (!confirmDelete) return;  
-  
-    try {  
-        await fetch(`/api/comments/${commentId}/replies/${replyId}`, {  
-            method: 'DELETE',  
-            headers: {  
-                'Content-Type': 'application/json',  
-            },  
-            body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),  
-        });  
-  
-        alert('Reply deleted successfully.');  
-        fetchComments(); // Refresh the comments after deletion  
-    } catch (error) {  
-        console.error('Error deleting reply:', error);  
-        alert('Failed to delete the reply.');  
-    }  
-}  
+    `;
 
-const showReplies = async (commentId) => {
+    document.body.appendChild(modal);
+
+    // Handle save action  
+    document.getElementById('save-reply-edit').onclick = async () => {
+      const updatedContent = document.getElementById('edit-reply-content').value;
+
+      if (!updatedContent.trim()) {
+        alert('Reply cannot be empty.');
+        return;
+      }
+
+      try {
+        await fetch(`/api/comments/${commentId}/replies/${replyId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: currentUser.sub || currentUser.id,
+            content: updatedContent,
+          }),
+        });
+
+        alert('Reply updated successfully.');
+        document.body.removeChild(modal);
+        fetchComments(); // Refresh the comments after editing  
+      } catch (error) {
+        console.error('Error updating reply:', error);
+        alert('Failed to update the reply.');
+      }
+    };
+
+    // Handle cancel action  
+    document.getElementById('cancel-reply-edit').onclick = () => {
+      document.body.removeChild(modal);
+    };
+  }
+
+  // Function to delete a reply  
+  async function deleteReply(commentId, replyId) {
+    if (!currentUser) {
+      alert("Please log in to delete a reply.");
+      return;
+    }
+
+    const confirmDelete = confirm("Are you sure you want to delete this reply and all its nested replies?");
+    if (!confirmDelete) return;
+
+    try {
+      await fetch(`/api/comments/${commentId}/replies/${replyId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),
+      });
+
+      alert('Reply deleted successfully.');
+      fetchComments(); // Refresh the comments after deletion  
+    } catch (error) {
+      console.error('Error deleting reply:', error);
+      alert('Failed to delete the reply.');
+    }
+  }
+
+  const showReplies = async (commentId) => {
     const modal = document.getElementById('replies-modal');
     const modalBody = document.getElementById('replies-modal-body');
 
@@ -450,20 +450,20 @@ const showReplies = async (commentId) => {
     modal.style.display = 'block';
 
     try {
-        const response = await fetch(`/api/comments/${commentId}/reply`);
-        const replies = await response.json();
+      const response = await fetch(`/api/comments/${commentId}/reply`);
+      const replies = await response.json();
 
-        // Fetch the original comment
-        const commentResponse = await fetch(`/api/comments/${commentId}`);
-        const comment = await commentResponse.json();
+      // Fetch the original comment
+      const commentResponse = await fetch(`/api/comments/${commentId}`);
+      const comment = await commentResponse.json();
 
-        // Clear previous content
-        modalBody.innerHTML = '';
+      // Clear previous content
+      modalBody.innerHTML = '';
 
-        // Display the original comment
-        const commentElement = document.createElement('div');
-        commentElement.classList.add('comment-container');
-        commentElement.innerHTML = `
+      // Display the original comment
+      const commentElement = document.createElement('div');
+      commentElement.classList.add('comment-container');
+      commentElement.innerHTML = `
             <div class="comment-header">
                 <img class="comment-avatar" src="${comment.userImage}" alt="${comment.user}" />
                 <div class="comment-details">
@@ -475,20 +475,20 @@ const showReplies = async (commentId) => {
             ${comment.image ? `<img class="comment-image" src="${comment.image}" alt="Comment Image" />` : ''}
             ${comment.video ? `<video class="comment-video" src="${comment.video}" controls></video>` : ''}
         `;
-        modalBody.appendChild(commentElement);
+      modalBody.appendChild(commentElement);
 
-        if (replies.length === 0) {
-            modalBody.innerHTML += '<p>No replies yet.</p>';
-            return;
-        }
+      if (replies.length === 0) {
+        modalBody.innerHTML += '<p>No replies yet.</p>';
+        return;
+      }
 
-        replies.forEach(reply => {
-            const timeAgo = formatTimeAgo(new Date(reply.createdAt));
-            const replyTo = reply.replyTo || 'unknown';
+      replies.forEach(reply => {
+        const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+        const replyTo = reply.replyTo || 'unknown';
 
-            const replyElement = document.createElement('div');
-            replyElement.classList.add('reply-container');
-            replyElement.innerHTML = `
+        const replyElement = document.createElement('div');
+        replyElement.classList.add('reply-container');
+        replyElement.innerHTML = `
                 <div class="reply-header">
                     <img class="reply-avatar" src="${reply.userImage}" alt="${reply.user}" />
                     <div class="reply-details">
@@ -500,102 +500,103 @@ const showReplies = async (commentId) => {
                 <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
-    <button onClick="editReply('${commentId}', '${reply._id}', '${reply.content}')">Edit</button> <button onClick="deleteReply('${commentId}', '${reply._id}')">Delete</button>
+                <button onClick="editReply('${commentId}', '${reply._id}', '${reply.content}')">Edit</button>
+                <button onClick="deleteReply('${commentId}', '${reply._id}')">Delete</button>
              
             `;
-            modalBody.appendChild(replyElement);
-        });
+        modalBody.appendChild(replyElement);
+      });
     } catch (error) {
-        modalBody.innerHTML = `<p>Error loading replies.</p>`;
-        console.error('Error fetching replies:', error);
+      modalBody.innerHTML = `<p>Error loading replies.</p>`;
+      console.error('Error fetching replies:', error);
     }
-};
+  };
 
-// Close Modal Function
-const closeRepliesModal = () => {
+  // Close Modal Function
+  const closeRepliesModal = () => {
     document.getElementById('replies-modal').style.display = 'none';
-};
+  };
 
   return (
     <div className={styles.commentSection}>
-            <div id='spinner'></div>
-            <h1 className={styles.commentTitle}>Comment Section</h1>
-            <textarea
-                className={styles.commentInput}
-                placeholder="Write a comment..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-            ></textarea>
-            <div className={styles.fileInputContainer}>
-            <div id="previewContainer" class="previewContainer" ></div>
-                <label className={styles.commentLabel}>
-                    <i className="fas fa-image"></i>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')}/>
-                </label>
-                <label className={styles.commentLabel}>
-                    <i className="fas fa-video"></i>
-                    <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
-                </label>
-            </div>
-            <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
-                {loading ? 'Posting...' : 'Post Comment'}
-            </button>
-           
-            <div className={styles.commentSection}>
-                {formattedComments.map((comment) => {
-                    const isOwner =
-                        currentUser &&
-                        (currentUser.sub === comment.userId || currentUser.id === comment.userId);
-                  
-      
-                    return (
-                        <div key={comment._id} className={styles.commentContainer}>
-                        <div className={styles.commentHeader}>
-                            <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} />
-                            <div className={styles.commentDetails}>
-                                <strong className={styles.commentUser}>{comment.user}</strong>
-                                <span className={styles.timeAgo}>{comment.timeAgo}</span>
-                            </div>
-                        </div>
-                        <p className={styles.commentText}>{comment.content}</p>
-                        {comment.image && <img className={styles.commentImage} src={comment.image} alt="Comment" />}
+      <div id='spinner'></div>
+      <h1 className={styles.commentTitle}>Comment Section</h1>
+      <textarea
+        className={styles.commentInput}
+        placeholder="Write a comment..."
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      ></textarea>
+      <div className={styles.fileInputContainer}>
+        <div id="previewContainer" class="previewContainer" ></div>
+        <label className={styles.commentLabel}>
+          <i className="fas fa-image"></i>
+          <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
+        </label>
+        <label className={styles.commentLabel}>
+          <i className="fas fa-video"></i>
+          <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
+        </label>
+      </div>
+      <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
+        {loading ? 'Posting...' : 'Post Comment'}
+      </button>
 
-                        {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
-                        
-                        <div className={styles.commentActions}>
-                            <span className={styles.likeButton} onClick={() => toggleLike(comment._id, comment.userLiked)}>
-                                {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
-                            </span>
-                            {isOwner && (
-                                <>
-                                    <button className={styles.editButton} onClick={() => handleEdit(comment)}>Edit</button>
-                                    <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
-                                </>
-                            )}
-                        </div>
-                        
-                        <div className={styles.replyActions}>
-                        <button onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}> Reply</button>
-                        <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
-                        </div>
-                    </div>
-                    
-                    );
-                })}
+      <div className={styles.commentSection}>
+        {formattedComments.map((comment) => {
+          const isOwner =
+            currentUser &&
+            (currentUser.sub === comment.userId || currentUser.id === comment.userId);
+
+
+          return (
+            <div key={comment._id} className={styles.commentContainer}>
+              <div className={styles.commentHeader}>
+                <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} />
+                <div className={styles.commentDetails}>
+                  <strong className={styles.commentUser}>{comment.user}</strong>
+                  <span className={styles.timeAgo}>{comment.timeAgo}</span>
+                </div>
+              </div>
+              <p className={styles.commentText}>{comment.content}</p>
+              {comment.image && <img className={styles.commentImage} src={comment.image} alt="Comment" />}
+
+              {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
+
+              <div className={styles.commentActions}>
+                <span className={styles.likeButton} onClick={() => toggleLike(comment._id, comment.userLiked)}>
+                  {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
+                </span>
+                {isOwner && (
+                  <>
+                    <button className={styles.editButton} onClick={() => handleEdit(comment)}>Edit</button>
+                    <button className={styles.deleteButton} onClick={() => deleteComment(comment._id)}>Delete</button>
+                  </>
+                )}
+              </div>
+
+              <div className={styles.replyActions}>
+                <button onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}> Reply</button>
+                <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
+              </div>
             </div>
-<div style={{ display: "none" }} className={styles.modal} id="replies-modal">
-  <div className={styles.modalContent}>
-    <div className={styles.modalHeader}>
-      <h3>Replies</h3>
-      <button className={styles.closeButton} onClick={closeRepliesModal}>✖</button>
-    </div>
-    <div className={styles.modalBody} id="replies-modal-body">
-      <p>Loading replies...</p>
-    </div>
-  </div>
-</div>
-            <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
-         {/* Edit Comment Modal */}
+
+          );
+        })}
+      </div>
+      <div style={{ display: "none" }} className={styles.modal} id="replies-modal">
+        <div className={styles.modalContent}>
+          <div className={styles.modalHeader}>
+            <h3>Replies</h3>
+            <button className={styles.closeButton} onClick={closeRepliesModal}>✖</button>
+          </div>
+          <div className={styles.modalBody} id="replies-modal-body">
+            <p>Loading replies...</p>
+          </div>
+        </div>
+      </div>
+      <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
+      {/* Edit Comment Modal */}
       {editingComment && (
         <div className={styles.editModal}>
           <div className={styles.editModalContent}>
@@ -612,7 +613,7 @@ const closeRepliesModal = () => {
           </div>
         </div>
       )}
-        </div>
+    </div>
   );
 };
 
