@@ -436,7 +436,20 @@ const CommentSection = () => {
       alert('Failed to delete the reply.');
     }
   }
+  async function toggleReplyLike(commentId, replyId, isLiked) {
+    if (!currentUser) {
+        alert("Please log in to like/unlike.");
+        return;
+    }
 
+    await fetch(`/api/comments/${commentId}/replies/${replyId}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.id }),
+    });
+
+    showReplies(commentId); // Refresh the replies in the modal
+}
   const showReplies = async (commentId) => {
     const modal = document.getElementById('replies-modal');
     const modalBody = document.getElementById('replies-modal-body');
@@ -452,6 +465,7 @@ const CommentSection = () => {
         const commentResponse = await fetch(`/api/comments/${commentId}`);
         const comment = await commentResponse.json();
 
+        // Clear previous content
         modalBody.innerHTML = '';
 
         // Display the original comment
@@ -478,6 +492,9 @@ const CommentSection = () => {
 
         replies.forEach(reply => {
             const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+            const replyTo = reply.replyTo || 'unknown';
+            const likedByUser = (reply.likes || []).includes(currentUser?.id);
+
             const replyElement = document.createElement('div');
             replyElement.classList.add('reply-container');
             replyElement.innerHTML = `
@@ -488,45 +505,65 @@ const CommentSection = () => {
                         <span class="reply-time">${timeAgo}</span>
                     </div>
                 </div>
+                ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
                 <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
-                <button class="edit-reply-btn" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-content="${reply.content}">Edit</button>
-                <button class="delete-reply-btn" data-comment-id="${commentId}" data-reply-id="${reply._id}">Delete</button>
-                 <button class="reply-to-reply-btn" 
+
+                <button class="edit-reply-btn" 
+                    data-comment-id="${commentId}" 
+                    data-reply-id="${reply._id}" 
+                    data-content="${reply.content}">
+                    Edit
+                </button>
+                <button class="delete-reply-btn" 
+                    data-comment-id="${commentId}" 
+                    data-reply-id="${reply._id}">
+                    Delete
+                </button>
+                <button class="reply-to-reply-btn" 
                     data-comment-id="${commentId}" 
                     data-reply-id="${reply._id}" 
                     data-user="${reply.user}" 
                     data-user-id="${reply.userId}">
                     Reply
                 </button>
-                `;
+
+                <div class="like-reply-btn" 
+                    data-comment-id="${commentId}" 
+                    data-reply-id="${reply._id}" 
+                    data-liked="${likedByUser}" 
+                    style="cursor: pointer; color: ${likedByUser ? 'blue' : 'gray'};">
+                    ❤️ <span class="like-count">${(reply.likes || []).length}</span> Like
+                </div>
+            `;
             modalBody.appendChild(replyElement);
         });
 
-        // Event Delegation for Edit Reply
-        modalBody.addEventListener('click', (event) => {
-            if (event.target.classList.contains('edit-reply-btn')) {
-                const commentId = event.target.getAttribute('data-comment-id');
-                const replyId = event.target.getAttribute('data-reply-id');
-                const currentContent = event.target.getAttribute('data-content');
-                editReply(commentId, replyId, currentContent);
-            }
+        // Attach event listeners to buttons
+        document.querySelectorAll('.edit-reply-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                editReply(this.dataset.commentId, this.dataset.replyId, this.dataset.content);
+            });
         });
 
-        // Event Delegation for Delete Reply
-        modalBody.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-reply-btn')) {
-                const commentId = event.target.getAttribute('data-comment-id');
-                const replyId = event.target.getAttribute('data-reply-id');
-                await deleteReply(commentId, replyId);
-            }
+        document.querySelectorAll('.delete-reply-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                deleteReply(this.dataset.commentId, this.dataset.replyId);
+            });
         });
+
         document.querySelectorAll('.reply-to-reply-btn').forEach(button => {
-          button.addEventListener('click', function () {
-              replyToComment(this.dataset.commentId, this.dataset.replyId, this.dataset.user, this.dataset.userId);
-          });
-      });
+            button.addEventListener('click', function () {
+                replyToComment(this.dataset.commentId, this.dataset.replyId, this.dataset.user, this.dataset.userId);
+            });
+        });
+
+        document.querySelectorAll('.like-reply-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                toggleReplyLike(this.dataset.commentId, this.dataset.replyId, this.dataset.liked === 'true');
+            });
+        });
 
     } catch (error) {
         modalBody.innerHTML = `<p>Error loading replies.</p>`;
@@ -608,7 +645,7 @@ const CommentSection = () => {
 
               <div className={styles.commentActions}>
                 <span className={styles.likeButton} onClick={() => toggleLike(comment._id, comment.userLiked)}>
-                  {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
+                  {comment.userLiked ? '❤️' : '❤️'} ({comment.likes.length})
                 </span>
                 {isOwner && (
                   <>
