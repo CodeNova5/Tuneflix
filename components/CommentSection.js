@@ -444,20 +444,18 @@ const CommentSection = () => {
     modal.style.display = 'block';
 
     try {
-      const response = await fetch(`/api/comments/${commentId}/reply`);
-      const replies = await response.json();
+        const response = await fetch(`/api/comments/${commentId}/reply`);
+        const replies = await response.json();
 
-      // Fetch the original comment
-      const commentResponse = await fetch(`/api/comments/${commentId}`);
-      const comment = await commentResponse.json();
+        const commentResponse = await fetch(`/api/comments/${commentId}`);
+        const comment = await commentResponse.json();
 
-      // Clear previous content
-      modalBody.innerHTML = '';
+        modalBody.innerHTML = '';
 
-      // Display the original comment
-      const commentElement = document.createElement('div');
-      commentElement.classList.add('comment-container');
-      commentElement.innerHTML = `
+        // Display the original comment
+        const commentElement = document.createElement('div');
+        commentElement.classList.add('comment-container');
+        commentElement.innerHTML = `
             <div class="comment-header">
                 <img class="comment-avatar" src="${comment.userImage}" alt="${comment.user}" />
                 <div class="comment-details">
@@ -469,20 +467,18 @@ const CommentSection = () => {
             ${comment.image ? `<img class="comment-image" src="${comment.image}" alt="Comment Image" />` : ''}
             ${comment.video ? `<video class="comment-video" src="${comment.video}" controls></video>` : ''}
         `;
-      modalBody.appendChild(commentElement);
+        modalBody.appendChild(commentElement);
 
-      if (replies.length === 0) {
-        modalBody.innerHTML += '<p>No replies yet.</p>';
-        return;
-      }
+        if (replies.length === 0) {
+            modalBody.innerHTML += '<p>No replies yet.</p>';
+            return;
+        }
 
-      replies.forEach(reply => {
-        const timeAgo = formatTimeAgo(new Date(reply.createdAt));
-        const replyTo = reply.replyTo || 'unknown';
-
-        const replyElement = document.createElement('div');
-        replyElement.classList.add('reply-container');
-        replyElement.innerHTML = `
+        replies.forEach(reply => {
+            const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+            const replyElement = document.createElement('div');
+            replyElement.classList.add('reply-container');
+            replyElement.innerHTML = `
                 <div class="reply-header">
                     <img class="reply-avatar" src="${reply.userImage}" alt="${reply.user}" />
                     <div class="reply-details">
@@ -490,21 +486,40 @@ const CommentSection = () => {
                         <span class="reply-time">${timeAgo}</span>
                     </div>
                 </div>
-                ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
                 <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
-                <button onClick="editReply('${commentId}', '${reply._id}', '${reply.content}')">Edit</button>
-                <button onClick="deleteReply('${commentId}', '${reply._id}')">Delete</button>
-             
+                <button class="edit-reply-btn" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-content="${reply.content}">Edit</button>
+                <button class="delete-reply-btn" data-comment-id="${commentId}" data-reply-id="${reply._id}">Delete</button>
             `;
-        modalBody.appendChild(replyElement);
-      });
+            modalBody.appendChild(replyElement);
+        });
+
+        // Event Delegation for Edit Reply
+        modalBody.addEventListener('click', (event) => {
+            if (event.target.classList.contains('edit-reply-btn')) {
+                const commentId = event.target.getAttribute('data-comment-id');
+                const replyId = event.target.getAttribute('data-reply-id');
+                const currentContent = event.target.getAttribute('data-content');
+                editReply(commentId, replyId, currentContent);
+            }
+        });
+
+        // Event Delegation for Delete Reply
+        modalBody.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('delete-reply-btn')) {
+                const commentId = event.target.getAttribute('data-comment-id');
+                const replyId = event.target.getAttribute('data-reply-id');
+                await deleteReply(commentId, replyId);
+            }
+        });
+
     } catch (error) {
-      modalBody.innerHTML = `<p>Error loading replies.</p>`;
-      console.error('Error fetching replies:', error);
+        modalBody.innerHTML = `<p>Error loading replies.</p>`;
+        console.error('Error fetching replies:', error);
     }
-  };
+};
+
 
   // Close Modal Function
   const closeRepliesModal = () => {
