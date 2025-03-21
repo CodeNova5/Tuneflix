@@ -539,7 +539,26 @@ const CommentSection = () => {
   const closeRepliesModal = () => {
     document.getElementById('replies-modal').style.display = 'none';
   };
+  async function toggleLike(commentId, isLiked) {
+    if (!currentUser) {
+        alert("Please log in to like a comment.");
+        return;
+    }
 
+    const userId = currentUser.sub || currentUser.id;
+
+    const url = isLiked
+        ? `/api/comments/${commentId}/unlike`
+        : `/api/comments/${commentId}/like`;
+
+    await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+    });
+
+    fetchComments(); // Refresh comments to update like counts
+}
   return (
     <div className={styles.commentSection}>
       <div id='spinner'></div>
@@ -570,6 +589,8 @@ const CommentSection = () => {
           const isOwner =
             currentUser &&
             (currentUser.sub === comment.userId || currentUser.id === comment.userId);
+            const userLiked = currentUser && comment.likes.includes(currentUser.sub || currentUser.id);
+
 
           return (
             <div key={comment._id} className={styles.commentContainer}>
