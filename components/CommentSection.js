@@ -493,7 +493,14 @@ const CommentSection = () => {
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
                 <button class="edit-reply-btn" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-content="${reply.content}">Edit</button>
                 <button class="delete-reply-btn" data-comment-id="${commentId}" data-reply-id="${reply._id}">Delete</button>
-            `;
+                 <button class="reply-to-reply-btn" 
+                    data-comment-id="${commentId}" 
+                    data-reply-id="${reply._id}" 
+                    data-user="${reply.user}" 
+                    data-user-id="${reply.userId}">
+                    Reply
+                </button>
+                `;
             modalBody.appendChild(replyElement);
         });
 
@@ -515,7 +522,12 @@ const CommentSection = () => {
                 await deleteReply(commentId, replyId);
             }
         });
-
+        document.querySelectorAll('.reply-to-reply-btn').forEach(button => {
+          button.addEventListener('click', function () {
+              replyToComment(this.dataset.commentId, this.dataset.replyId, this.dataset.user, this.dataset.userId);
+          });
+      });
+      
     } catch (error) {
         modalBody.innerHTML = `<p>Error loading replies.</p>`;
         console.error('Error fetching replies:', error);
