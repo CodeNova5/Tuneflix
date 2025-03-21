@@ -36,11 +36,12 @@ const commentSchema = new mongoose.Schema({
 const Comment = mongoose.models.Comment || mongoose.model('Comment', commentSchema);
 
 export default async function handler(req, res) {
-  const { commentId } = req.query;
+ 
 
 
 if (req.method === 'GET') {
     try {
+      const { commentId } = req.query;
       const comment = await Comment.findById(commentId).select('replies');
 
       if (!comment) {
@@ -55,7 +56,7 @@ if (req.method === 'GET') {
   } 
 
   if (req.method === 'PUT') {
-    const { commentId, replyId } = req.params;  
+    const { commentId, replyId } = req.query;  
     const { userId, content } = req.body; // Get userId and content from request body  
   
     try {  
