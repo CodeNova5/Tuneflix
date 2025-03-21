@@ -395,7 +395,8 @@ const CommentSection = () => {
 
         alert('Reply updated successfully.');
         document.body.removeChild(modal);
-  
+        showReplies(commentId); // Refresh the replies in the modal
+
       } catch (error) {
         console.error('Error updating reply:', error);
         alert('Failed to update the reply.');
@@ -428,6 +429,8 @@ const CommentSection = () => {
       });
 
       alert('Reply deleted successfully.'); 
+      showReplies(commentId); // Refresh the replies in the modal
+
     } catch (error) {
       console.error('Error deleting reply:', error);
       alert('Failed to delete the reply.');
