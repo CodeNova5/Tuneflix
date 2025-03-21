@@ -36,10 +36,7 @@ const commentSchema = new mongoose.Schema({
 const Comment = mongoose.models.Comment || mongoose.model('Comment', commentSchema);
 
 export default async function handler(req, res) {
- 
-
-
-if (req.method === 'GET') {
+  if (req.method === 'GET') {
     try {
       const { commentId } = req.query;
       const comment = await Comment.findById(commentId).select('replies');
@@ -89,24 +86,83 @@ if (req.method === 'GET') {
     }  
   } 
 
+  if (req.method === 'DELETE') {
+    const { commentId, replyId } = req.query;
+    const { userId } = req.body; // Get the user ID from the request body
 
+    try {
+      // Find the parent comment
+      const comment = await Comment.findById(commentId);
 
-  else {
+      if (!comment) {
+        return res.status(404).json({ message: 'Comment not found.' });
+      }
+
+      // Helper function to find and delete the reply recursively
+      const deleteNestedReply = (replies, replyId) => {
+        for (let i = 0; i < replies.length; i++) {
+          const reply = replies[i];
+          if (reply._id.toString() === replyId) {
+            // Check user authorization
+            if (reply.userId !== userId) {
+              throw new Error('Unauthorized');
+            }
+
+            // Delete associated media if it exists
+            if (reply.media) {
+              
+            }
+
+            // Remove the reply
+            replies.splice(i, 1);
+            return true;
+          }
+
+          // Recursively search in nested replies
+          if (reply.replies && reply.replies.length > 0) {
+            const foundAndDeleted = deleteNestedReply(reply.replies, replyId);
+            if (foundAndDeleted) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+      // Start deleting the reply
+      const deleted = deleteNestedReply(comment.replies, replyId);
+
+      if (!deleted) {
+        return res.status(404).json({ message: 'Reply not found.' });
+      }
+
+      // Save the updated comment
+      await comment.save();
+
+      res.json({ message: 'Reply and associated media deleted successfully.' });
+    } catch (error) {
+      if (error.message === 'Unauthorized') {
+        return res.status(403).json({ message: 'You are not authorized to delete this reply.' });
+      }
+      console.error('Error deleting reply:', error);
+      res.status(500).json({ message: 'Internal server error.' });
+    }
+  } else {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
-// Recursive function to find a reply by ID  
-function findReply(replies, replyId) {  
+
+  // Recursive function to find a reply by ID  
+  function findReply(replies, replyId) {  
     if (!Array.isArray(replies)) return null; // Ensure replies is an array  
-  
+
     for (const reply of replies) {  
-        if (reply && reply._id && reply._id.toString() === replyId) {  
-            return reply;  
-        }  
-        // Recursively search nested replies  
-        const nestedReply = reply?.replies ? findReply(reply.replies, replyId) : null;  
-        if (nestedReply) return nestedReply;  
+      if (reply && reply._id && reply._id.toString() === replyId) {  
+        return reply;  
+      }  
+      // Recursively search nested replies  
+      const nestedReply = reply?.replies ? findReply(reply.replies, replyId) : null;  
+      if (nestedReply) return nestedReply;  
     }  
     return null;  
-}  
-  
+  }  
 }

@@ -395,7 +395,7 @@ const CommentSection = () => {
 
         alert('Reply updated successfully.');
         document.body.removeChild(modal);
-        fetchComments(); // Refresh the comments after editing
+  
       } catch (error) {
         console.error('Error updating reply:', error);
         alert('Failed to update the reply.');
@@ -427,8 +427,7 @@ const CommentSection = () => {
         body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),
       });
 
-      alert('Reply deleted successfully.');
-      fetchComments(); // Refresh the comments after deletion  
+      alert('Reply deleted successfully.'); 
     } catch (error) {
       console.error('Error deleting reply:', error);
       alert('Failed to delete the reply.');
