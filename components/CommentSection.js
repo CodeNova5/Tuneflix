@@ -299,7 +299,7 @@ const CommentSection = () => {
 
     const form = document.getElementById('reply-form');
     const errorMsg = document.getElementById('reply-error');
-
+    showReplies(commentId); // Refresh the replies in the modal
     form.onsubmit = async (e) => {
       e.preventDefault();
 
@@ -333,7 +333,7 @@ const CommentSection = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
-        fetchComments();
+        showReplies(commentId); // Refresh the replies in the modal
         modal.style.display = 'none';
       } catch (error) {
         errorMsg.style.display = 'block';
@@ -527,7 +527,7 @@ const CommentSection = () => {
               replyToComment(this.dataset.commentId, this.dataset.replyId, this.dataset.user, this.dataset.userId);
           });
       });
-      
+
     } catch (error) {
         modalBody.innerHTML = `<p>Error loading replies.</p>`;
         console.error('Error fetching replies:', error);
