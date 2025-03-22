@@ -294,8 +294,8 @@ showReplies(commentId);
     modal.innerHTML = `  
     <form id="reply-form" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1px solid #ccc;">  
        <input id="reply-content" type="text" placeholder="Write a reply..." style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none;">  
-        <button type="submit" style="background: none; border: none; cursor: pointer;">  
-            <i class="fas fa-paper-plane" style="font-size: 18px; color: white;"></i>  
+        <button type="submit" style="background: none; color: white;  border: none; cursor: pointer;">  
+            &#x2709;  <!-- Unicode for a paper airplane -->
         </button>  
     </form>  
     <p id="reply-error" style="color: red; display: none; padding: 5px;">Error submitting reply. Please try again.</p>  
@@ -514,8 +514,7 @@ const form = document.getElementById('reply-form');
                 ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
                 <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
-                ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
-  <i class="fas fa-paper-plane" style="font-size: 18px; color: white;"></i>  
+                ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}  
                 <button class="edit-reply-btn" 
                     data-comment-id="${commentId}" 
                     data-reply-id="${reply._id}" 
@@ -607,10 +606,6 @@ modal.style.display = "none";
 }
   return (
    <div className={styles.commentSection}>
- <FontAwesomeIcon 
-  icon={faCoffee} 
-  style={{ color: "#ff6347", fontSize: "30px" }} 
-/>
       <div id='spinner'></div>
       <h1 className={styles.commentTitle}>Comment Section</h1>
       <textarea
