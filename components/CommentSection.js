@@ -295,7 +295,7 @@ showReplies(commentId);
     <form id="reply-form" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1px solid #ccc;">  
        <input id="reply-content" type="text" placeholder="Write a reply..." style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none;">  
         <button type="submit" style="background: none; border: none; cursor: pointer;">  
-            <i class="fas fa-paper-plane" style="font-size: 18px; color: #1877F2;"></i>  
+            <i class="fas fa-paper-plane" style="font-size: 18px; color: white;"></i>  
         </button>  
     </form>  
     <p id="reply-error" style="color: red; display: none; padding: 5px;">Error submitting reply. Please try again.</p>  
@@ -515,7 +515,7 @@ const form = document.getElementById('reply-form');
                 <p class="reply-text">${reply.content}</p>
                 ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
                 ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}
-
+  <i class="fas fa-paper-plane" style="font-size: 18px; color: white;"></i>  
                 <button class="edit-reply-btn" 
                     data-comment-id="${commentId}" 
                     data-reply-id="${reply._id}" 
