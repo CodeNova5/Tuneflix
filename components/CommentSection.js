@@ -602,6 +602,8 @@ const CommentSection = () => {
     <div className={styles.commentSection}>
       <h1 className={styles.commentTitle}>Comment Section</h1>
       <div style={{ position: "fixed", bottom: "0", left: "0", width: "80%;", backgroundColor: "black", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
+      <div id="previewContainer" className="previewContainer"></div>
+
         <textarea
           className={styles.commentInput}
           placeholder="Write a comment..."
@@ -609,8 +611,7 @@ const CommentSection = () => {
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
         <div className={styles.fileInputContainer}>
-          <div id="previewContainer" className="previewContainer"></div>
-          <label className={styles.commentLabel}>
+            <label className={styles.commentLabel}>
             <i className="fas fa-image" onClick={() => document.getElementById('imageUpload').click()}></i>
             <input
               id="imageUpload"
