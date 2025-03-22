@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -598,12 +598,19 @@ const CommentSection = () => {
 
     fetchComments(); // Refresh comments to update like counts
   }
-  const autoResizeTextarea = document.getElementById("autoResizeTextarea");
+  const textareaRef = useRef(null);
 
-  autoResizeTextareatextarea.addEventListener("input", function () {
-    this.style.height = "auto"; // Reset height to recalculate
-    this.style.height = this.scrollHeight + "px"; // Set height to fit content
-  });
+  const adjustHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight(); // Ensure proper height on initial render
+  }, []);
+
   return (
     <div className={styles.commentSection}>
       <h1 className={styles.commentTitle}>Comment Section</h1>
@@ -611,7 +618,9 @@ const CommentSection = () => {
       <div id="previewContainer" className="previewContainer"></div>
 
         <textarea
-          id="autoResizeTextarea"
+           ref={textareaRef}
+           rows="1"
+           onInput={adjustHeight}
           className={styles.commentInput}
           placeholder="Write a comment..."
           value={content}
