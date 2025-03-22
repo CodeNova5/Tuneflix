@@ -601,7 +601,7 @@ const CommentSection = () => {
   return (
     <div className={styles.commentSection}>
       <h1 className={styles.commentTitle}>Comment Section</h1>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
+      <div style={{ position: "fixed", bottom: "0", left:"0", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
         <textarea
           className={styles.commentInput}
           placeholder="Write a comment..."
