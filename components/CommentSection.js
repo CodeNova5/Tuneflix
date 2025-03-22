@@ -469,6 +469,8 @@ const CommentSection = () => {
     modalBody.innerHTML = '<p>Loading replies...</p>';
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden'; // Prevent scrolling
+    modal.style.overflowY = 'scroll'; // Enable vertical scrolling
+
     try {
       const response = await fetch(`/api/comments/${commentId}/reply`);
       const replies = await response.json();
@@ -481,19 +483,19 @@ const CommentSection = () => {
 
       // Display the original comment
       const commentElement = document.createElement('div');
-      commentElement.classList.add('comment-container');
+      commentElement.classList.add(styles.commentContainer);
       commentElement.innerHTML = `
-            <div class="comment-header">
-                <img class="comment-avatar" src="${comment.userImage}" alt="${comment.user}" />
-                <div class="comment-details">
-                    <strong class="comment-user">${comment.user}</strong>
-                    <span class="comment-time">${formatTimeAgo(new Date(comment.createdAt))}</span>
-                </div>
-            </div>
-            <p class="comment-text">${comment.content}</p>
-            ${comment.image ? `<img class="comment-image" src="${comment.image}" alt="Comment Image" />` : ''}
-            ${comment.video ? `<video class="comment-video" src="${comment.video}" controls></video>` : ''}
-        `;
+        <div class="${styles.commentHeader}">
+          <img class="${styles.commentAvatar}" src="${comment.userImage}" alt="${comment.user}" />
+          <div class="${styles.commentDetails}">
+            <strong class="${styles.commentUser}">${comment.user}</strong>
+            <span class="${styles.timeAgo}">${formatTimeAgo(new Date(comment.createdAt))}</span>
+          </div>
+        </div>
+        <p class="${styles.commentText}">${comment.content}</p>
+        ${comment.image ? `<img class="${styles.commentImage}" src="${comment.image}" alt="Comment Image" />` : ''}
+        ${comment.video ? `<video class="${styles.commentVideo}" src="${comment.video}" controls></video>` : ''}
+      `;
       modalBody.appendChild(commentElement);
 
       if (replies.length === 0) {
@@ -507,69 +509,51 @@ const CommentSection = () => {
         const likedByUser = (reply.likes || []).includes(currentUser?.id);
 
         const replyElement = document.createElement('div');
-        replyElement.classList.add('reply-container');
+        replyElement.classList.add(styles.commentContainer);
         replyElement.innerHTML = `
-                <div class="reply-header">
-                    <img class="reply-avatar" src="${reply.userImage}" alt="${reply.user}" />
-                    <div class="reply-details">
-                        <strong class="reply-user">${reply.user}</strong>
-                        <span class="reply-time">${timeAgo}</span>
-                    </div>
-                </div>
-                ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
-                <p class="reply-text">${reply.content}</p>
-                ${reply.image ? `<img class="reply-image" src="${reply.image}" alt="Reply Image" />` : ''}
-                ${reply.video ? `<video class="reply-video" src="${reply.video}" controls></video>` : ''}  
-                <button class="edit-reply-btn" 
-                    data-comment-id="${commentId}" 
-                    data-reply-id="${reply._id}" 
-                    data-content="${reply.content}">
-                    Edit
-                </button>
-                <button class="delete-reply-btn" 
-                    data-comment-id="${commentId}" 
-                    data-reply-id="${reply._id}">
-                    Delete
-                </button>
-                <button class="reply-to-reply-btn" 
-                    data-comment-id="${commentId}" 
-                    data-reply-id="${reply._id}" 
-                    data-user="${reply.user}" 
-                    data-user-id="${reply.userId}">
-                    Reply
-                </button>
-
-                <div class="like-reply-btn" 
-                    data-comment-id="${commentId}" 
-                    data-reply-id="${reply._id}" 
-                    data-liked="${likedByUser}" 
-                    style="cursor: pointer; color: ${likedByUser ? 'blue' : 'gray'};">
-                    ❤️ <span class="like-count">${(reply.likes || []).length}</span> Like
-                </div>
-            `;
+          <div class="${styles.commentHeader}">
+            <img class="${styles.commentAvatar}" src="${reply.userImage}" alt="${reply.user}" />
+            <div class="${styles.commentDetails}">
+              <strong class="${styles.commentUser}">${reply.user}</strong>
+              <span class="${styles.timeAgo}">${timeAgo}</span>
+            </div>
+          </div>
+          ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
+          <p class="${styles.commentText}">${reply.content}</p>
+          ${reply.image ? `<img class="${styles.commentImage}" src="${reply.image}" alt="Reply Image" />` : ''}
+          ${reply.video ? `<video class="${styles.commentVideo}" src="${reply.video}" controls></video>` : ''}
+          <div class="${styles.commentActions}">
+            <span class="${styles.likeButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-liked="${likedByUser}" style="cursor: pointer; color: ${likedByUser ? 'blue' : 'gray'};">
+              ❤️ <span class="like-count">${(reply.likes || []).length}</span> Like
+            </span>
+            <button class="${styles.editButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-content="${reply.content}">Edit</button>
+            <button class="${styles.deleteButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}">Delete</button>
+            <button class="${styles.replyButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-user="${reply.user}" data-user-id="${reply.userId}">Reply</button>
+          </div>
+        `;
         modalBody.appendChild(replyElement);
       });
 
       // Attach event listeners to buttons
-      document.querySelectorAll('.edit-reply-btn').forEach(button => {
+      document.querySelectorAll(`.${styles.editButton}`).forEach(button => {
         button.addEventListener('click', function () {
           editReply(this.dataset.commentId, this.dataset.replyId, this.dataset.content);
         });
       });
 
-      document.querySelectorAll('.delete-reply-btn').forEach(button => {
+      document.querySelectorAll(`.${styles.deleteButton}`).forEach(button => {
         button.addEventListener('click', function () {
           deleteReply(this.dataset.commentId, this.dataset.replyId);
         });
       });
 
-      document.querySelectorAll('.reply-to-reply-btn').forEach(button => {
+      document.querySelectorAll(`.${styles.replyButton}`).forEach(button => {
         button.addEventListener('click', function () {
           replyToComment(this.dataset.commentId, this.dataset.replyId, this.dataset.user, this.dataset.userId);
         });
       });
 
-      document.querySelectorAll('.like-reply-btn').forEach(button => {
+      document.querySelectorAll(`.${styles.likeButton}`).forEach(button => {
         button.addEventListener('click', function () {
           toggleReplyLike(this.dataset.commentId, this.dataset.replyId, this.dataset.liked === 'true');
         });
@@ -580,7 +564,6 @@ const CommentSection = () => {
       console.error('Error fetching replies:', error);
     }
   };
-
 
   // Close Modal Function
   const closeRepliesModal = () => {
