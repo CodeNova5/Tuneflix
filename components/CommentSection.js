@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
-
+import Head from 'next/head';
 const CommentSection = () => {
   const [comments, setComments] = useState([]);
   const [content, setContent] = useState('');
