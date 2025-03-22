@@ -628,6 +628,7 @@ const CommentSection = () => {
             const userLiked = currentUser && comment.likes.includes(currentUser.sub || currentUser.id);
 
 
+
           return (
             <div key={comment._id} className={styles.commentContainer}>
               <div className={styles.commentHeader}>
@@ -643,9 +644,10 @@ const CommentSection = () => {
               {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
 
               <div className={styles.commentActions}>
-                <span className={styles.likeButton} onClick={() => toggleLike(comment._id, comment.userLiked)}>
-                  {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
-                </span>
+               
+<span className={styles.likeButton} onClick={() => toggleLike(comment._id)}>
+  {userLiked ? '❤️' : '🤍'} ({comment.likes.length})
+</span>
                 {isOwner && (
                   <>
                     <button className={styles.editButton} onClick={() => handleEdit(comment)}>Edit</button>
