@@ -293,9 +293,9 @@ showReplies(commentId);
 
     modal.innerHTML = `  
     <form id="reply-form" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1px solid #ccc;">  
-       <input id="reply-content" type="text" placeholder="Write a reply..." style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none;">  
-        <button type="submit" style="background: none; color: white;  border: none; cursor: pointer;">  
-            &#x2709;  <!-- Unicode for a paper airplane -->
+       <textarea id="reply-content" type="text" placeholder="Write a reply..." style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none;"></textarea> 
+        <button type="submit" style="background: none; color: white;  border: none; cursor: pointer; font-size: 16px;">  
+            &#xf1d8  <!-- Unicode for a paper airplane -->
         </button>  
     </form>  
     <p id="reply-error" style="color: red; display: none; padding: 5px;">Error submitting reply. Please try again.</p>  
