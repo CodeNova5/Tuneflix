@@ -299,7 +299,6 @@ const CommentSection = () => {
 
     const form = document.getElementById('reply-form');
     const errorMsg = document.getElementById('reply-error');
-    showReplies(commentId); // Refresh the replies in the modal
     form.onsubmit = async (e) => {
       e.preventDefault();
 
@@ -657,7 +656,9 @@ const CommentSection = () => {
 
               <div className={styles.replyActions}>
                 <button onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}> Reply</button>
-                <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
+                {comment.replies.length > 0 && (
+    <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
+)}
               </div>
             </div>
           );
