@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoffee, } from "@fortawesome/free-solid-svg-icons";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const CommentSection = () => {
 
@@ -168,7 +167,7 @@ const CommentSection = () => {
         img.style.height = '100px'; // Set height for image preview
         img.style.width = '100px'; // Set width
         previewContainer.appendChild(img);
-        
+
       } else if (fileType.startsWith('video/')) {
         // Handle video preview
         const video = document.createElement('video');
@@ -576,7 +575,7 @@ const CommentSection = () => {
     if (modal) {
       modal.style.display = "none";
     }
-     document.getElementById('replies-modal').style.display = 'none';
+    document.getElementById('replies-modal').style.display = 'none';
     document.body.style.overflow = 'auto'; // Restore scrolling
   };
   async function toggleLike(commentId, isLiked) {
@@ -601,30 +600,44 @@ const CommentSection = () => {
   }
   return (
     <div className={styles.commentSection}>
-     <h1 className={styles.commentTitle}>Comment Section</h1>
-     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
-      <textarea
-        className={styles.commentInput}
-        placeholder="Write a comment..."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      ></textarea>
-      <div className={styles.fileInputContainer}>
-        <div id="previewContainer" class="previewContainer" ></div>
-        <label className={styles.commentLabel}>
-          <i className="fas fa-image"></i>
-          <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
-        </label>
-        <label className={styles.commentLabel}>
-          <i className="fas fa-video"></i>
-          <input type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} />
-        </label>
-      </div>
-      <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" style="fill: #1F51FF; transform: rotate(50deg);">
-        <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480l0-83.6c0-4 1.5-7.8 4.2-10.8L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/>
-      </svg>
-      </button>
+      <h1 className={styles.commentTitle}>Comment Section</h1>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
+        <textarea
+          className={styles.commentInput}
+          placeholder="Write a comment..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        ></textarea>
+        <div className={styles.fileInputContainer}>
+          <div id="previewContainer" class="previewContainer" ></div>
+          <label className={styles.commentLabel}>
+            <i className="fas fa-image" onClick={() => document.getElementById('imageUpload').click()}></i>
+            <input
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={(e) => handleFileChange(e, 'image')}
+            />
+          </label>
+
+          <label className={styles.commentLabel}>
+            <i className="fas fa-video" onClick={() => document.getElementById('videoUpload').click()}></i>
+            <input
+              id="videoUpload"
+              type="file"
+              accept="video/*"
+              style={{ display: "none" }}
+              onChange={(e) => handleFileChange(e, 'video')}
+            />
+          </label>
+
+        </div>
+        <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" style="fill: #1F51FF; transform: rotate(50deg);">
+            <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480l0-83.6c0-4 1.5-7.8 4.2-10.8L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" />
+          </svg>
+        </button>
       </div>
 
       <div className={styles.commentSection}>
@@ -666,7 +679,7 @@ const CommentSection = () => {
               <div className={styles.replyActions}>
                 <button onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}> Reply</button>
                 {comment.replies.length > 0 && (
-                 <div>({comment.replies.length})</div>
+                  <div>({comment.replies.length})</div>
                 )}
               </div>
             </div>
