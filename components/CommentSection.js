@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -610,44 +610,46 @@ const CommentSection = () => {
   useEffect(() => {
     adjustHeight(); // Ensure proper height on initial render
   }, []);
+  const imageInputRef = useRef(null);
+  const videoInputRef = useRef(null);
 
   return (
     <div className={styles.commentSection}>
       <h1 className={styles.commentTitle}>Comment Section</h1>
-      <div style={{ position: "fixed", bottom: "0", left: "0", width: "80%;", backgroundColor: "black", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
-      <div id="previewContainer" className="previewContainer"></div>
+      <div style={{ position: "fixed", bottom: "0", left: "0", width: "100%;", backgroundColor: "black", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
+        <div id="previewContainer" className="previewContainer"></div>
+        <label className={styles.commentLabel} onClick={() => imageInputRef.current.click()}>
+          <i className="fas fa-image"></i>
+        </label>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={(e) => handleFileChange(e, "image")}
+        />
 
+        <label className={styles.commentLabel} onClick={() => videoInputRef.current.click()}>
+          <i className="fas fa-video"></i>
+        </label>
+        <input
+          ref={videoInputRef}
+          type="file"
+          accept="video/*"
+          style={{ display: "none" }}
+          onChange={(e) => handleFileChange(e, "video")}
+        />
         <textarea
-           ref={textareaRef}
-           rows="1"
-           onInput={adjustHeight}
+          ref={textareaRef}
+          rows="1"
+          onInput={adjustHeight}
           className={styles.commentInput}
           placeholder="Write a comment..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
         <div className={styles.fileInputContainer}>
-            <label className={styles.commentLabel}>
-            <i className="fas fa-image" onClick={() => document.getElementById('imageUpload').click()}></i>
-            <input
-              id="imageUpload"
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={(e) => handleFileChange(e, 'image')}
-            />
-          </label>
 
-          <label className={styles.commentLabel}>
-            <i className="fas fa-video" onClick={() => document.getElementById('videoUpload').click()}></i>
-            <input
-              id="videoUpload"
-              type="file"
-              accept="video/*"
-              style={{ display: "none" }}
-              onChange={(e) => handleFileChange(e, 'video')}
-            />
-          </label>
         </div>
         <button className={styles.commentSubmit} onClick={postComment} disabled={loading}>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" style={{ fill: "#1F51FF", transform: "rotate(50deg)" }}>
