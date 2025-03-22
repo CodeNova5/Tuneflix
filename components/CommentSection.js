@@ -459,6 +459,8 @@ const CommentSection = () => {
 
     showReplies(commentId); // Refresh the replies in the modal
   }
+
+  
   const showReplies = async (commentId) => {
     const modal = document.getElementById('replies-modal');
     const modalBody = document.getElementById('replies-modal-body');
