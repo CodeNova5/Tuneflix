@@ -598,6 +598,12 @@ const CommentSection = () => {
 
     fetchComments(); // Refresh comments to update like counts
   }
+  const autoResizeTextarea = document.getElementById("autoResizeTextarea");
+
+  autoResizeTextareatextarea.addEventListener("input", function () {
+    this.style.height = "auto"; // Reset height to recalculate
+    this.style.height = this.scrollHeight + "px"; // Set height to fit content
+  });
   return (
     <div className={styles.commentSection}>
       <h1 className={styles.commentTitle}>Comment Section</h1>
@@ -605,6 +611,7 @@ const CommentSection = () => {
       <div id="previewContainer" className="previewContainer"></div>
 
         <textarea
+          id="autoResizeTextarea"
           className={styles.commentInput}
           placeholder="Write a comment..."
           value={content}
