@@ -575,7 +575,10 @@ const form = document.getElementById('reply-form');
 
   // Close Modal Function
   const closeRepliesModal = () => {
-    document.getElementById('replies-modal').style.display = 'none';
+      const modal = document.getElementById('reply-modal');
+if (modal) {
+modal.style.display = "none";
+} document.getElementById('replies-modal').style.display = 'none';
   };
   async function toggleLike(commentId, isLiked) {
     if (!currentUser) {
