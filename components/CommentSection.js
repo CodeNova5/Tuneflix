@@ -645,7 +645,7 @@ const CommentSection = () => {
 
               <div className={styles.commentActions}>
                 <span className={styles.likeButton} onClick={() => toggleLike(comment._id, comment.userLiked)}>
-                  {comment.userLiked ? '❤️' : '❤️'} ({comment.likes.length})
+                  {comment.userLiked ? '❤️' : '🤍'} ({comment.likes.length})
                 </span>
                 {isOwner && (
                   <>
