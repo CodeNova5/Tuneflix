@@ -295,7 +295,9 @@ showReplies(commentId);
     <form id="reply-form" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1px solid #ccc;">  
        <textarea id="reply-content" type="text" placeholder="Write a reply..." style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none;"></textarea> 
         <button type="submit" style="background: none; color: white;  border: none; cursor: pointer; font-size: 16px;">  
-            &#xf1d8  <!-- Unicode for a paper airplane -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" style="fill: white;">
+                <path d="M12 2L8 6h3v4h2V6h3l-4-4z"/>
+            </svg>
         </button>  
     </form>  
     <p id="reply-error" style="color: red; display: none; padding: 5px;">Error submitting reply. Please try again.</p>  
