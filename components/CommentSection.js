@@ -287,16 +287,16 @@ showReplies(commentId);
       document.body.appendChild(modal);
     }
 
-    modal.innerHTML = `
-        <form id="reply-form">
-            <h3>Reply to ${commentOwner}</h3>
-            <textarea id="reply-content" placeholder="Write your reply..." rows="4" style="width: 100%;"></textarea>
-            <br><br>
-            <button type="submit">Submit Reply</button>
-            <button type="button" id="close-modal">Cancel</button>
-        </form>
-        <p id="reply-error" style="color: red; display: none;">Error submitting reply. Please try again.</p>
-    `;
+    modal.innerHTML = `  
+    <form id="reply-form" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1px solid #ccc;">  
+       <input id="reply-content" type="text" placeholder="Write a reply..." style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none;">  
+        <button type="submit" style="background: none; border: none; cursor: pointer;">  
+            <i class="fas fa-paper-plane" style="font-size: 18px; color: #1877F2;"></i>  
+        </button>  
+    </form>  
+    <p id="reply-error" style="color: red; display: none; padding: 5px;">Error submitting reply. Please try again.</p>  
+`;
+
 const textarea = document.getElementById("reply-content");
 textarea.focus(); // Focus the textarea
 const form = document.getElementById('reply-form');
