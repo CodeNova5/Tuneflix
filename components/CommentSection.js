@@ -270,6 +270,7 @@ const CommentSection = () => {
   };
 
   async function replyToComment(commentId, replyId, commentOwner, commentOwnerId) {
+showReplies(commentId);
     let modal = document.getElementById('reply-modal');
     if (!modal) {
       modal = document.createElement('div');
@@ -296,8 +297,9 @@ const CommentSection = () => {
         </form>
         <p id="reply-error" style="color: red; display: none;">Error submitting reply. Please try again.</p>
     `;
-
-    const form = document.getElementById('reply-form');
+const textarea = document.getElementById("reply-content");
+textarea.focus(); // Focus the textarea
+const form = document.getElementById('reply-form');
     const errorMsg = document.getElementById('reply-error');
     form.onsubmit = async (e) => {
       e.preventDefault();
