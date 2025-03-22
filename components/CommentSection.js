@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
 import Head from 'next/head';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoffee } from "@fortawesome/free-solid-svg-icons";
+
 const CommentSection = () => {
+
   const [comments, setComments] = useState([]);
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
@@ -612,7 +616,10 @@ modal.style.display = "none";
           crossOrigin="anonymous"
         />
       </Head>
- 
+ <FontAwesomeIcon 
+  icon={faCoffee} 
+  style={{ color: "#ff6347", fontSize: "30px" }} 
+/>
       <div id='spinner'></div>
       <h1 className={styles.commentTitle}>Comment Section</h1>
       <textarea
