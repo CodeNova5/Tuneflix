@@ -466,7 +466,7 @@ const CommentSection = () => {
     const modalBody = document.getElementById('replies-modal-body');
 
     // Show loading indicator
-    modalBody.innerHTML = '<p>Loading replies...</p>';
+    modalBody.innerHTML = '<div class="spinner"></div>';
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden'; // Prevent scrolling
     modal.style.overflowY = 'scroll'; // Enable vertical scrolling
@@ -658,7 +658,7 @@ const CommentSection = () => {
               <div className={styles.replyActions}>
                 <button onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}> Reply</button>
                 {comment.replies.length > 0 && (
-                  <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
+                 <div>({comment.replies.length})</div>
                 )}
               </div>
             </div>
