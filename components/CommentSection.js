@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
-import Head from 'next/head';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCoffee } from "@fortawesome/free-solid-svg-icons";
 
@@ -608,14 +607,6 @@ modal.style.display = "none";
 }
   return (
    <div className={styles.commentSection}>
-<Head>
-        <link 
-          rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
-          integrity="sha384-LRZsrY0HtdxGXEjb0nFh59HvhIWQFak7pHRH93S4iwF+KfblAGtFKJ5n3e2kcA1Y" 
-          crossOrigin="anonymous"
-        />
-      </Head>
  <FontAwesomeIcon 
   icon={faCoffee} 
   style={{ color: "#ff6347", fontSize: "30px" }} 
