@@ -275,25 +275,25 @@ const CommentSection = () => {
 
 
   async function replyToComment(commentId, replyId, commentOwner, commentOwnerId) {
-let modal = document.getElementById('reply-modal');
-if (!modal) {
-  modal = document.createElement('div');
-  modal.id = 'reply-modal';
-  modal.style.position = 'fixed';
-  modal.style.bottom = '0';  // Position at the bottom of the screen
-  modal.style.left = '0';
-  modal.style.width = '100%'; // Span the width horizontally
-  modal.style.background = 'black';
-  modal.style.color = 'white';
-  modal.style.padding = '10px'; // Adjusted padding for better fit
-  modal.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.1)';
-  modal.style.zIndex = 1000;
-  document.body.appendChild(modal);
-}
+    let modal = document.getElementById('reply-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'reply-modal';
+      modal.style.position = 'fixed';
+      modal.style.bottom = '0';  // Position at the bottom of the screen
+      modal.style.left = '0';
+      modal.style.width = '100%'; // Span the width horizontally
+      modal.style.background = 'black';
+      modal.style.color = 'white';
+      modal.style.padding = '10px'; // Adjusted padding for better fit
+      modal.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.1)';
+      modal.style.zIndex = 1000;
+      document.body.appendChild(modal);
+    }
 
-modal.innerHTML = `
+    modal.innerHTML = `
   <form id="reply-form" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-top: 1px solid #ccc;">
-    <textarea id="reply-content" type="text" placeholder="Write a reply..." style=" padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none; height: 40px;"></textarea>
+    <textarea id="reply-content" type="text" placeholder="Write a reply..." style=" padding: 8px; border-radius: 20px; border: 1px solid #ccc; outline: none; height: 40px; width: 80%;"></textarea>
     <button type="submit" style="background: none; color: white; border: none; cursor: pointer; font-size: 16px;">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" style="fill: #1F51FF; transform: rotate(50deg);">
         <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480l0-83.6c0-4 1.5-7.8 4.2-10.8L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/>
@@ -302,11 +302,11 @@ modal.innerHTML = `
   </form>
   <p id="reply-error" style="color: red; display: none; padding: 5px;">Error submitting reply. Please try again.</p>
 `;
-modal.style.display = 'block';
-showReplies(commentId);
-const textarea = document.getElementById("reply-content");
-textarea.focus(); // Focus the textarea
-const form = document.getElementById('reply-form');
+    modal.style.display = 'block';
+    showReplies(commentId);
+    const textarea = document.getElementById("reply-content");
+    textarea.focus(); // Focus the textarea
+    const form = document.getElementById('reply-form');
     const errorMsg = document.getElementById('reply-error');
     form.onsubmit = async (e) => {
       e.preventDefault();
@@ -437,7 +437,7 @@ const form = document.getElementById('reply-form');
         body: JSON.stringify({ userId: currentUser.sub || currentUser.id }),
       });
 
-      alert('Reply deleted successfully.'); 
+      alert('Reply deleted successfully.');
       showReplies(commentId); // Refresh the replies in the modal
 
     } catch (error) {
@@ -447,18 +447,18 @@ const form = document.getElementById('reply-form');
   }
   async function toggleReplyLike(commentId, replyId, isLiked) {
     if (!currentUser) {
-        alert("Please log in to like/unlike.");
-        return;
+      alert("Please log in to like/unlike.");
+      return;
     }
 
     await fetch(`/api/comments/${commentId}/replies/${replyId}/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUser.id }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentUser.id }),
     });
 
     showReplies(commentId); // Refresh the replies in the modal
-}
+  }
   const showReplies = async (commentId) => {
     const modal = document.getElementById('replies-modal');
     const modalBody = document.getElementById('replies-modal-body');
@@ -468,19 +468,19 @@ const form = document.getElementById('reply-form');
     modal.style.display = 'block';
 
     try {
-        const response = await fetch(`/api/comments/${commentId}/reply`);
-        const replies = await response.json();
+      const response = await fetch(`/api/comments/${commentId}/reply`);
+      const replies = await response.json();
 
-        const commentResponse = await fetch(`/api/comments/${commentId}`);
-        const comment = await commentResponse.json();
+      const commentResponse = await fetch(`/api/comments/${commentId}`);
+      const comment = await commentResponse.json();
 
-        // Clear previous content
-        modalBody.innerHTML = '';
+      // Clear previous content
+      modalBody.innerHTML = '';
 
-        // Display the original comment
-        const commentElement = document.createElement('div');
-        commentElement.classList.add('comment-container');
-        commentElement.innerHTML = `
+      // Display the original comment
+      const commentElement = document.createElement('div');
+      commentElement.classList.add('comment-container');
+      commentElement.innerHTML = `
             <div class="comment-header">
                 <img class="comment-avatar" src="${comment.userImage}" alt="${comment.user}" />
                 <div class="comment-details">
@@ -492,21 +492,21 @@ const form = document.getElementById('reply-form');
             ${comment.image ? `<img class="comment-image" src="${comment.image}" alt="Comment Image" />` : ''}
             ${comment.video ? `<video class="comment-video" src="${comment.video}" controls></video>` : ''}
         `;
-        modalBody.appendChild(commentElement);
+      modalBody.appendChild(commentElement);
 
-        if (replies.length === 0) {
-            modalBody.innerHTML += '<p>No replies yet.</p>';
-            return;
-        }
+      if (replies.length === 0) {
+        modalBody.innerHTML += '<p>No replies yet.</p>';
+        return;
+      }
 
-        replies.forEach(reply => {
-            const timeAgo = formatTimeAgo(new Date(reply.createdAt));
-            const replyTo = reply.replyTo || 'unknown';
-            const likedByUser = (reply.likes || []).includes(currentUser?.id);
+      replies.forEach(reply => {
+        const timeAgo = formatTimeAgo(new Date(reply.createdAt));
+        const replyTo = reply.replyTo || 'unknown';
+        const likedByUser = (reply.likes || []).includes(currentUser?.id);
 
-            const replyElement = document.createElement('div');
-            replyElement.classList.add('reply-container');
-            replyElement.innerHTML = `
+        const replyElement = document.createElement('div');
+        replyElement.classList.add('reply-container');
+        replyElement.innerHTML = `
                 <div class="reply-header">
                     <img class="reply-avatar" src="${reply.userImage}" alt="${reply.user}" />
                     <div class="reply-details">
@@ -545,70 +545,70 @@ const form = document.getElementById('reply-form');
                     ❤️ <span class="like-count">${(reply.likes || []).length}</span> Like
                 </div>
             `;
-            modalBody.appendChild(replyElement);
-        });
+        modalBody.appendChild(replyElement);
+      });
 
-        // Attach event listeners to buttons
-        document.querySelectorAll('.edit-reply-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                editReply(this.dataset.commentId, this.dataset.replyId, this.dataset.content);
-            });
+      // Attach event listeners to buttons
+      document.querySelectorAll('.edit-reply-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          editReply(this.dataset.commentId, this.dataset.replyId, this.dataset.content);
         });
+      });
 
-        document.querySelectorAll('.delete-reply-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                deleteReply(this.dataset.commentId, this.dataset.replyId);
-            });
+      document.querySelectorAll('.delete-reply-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          deleteReply(this.dataset.commentId, this.dataset.replyId);
         });
+      });
 
-        document.querySelectorAll('.reply-to-reply-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                replyToComment(this.dataset.commentId, this.dataset.replyId, this.dataset.user, this.dataset.userId);
-            });
+      document.querySelectorAll('.reply-to-reply-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          replyToComment(this.dataset.commentId, this.dataset.replyId, this.dataset.user, this.dataset.userId);
         });
+      });
 
-        document.querySelectorAll('.like-reply-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                toggleReplyLike(this.dataset.commentId, this.dataset.replyId, this.dataset.liked === 'true');
-            });
+      document.querySelectorAll('.like-reply-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          toggleReplyLike(this.dataset.commentId, this.dataset.replyId, this.dataset.liked === 'true');
         });
+      });
 
     } catch (error) {
-        modalBody.innerHTML = `<p>Error loading replies.</p>`;
-        console.error('Error fetching replies:', error);
+      modalBody.innerHTML = `<p>Error loading replies.</p>`;
+      console.error('Error fetching replies:', error);
     }
-};
+  };
 
 
   // Close Modal Function
   const closeRepliesModal = () => {
-      const modal = document.getElementById('reply-modal');
-if (modal) {
-modal.style.display = "none";
-} document.getElementById('replies-modal').style.display = 'none';
+    const modal = document.getElementById('reply-modal');
+    if (modal) {
+      modal.style.display = "none";
+    } document.getElementById('replies-modal').style.display = 'none';
   };
   async function toggleLike(commentId, isLiked) {
     if (!currentUser) {
-        alert("Please log in to like a comment.");
-        return;
+      alert("Please log in to like a comment.");
+      return;
     }
 
     const userId = currentUser.sub || currentUser.id;
 
     const url = isLiked
-        ? `/api/comments/${commentId}/unlike`
-        : `/api/comments/${commentId}/like`;
+      ? `/api/comments/${commentId}/unlike`
+      : `/api/comments/${commentId}/like`;
 
     await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
     });
 
     fetchComments(); // Refresh comments to update like counts
-}
+  }
   return (
-   <div className={styles.commentSection}>
+    <div className={styles.commentSection}>
       <div id='spinner'></div>
       <h1 className={styles.commentTitle}>Comment Section</h1>
       <textarea
@@ -637,7 +637,7 @@ modal.style.display = "none";
           const isOwner =
             currentUser &&
             (currentUser.sub === comment.userId || currentUser.id === comment.userId);
-            const userLiked = currentUser && comment.likes.includes(currentUser.sub || currentUser.id);
+          const userLiked = currentUser && comment.likes.includes(currentUser.sub || currentUser.id);
 
 
 
@@ -656,10 +656,10 @@ modal.style.display = "none";
               {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
 
               <div className={styles.commentActions}>
-               
-<span className={styles.likeButton} onClick={() => toggleLike(comment._id)}>
-  {userLiked ? '❤️' : '🤍'} ({comment.likes.length})
-</span>
+
+                <span className={styles.likeButton} onClick={() => toggleLike(comment._id)}>
+                  {userLiked ? '❤️' : '🤍'} ({comment.likes.length})
+                </span>
                 {isOwner && (
                   <>
                     <button className={styles.editButton} onClick={() => handleEdit(comment)}>Edit</button>
@@ -671,8 +671,8 @@ modal.style.display = "none";
               <div className={styles.replyActions}>
                 <button onClick={() => replyToComment(comment._id, null, comment.user, comment.userId)}> Reply</button>
                 {comment.replies.length > 0 && (
-    <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
-)}
+                  <button id="view-replies" onClick={() => showReplies(comment._id)}>View Replies</button>
+                )}
               </div>
             </div>
           );
