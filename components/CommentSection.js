@@ -603,6 +603,14 @@ modal.style.display = "none";
     fetchComments(); // Refresh comments to update like counts
 }
   return (
+<Head>
+        <link 
+          rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+          integrity="sha384-LRZsrY0HtdxGXEjb0nFh59HvhIWQFak7pHRH93S4iwF+KfblAGtFKJ5n3e2kcA1Y" 
+          crossOrigin="anonymous"
+        />
+      </Head>
     <div className={styles.commentSection}>
       <div id='spinner'></div>
       <h1 className={styles.commentTitle}>Comment Section</h1>
