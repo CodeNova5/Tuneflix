@@ -603,6 +603,7 @@ modal.style.display = "none";
     fetchComments(); // Refresh comments to update like counts
 }
   return (
+   <div className={styles.commentSection}>
 <Head>
         <link 
           rel="stylesheet" 
@@ -611,7 +612,7 @@ modal.style.display = "none";
           crossOrigin="anonymous"
         />
       </Head>
-    <div className={styles.commentSection}>
+ 
       <div id='spinner'></div>
       <h1 className={styles.commentTitle}>Comment Section</h1>
       <textarea
