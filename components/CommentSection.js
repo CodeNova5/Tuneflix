@@ -14,7 +14,7 @@ const CommentSection = () => {
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [limit] = useState(5);
+  const [limit] = useState(100);
   const [pageUrl, setPageUrl] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const pathname = usePathname(); // Get the current path in Next.js
@@ -375,8 +375,8 @@ const CommentSection = () => {
         <h3>Edit Reply</h3>
         <textarea id="edit-reply-content" style="width: 100%; height: 80px;">${currentContent}</textarea>
         <br>
-        <button id="save-reply-edit">Save</button>
-        <button id="cancel-reply-edit">Cancel</button>
+        <button style="background: green; color: white;  border: none; padding: 5px 10px;" id="save-reply-edit">Save</button>
+        <button style="background: red; color: white; border: none; padding: 5px 10px;" id="cancel-reply-edit">Cancel</button>
     `;
 
     document.body.appendChild(modal);
@@ -460,7 +460,7 @@ const CommentSection = () => {
     showReplies(commentId); // Refresh the replies in the modal
   }
 
-  
+
   const showReplies = async (commentId) => {
     const modal = document.getElementById('replies-modal');
     const modalBody = document.getElementById('replies-modal-body');
@@ -468,7 +468,7 @@ const CommentSection = () => {
     // Show loading indicator
     modalBody.innerHTML = '<p>Loading replies...</p>';
     modal.style.display = 'block';
-
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
     try {
       const response = await fetch(`/api/comments/${commentId}/reply`);
       const replies = await response.json();
@@ -587,7 +587,9 @@ const CommentSection = () => {
     const modal = document.getElementById('reply-modal');
     if (modal) {
       modal.style.display = "none";
-    } document.getElementById('replies-modal').style.display = 'none';
+    }
+     document.getElementById('replies-modal').style.display = 'none';
+    document.body.style.overflow = 'auto'; // Restore scrolling
   };
   async function toggleLike(commentId, isLiked) {
     if (!currentUser) {
@@ -691,7 +693,6 @@ const CommentSection = () => {
           </div>
         </div>
       </div>
-      <button className={styles.commentButton} onClick={() => setPage(page + 1)}>Load More</button>
       {/* Edit Comment Modal */}
       {editingComment && (
         <div className={styles.editModal}>
