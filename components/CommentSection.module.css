@@ -154,19 +154,11 @@
     margin-right:10px;
 }
 /* Submit button */
-.comment-submit {
-    width: 100%;
-    background: #28a745;
-    border: none;
-    color: white;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-top: 10px;
+.commentSubmit {
+    margin: 10px;
 }
 
-.comment-submit:hover {
+.commentSubmit:hover {
     background: #218838;
 }
 
