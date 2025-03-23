@@ -232,7 +232,10 @@ const CommentSection = () => {
     if (!content) return alert('Comment cannot be empty');
     if (!currentUser) return alert('User not found');
     if (!pageUrl) return alert('Page URL not found');
-
+        // Show the spinner
+        const spinner = document.getElementById('spinner');
+        if (spinner) spinner.style.display = 'block';
+    
     const formData = new FormData();
     formData.append('pageUrl', pageUrl);
     formData.append('content', content);
@@ -256,9 +259,6 @@ const CommentSection = () => {
     formData.append('imagePath', uploadedImagePath);
     formData.append('videoPath', uploadedVideoPath);
 
-    // Show the spinner
-    const spinner = document.getElementById('spinner');
-    if (spinner) spinner.style.display = 'block';
 
     setLoading(true);
 
