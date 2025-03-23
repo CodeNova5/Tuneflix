@@ -145,41 +145,52 @@ const CommentSection = () => {
     setCurrentUser(userInfo.data ? userInfo.data : null);
   }, []);
 
-  // Handle file selection
-  const handleFileChange = (e, type) => {
-    if (type === 'image') setImage(e.target.files[0]);
-    else setVideo(e.target.files[0]);
+ // Handle file selection
+const handleFileChange = (e, type) => {
+  const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 5MB limit for images
+  const MAX_VIDEO_SIZE = 20 * 1024 * 1024; // 20MB limit for videos
 
-    const selectedFile = e.target.files[0];
-    const previewContainer = document.getElementById('previewContainer');
+  const selectedFile = e.target.files[0];
+  if (!selectedFile) return;
 
-    // Clear any existing preview
-    previewContainer.innerHTML = '';
+  // Check file size
+  if (
+    (type === 'image' && selectedFile.size > MAX_IMAGE_SIZE) ||
+    (type === 'video' && selectedFile.size > MAX_VIDEO_SIZE)
+  ) {
+    alert(`File size exceeds the limit! Max size: ${type === 'image' ? '10MB' : '20MB'}`);
+    e.target.value = ''; // Reset input
+    return;
+  }
 
-    if (selectedFile) {
-      const fileType = selectedFile.type;
+  // Set file state
+  if (type === 'image') setImage(selectedFile);
+  else setVideo(selectedFile);
 
-      if (fileType.startsWith('image/')) {
-        // Handle image preview
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(selectedFile);
-        img.classList.add('preview-image'); // Add class for styling
-        img.style.height = '100px'; // Set height for image preview
-        img.style.width = '100px'; // Set width
-        previewContainer.appendChild(img);
+  const previewContainer = document.getElementById('previewContainer');
+  previewContainer.innerHTML = ''; // Clear any existing preview
 
-      } else if (fileType.startsWith('video/')) {
-        // Handle video preview
-        const video = document.createElement('video');
-        video.src = URL.createObjectURL(selectedFile);
-        video.controls = true; // Add controls to the video element
-        video.style.height = '100px'; // Set height for video preview
-        video.style.width = '100px'; // Set width
-        video.classList.add('preview-video'); // Add class for styling b
-        previewContainer.appendChild(video);
-      }
-    }
-  };
+  const fileType = selectedFile.type;
+  if (fileType.startsWith('image/')) {
+    // Handle image preview
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(selectedFile);
+    img.classList.add('preview-image');
+    img.style.height = '100px';
+    img.style.width = '100px';
+    previewContainer.appendChild(img);
+  } else if (fileType.startsWith('video/')) {
+    // Handle video preview
+    const video = document.createElement('video');
+    video.src = URL.createObjectURL(selectedFile);
+    video.controls = true;
+    video.style.height = '100px';
+    video.style.width = '100px';
+    video.classList.add('preview-video');
+    previewContainer.appendChild(video);
+  }
+};
+
 
   async function convertFileToBase64(file) {
     return new Promise((resolve, reject) => {
@@ -222,57 +233,55 @@ const CommentSection = () => {
     if (!currentUser) return alert('User not found');
     if (!pageUrl) return alert('Page URL not found'); // Ensure pageUrl is set
   
-
     const formData = new FormData();
     formData.append('pageUrl', pageUrl);
     formData.append('content', content);
     formData.append('user', currentUser.name);
     formData.append('userId', currentUser.sub || currentUser.id);
     formData.append('userImage', currentUser.picture);
-
-    // Handle file upload to GitHub if an image or video is selected
+  
     let uploadedImagePath = '';
     let uploadedVideoPath = '';
-
+  
     if (image) {
-      const imagePath = await uploadFileToGitHub(image, 'image'); // Call your previous upload function for image
-      uploadedImagePath = imagePath; // Get the path from the upload function
+      const imagePath = await uploadFileToGitHub(image, 'image');
+      uploadedImagePath = imagePath;
     }
-
+  
     if (video) {
-      const videoPath = await uploadFileToGitHub(video, 'video'); // Call your previous upload function for video
-      uploadedVideoPath = videoPath; // Get the path from the upload function
+      const videoPath = await uploadFileToGitHub(video, 'video');
+      uploadedVideoPath = videoPath;
     }
-
+  
     formData.append('imagePath', uploadedImagePath);
-
     formData.append('videoPath', uploadedVideoPath);
     setLoading(true);
-
+  
     try {
       const response = await fetch('/api/comments/comments', {
         method: 'POST',
         body: formData,
       });
-
+  
       if (!response.ok) throw new Error('Failed to post comment');
-
+  
       const newComment = await response.json();
       setComments([newComment, ...comments]);
       setContent('');
       setImage(null);
       setVideo(null);
+  
+      // Clear the preview container
+      const previewContainer = document.getElementById('previewContainer');
+      if (previewContainer) previewContainer.innerHTML = '';
     } catch (error) {
       console.error('Error posting comment:', error);
       alert('Error posting comment');
+    } finally {
+      setLoading(false);
     }
-    finally {
-      // Clear input fields
-      setContent('');
-    }
-
-    setLoading(false);
   };
+  
 
 
 
