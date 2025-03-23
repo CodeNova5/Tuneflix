@@ -31,7 +31,7 @@ export default function FileUpload() {
       const base64String = reader.result.split(',')[1]; // Remove data prefix
 
       try {
-        const response = await fetch('/api/uploadFile', {
+        const response = await fetch('/api/comments/uploadFile', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
