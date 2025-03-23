@@ -1,4 +1,3 @@
-// filepath: c:\Users\HP i7\Documents\Next\my-next-app\components\SongDetails.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -13,19 +12,26 @@ type SongDetailsType = {
 const SongDetails = () => {
   const router = useRouter();
   const [songDetails, setSongDetails] = useState<SongDetailsType | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    const fetchSongDetails = async () => {
-      const { artist, track } = router.query;
-      if (artist && track) {
-        const response = await fetch(`/api/song-details?artist=${artist}&track=${track}`);
-        const details = await response.json();
-        setSongDetails(details);
-      }
-    };
+    setIsClient(true);
+  }, []);
 
-    fetchSongDetails();
-  }, [router.query]);
+  useEffect(() => {
+    if (isClient) {
+      const fetchSongDetails = async () => {
+        const { artist, track } = router.query;
+        if (artist && track) {
+          const response = await fetch(`/api/song-details?artist=${artist}&track=${track}`);
+          const details = await response.json();
+          setSongDetails(details);
+        }
+      };
+
+      fetchSongDetails();
+    }
+  }, [router.query, isClient]);
 
   if (!songDetails) {
     return <p>Loading...</p>;
