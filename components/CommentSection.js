@@ -221,9 +221,7 @@ const CommentSection = () => {
     if (!content) return alert('Comment cannot be empty');
     if (!currentUser) return alert('User not found');
     if (!pageUrl) return alert('Page URL not found'); // Ensure pageUrl is set
-    const spinner = document.getElementById('spinner');
-
-    spinner.style.display = 'block';
+  
 
     const formData = new FormData();
     formData.append('pageUrl', pageUrl);
