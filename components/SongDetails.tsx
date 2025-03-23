@@ -1,7 +1,6 @@
-'use client';
+// filepath: c:\Users\HP i7\Documents\Next\my-next-app\components\SongDetails.tsx
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { getSongDetails } from '../lib/spotify';
 
 const SongDetails = () => {
   const router = useRouter();
@@ -11,7 +10,8 @@ const SongDetails = () => {
     const fetchSongDetails = async () => {
       const { artist, track } = router.query;
       if (artist && track) {
-        const details = await getSongDetails(artist as string, track as string);
+        const response = await fetch(`/api/song-details?artist=${artist}&track=${track}`);
+        const details = await response.json();
         setSongDetails(details);
       }
     };
