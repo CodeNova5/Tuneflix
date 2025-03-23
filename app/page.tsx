@@ -1,6 +1,7 @@
 import FileUpload from '../components/FileUpload';
 import CommentSection from "../components/CommentSection";
 import Head from 'next/head';
+import SongDetails from '../components/SongDetails';
 
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       <h1>Upload an Image</h1>
       <FileUpload />
       <CommentSection />
+      <SongDetails />
     </div>
   );
 }

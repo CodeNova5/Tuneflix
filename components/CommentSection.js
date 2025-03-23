@@ -631,7 +631,7 @@ const CommentSection = () => {
 
   return (
     <div className={styles.commentSection}>
-      <div id="spinner" className={styles.spinner} style={{ display: "none", textAlign: "center" }}>
+      <div id="spinner" className={styles.spinner} style={{ display: "none"}}>
         
       </div>
       <h1 className={styles.commentTitle}>Comment Section</h1>

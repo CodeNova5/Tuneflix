@@ -23,6 +23,7 @@
     "mongoose": "^8.12.1",
     "next": "15.2.1",
     "next-connect": "^1.0.0",
+    "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "timeago.js": "^4.0.2"
