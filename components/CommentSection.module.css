@@ -1,4 +1,4 @@
-.commentContainer {
+l.commentContainer {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -150,7 +150,8 @@
 }
 .commentLabel {
     font-size: 20px;
-    margin-left: 20px;
+    margin-left: 10px;
+    margin-right:10px;
 }
 /* Submit button */
 .comment-submit {
