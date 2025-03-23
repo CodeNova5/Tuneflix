@@ -3,9 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
+type SongDetailsType = {
+  name: string;
+  album: string;
+  duration: number;
+  relatedTracks: string[];
+};
+
 const SongDetails = () => {
   const router = useRouter();
-  const [songDetails, setSongDetails] = useState(null);
+  const [songDetails, setSongDetails] = useState<SongDetailsType | null>(null);
 
   useEffect(() => {
     const fetchSongDetails = async () => {
