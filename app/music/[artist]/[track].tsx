@@ -1,4 +1,4 @@
-// filepath: c:\Users\HP i7\Documents\Next\my-next-app\pages\music\[artist]\[track].tsx
+'use client';
 import Head from 'next/head';
 import SongDetails from '../../../components/SongDetails';
 
