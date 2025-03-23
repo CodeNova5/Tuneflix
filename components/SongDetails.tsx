@@ -1,4 +1,5 @@
 // filepath: c:\Users\HP i7\Documents\Next\my-next-app\components\SongDetails.tsx
+'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
