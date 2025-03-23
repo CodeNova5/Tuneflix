@@ -631,8 +631,8 @@ const CommentSection = () => {
 
   return (
     <div className={styles.commentSection}>
-      <div id="spinner" style={{ display: "none", textAlign: "center" }}>
-        <div className="loader"></div>
+      <div id="spinner" className={styles.spinner} style={{ display: "none", textAlign: "center" }}>
+        
       </div>
       <h1 className={styles.commentTitle}>Comment Section</h1>
       <div style={{ position: "fixed", bottom: "0", left: "0", width: "100%;", backgroundColor: "black", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
