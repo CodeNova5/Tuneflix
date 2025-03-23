@@ -651,17 +651,7 @@ const CommentSection = () => {
         <div className={styles.fileInputContainer}>
 
         </div>
-      <button className={styles.commentSubmit
-
-} onClick={postComment} disabled={loading}>
-
-654
-
-<button type="submit" className={styles
-
-+ .commentSubmit} onClick={postComment} disabled={
-
-loading}>
+      <button type="submit" className={styles.commentSubmit} onClick={postComment} disabled={loading}>
 <svg xmlns="http://www.w3.org/2000
 
 /svg" viewBox="0 0 512 512" width="24" height ="24" style={{ fill: "#1F51FF", transform: "rotate(50deg)" }}>
