@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useRouter } from "next/router";
 
 interface Track {
   name: string;
@@ -11,7 +12,6 @@ interface Track {
 interface PageProps {
   params: { artist: string; song: string };
 }
-
 
 async function getSongDetails(artist: string, song: string): Promise<Track | null> {
   const clientId = process.env.SPOTIFY_CLIENT_ID!;
@@ -47,16 +47,20 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
   }
 }
 
-export default function Page({ params }: PageProps) {
+export default function Page() {
+  const router = useRouter();
+  const { artist, song } = router.query as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
 
   React.useEffect(() => {
-    async function fetchData() {
-      const trackData = await getSongDetails(params.artist, params.song);
-      setTrack(trackData);
+    if (artist && song) {
+      async function fetchData() {
+        const trackData = await getSongDetails(artist, song);
+        setTrack(trackData);
+      }
+      fetchData();
     }
-    fetchData();
-  }, [params]);
+  }, [artist, song]);
 
   if (!track) return <h1>Song not found</h1>;
 
