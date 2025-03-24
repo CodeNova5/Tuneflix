@@ -1,4 +1,6 @@
-interface TrackProps {
+import { PageProps } from "next";
+
+interface TrackProps extends PageProps {
   params: { artist: string; song: string };
 }
 
@@ -30,6 +32,8 @@ async function getSongDetails(artist: string, song: string) {
 }
 
 export default async function Page({ params }: TrackProps) {
+  if (!params) return <h1>Invalid parameters</h1>;
+
   const track = await getSongDetails(params.artist, params.song);
 
   if (!track) return <h1>Song not found</h1>;
