@@ -1,3 +1,4 @@
+// filepath: c:\Users\HP i7\Documents\Next\my-next-app\app\[music]\[artist]\[song]\page.tsx
 "use client";
 import React from "react";
 import { useRouter } from "next/router";
@@ -7,44 +8,6 @@ interface Track {
   artists: { name: string }[];
   album: { name: string; images: { url: string }[] };
   preview_url: string | null;
-}
-
-interface PageProps {
-  params: { artist: string; song: string };
-}
-
-async function getSongDetails(artist: string, song: string): Promise<Track | null> {
-  const clientId = process.env.SPOTIFY_CLIENT_ID!;
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
-
-  try {
-    const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: "grant_type=client_credentials",
-    });
-
-    if (!tokenResponse.ok) throw new Error("Failed to get access token");
-
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
-
-    const searchResponse = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=1`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-
-    if (!searchResponse.ok) throw new Error("Failed to fetch song details");
-
-    const searchData = await searchResponse.json();
-    return searchData.tracks.items[0] || null;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
 }
 
 export default function Page() {
@@ -59,7 +22,8 @@ export default function Page() {
   React.useEffect(() => {
     if (router.isReady && artist && song) {
       async function fetchData() {
-        const trackData = await getSongDetails(artist, song);
+        const response = await fetch(`/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`);
+        const trackData = await response.json();
         setTrack(trackData);
       }
       fetchData();
