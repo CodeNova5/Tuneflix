@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { GetServerSideProps } from "next";
 
 interface Track {
   name: string;
@@ -10,11 +9,9 @@ interface Track {
 }
 
 interface PageProps {
-  params: {
-    artist: string;
-    song: string;
-  };
+  params: { artist: string; song: string };
 }
+
 
 async function getSongDetails(artist: string, song: string): Promise<Track | null> {
   const clientId = process.env.SPOTIFY_CLIENT_ID!;
