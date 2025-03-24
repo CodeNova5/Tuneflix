@@ -1,17 +1,13 @@
-import { PageProps } from "next";
+import { useEffect, useState } from "react";
 
-interface TrackProps extends PageProps {
-  params: { artist: string; song: string };
-}
-
-interface SpotifyTrack {
+interface Track {
   name: string;
   artists: { name: string }[];
   album: { name: string; images: { url: string }[] };
   preview_url: string | null;
 }
 
-async function getSongDetails(artist: string, song: string): Promise<SpotifyTrack | null> {
+async function getSongDetails(artist: string, song: string): Promise<Track | null> {
   const clientId = process.env.SPOTIFY_CLIENT_ID!;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
 
@@ -47,12 +43,26 @@ async function getSongDetails(artist: string, song: string): Promise<SpotifyTrac
   }
 }
 
-export default async function Page({ params }: { params: { artist: string; song: string } }) {
-  if (!params) return <h1>Invalid parameters</h1>;
+interface PageProps {
+  params: {
+    artist: string;
+    song: string;
+  };
+}
 
-  const track = await getSongDetails(params.artist, params.song);
+export default function Page({ params }: PageProps) {
+  const [track, setTrack] = useState<Track | null>(null);
 
-  if (!track) return <h1>Song not found</h1>;
+  useEffect(() => {
+    async function fetchSongDetails() {
+      const fetchedTrack = await getSongDetails(params.artist, params.song);
+      setTrack(fetchedTrack);
+    }
+
+    fetchSongDetails();
+  }, [params.artist, params.song]);
+
+  if (!track) return <h1>Loading...</h1>;
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
