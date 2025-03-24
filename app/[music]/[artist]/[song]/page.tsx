@@ -31,7 +31,7 @@ async function getSongDetails(artist: string, song: string) {
   return searchData.tracks.items[0] || null;
 }
 
-export default async function Page({ params }: TrackProps) {
+export default async function Page({ params }: { params: { artist: string; song: string } }) {
   if (!params) return <h1>Invalid parameters</h1>;
 
   const track = await getSongDetails(params.artist, params.song);
