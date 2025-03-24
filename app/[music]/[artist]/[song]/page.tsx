@@ -50,11 +50,6 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
   }
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { artist, song } = context.params as { artist: string; song: string };
-  return { props: { params: { artist, song } } };
-};
-
 export default function Page({ params }: PageProps) {
   const [track, setTrack] = React.useState<Track | null>(null);
 
