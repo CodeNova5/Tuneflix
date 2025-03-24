@@ -48,6 +48,10 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
 }
 
 export default function Page() {
+  if (typeof window === 'undefined') {
+    return null; // Ensure the component only renders on the client side
+  }
+
   const router = useRouter();
   const { artist, song } = router.query as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
