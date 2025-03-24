@@ -1,4 +1,3 @@
-// filepath: c:\Users\HP i7\Documents\Next\my-next-app\app\[music]\[artist]\[song]\page.tsx
 "use client";
 import React from "react";
 import { useRouter } from "next/router";
@@ -11,16 +10,17 @@ interface Track {
 }
 
 export default function Page() {
-  if (typeof window === 'undefined') {
-    return null; // Ensure the component only renders on the client side
-  }
-
   const router = useRouter();
   const { artist, song } = router.query as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
-    if (router.isReady && artist && song) {
+    setIsClient(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (isClient && router.isReady && artist && song) {
       async function fetchData() {
         const response = await fetch(`/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`);
         const trackData = await response.json();
@@ -28,7 +28,7 @@ export default function Page() {
       }
       fetchData();
     }
-  }, [router.isReady, artist, song]);
+  }, [isClient, router.isReady, artist, song]);
 
   if (!track) return <h1>Song not found</h1>;
 
