@@ -53,14 +53,14 @@ export default function Page() {
   const [track, setTrack] = React.useState<Track | null>(null);
 
   React.useEffect(() => {
-    if (artist && song) {
+    if (router.isReady && artist && song) {
       async function fetchData() {
         const trackData = await getSongDetails(artist, song);
         setTrack(trackData);
       }
       fetchData();
     }
-  }, [artist, song]);
+  }, [router.isReady, artist, song]);
 
   if (!track) return <h1>Song not found</h1>;
 
