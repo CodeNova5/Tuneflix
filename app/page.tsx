@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 
+type Album = {
+    id: string;
+    name: string;
+    artists: { id: string; name: string }[];
+};
+
 export default function Home() {
-    const [albums, setAlbums] = useState([]);
+    const [albums, setAlbums] = useState<Album[]>([]); // Explicitly set the type
 
     useEffect(() => {
         fetch("/api/spotify")
