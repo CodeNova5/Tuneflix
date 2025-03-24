@@ -1,17 +1,22 @@
-import FileUpload from '../components/FileUpload';
-import CommentSection from "../components/CommentSection";
-import Head from 'next/head';
+import Link from "next/link";
 
-export default function Home() {
-  return (
-    <div>
-      <Head>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-      </Head>
+export async function getServerSideProps() {
+    const res = await fetch("/api/spotify");
+    const data = await res.json();
+    return { props: { albums: data.albums.items } };
+}
 
-      <h1>Upload an Image</h1>
-      <FileUpload />
-      <CommentSection />
-    </div>
-  );
+export default function Home({ albums }) {
+    return (
+        <div>
+            <h1>New Releases</h1>
+            {albums.map(album => (
+                <div key={album.id}>
+                    <Link href={`/artist/${album.artists[0].id}`}>
+                        <a>{album.artists[0].name}</a>
+                    </Link>
+                </div>
+            ))}
+        </div>
+    );
 }
