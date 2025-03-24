@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import React from "react";
 
 interface Track {
   name: string;
@@ -13,7 +13,6 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
 
   try {
-    // Get Spotify access token
     const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
       method: "POST",
       headers: {
@@ -28,7 +27,6 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // Fetch song details
     const searchResponse = await fetch(
       `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=1`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
@@ -44,26 +42,10 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
   }
 }
 
-interface PageProps {
-  params: {
-    artist: string;
-    song: string;
-  };
-}
+export default async function Page({ params }: { params: { artist: string; song: string } }) {
+  const track = await getSongDetails(params.artist, params.song);
 
-export default function Page({ params }: PageProps) {
-  const [track, setTrack] = useState<Track | null>(null);
-
-  useEffect(() => {
-    async function fetchSongDetails() {
-      const fetchedTrack = await getSongDetails(params.artist, params.song);
-      setTrack(fetchedTrack);
-    }
-
-    fetchSongDetails();
-  }, [params.artist, params.song]);
-
-  if (!track) return <h1>Loading...</h1>;
+  if (!track) return <h1>Song not found</h1>;
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
