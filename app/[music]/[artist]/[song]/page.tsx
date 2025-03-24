@@ -8,6 +8,13 @@ interface Track {
   preview_url: string | null;
 }
 
+interface PageProps {
+  params: {
+    artist: string;
+    song: string;
+  };
+}
+
 async function getSongDetails(artist: string, song: string): Promise<Track | null> {
   const clientId = process.env.SPOTIFY_CLIENT_ID!;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
@@ -42,7 +49,7 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
   }
 }
 
-export default async function Page({ params }: { params: { artist: string; song: string } }) {
+export default async function Page({ params }: PageProps) {
   const track = await getSongDetails(params.artist, params.song);
 
   if (!track) return <h1>Song not found</h1>;
