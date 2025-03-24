@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from "react";
 
 export default function ArtistPage({ params }: { params: { id: string } }) {
