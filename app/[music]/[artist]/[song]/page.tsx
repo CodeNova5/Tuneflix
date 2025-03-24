@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { GetServerSideProps } from "next";
 
 interface Track {
   name: string;
@@ -49,8 +50,21 @@ async function getSongDetails(artist: string, song: string): Promise<Track | nul
   }
 }
 
-export default async function Page({ params }: PageProps) {
-  const track = await getSongDetails(params.artist, params.song);
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { artist, song } = context.params as { artist: string; song: string };
+  return { props: { params: { artist, song } } };
+};
+
+export default function Page({ params }: PageProps) {
+  const [track, setTrack] = React.useState<Track | null>(null);
+
+  React.useEffect(() => {
+    async function fetchData() {
+      const trackData = await getSongDetails(params.artist, params.song);
+      setTrack(trackData);
+    }
+    fetchData();
+  }, [params]);
 
   if (!track) return <h1>Song not found</h1>;
 
