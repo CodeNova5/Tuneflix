@@ -1,5 +1,3 @@
-
-
 interface TrackProps {
   params: { artist: string; song: string };
 }
