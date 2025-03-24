@@ -1,4 +1,4 @@
-import axios from "axios";
+
 
 interface TrackProps {
   params: { artist: string; song: string };
@@ -8,25 +8,27 @@ async function getSongDetails(artist: string, song: string) {
   const clientId = process.env.SPOTIFY_CLIENT_ID!;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
 
-  const tokenResponse = await axios.post(
-    "https://accounts.spotify.com/api/token",
-    new URLSearchParams({ grant_type: "client_credentials" }),
-    {
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }
-  );
+  // Get Spotify access token
+  const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials",
+  });
 
-  const accessToken = tokenResponse.data.access_token;
+  const tokenData = await tokenResponse.json();
+  const accessToken = tokenData.access_token;
 
-  const searchResponse = await axios.get(
+  // Fetch song details
+  const searchResponse = await fetch(
     `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=1`,
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
 
-  return searchResponse.data.tracks.items[0] || null;
+  const searchData = await searchResponse.json();
+  return searchData.tracks.items[0] || null;
 }
 
 export default async function Page({ params }: TrackProps) {
