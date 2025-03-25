@@ -37,7 +37,7 @@ export default function Page() {
       {track.preview_url && (
         <audio controls>
           <source src={track.preview_url} type="audio/mpeg" />
-          Your browser does not support the audio tag.
+          Your browser does not supports the audio tag.
         </audio>
       )}
     </div>
