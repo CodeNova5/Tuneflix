@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/response";
+import type { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
