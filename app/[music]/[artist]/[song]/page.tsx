@@ -18,7 +18,10 @@ export default function Page() {
   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
-        const response = await fetch(`/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`);
+        const encodedArtist = encodeURIComponent(artist || "");
+const encodedSong = encodeURIComponent(song || "");
+
+const response = await fetch(`/api/song-details?artist=${encodedArtist}&song=${encodedSong}`);
         const trackData = await response.json();
         setTrack(trackData);
       }
