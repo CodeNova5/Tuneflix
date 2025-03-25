@@ -11,14 +11,16 @@ interface Track {
 
 export default function Page() {
   const searchParams = useSearchParams();
-  const artist = searchParams.get("artist");
-  const song = searchParams.get("song");
+  const artist = searchParams.get("artist") || ""; // Ensure it's a string
+  const song = searchParams.get("song") || ""; // Ensure it's a string
   const [track, setTrack] = React.useState<Track | null>(null);
 
   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
-        const response = await fetch(`/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`);
+        const response = await fetch(
+          `/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`
+        );
         const trackData = await response.json();
         setTrack(trackData);
       }
@@ -37,7 +39,7 @@ export default function Page() {
       {track.preview_url && (
         <audio controls>
           <source src={track.preview_url} type="audio/mpeg" />
-          Your browser does not supports the audio tag.
+          Your browser does not support the audio tag.
         </audio>
       )}
     </div>
