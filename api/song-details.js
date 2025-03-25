@@ -37,7 +37,7 @@ const handler = async (req, res) => {
 
     // Fetch song details
     const searchResponse = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=2`,
+      `https://api.spotify.com/v1/search?q=track:${encodeURIComponent(song)}%20artist:${encodeURIComponent(artist)}&type=track&limit=10`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
 
@@ -54,16 +54,27 @@ const handler = async (req, res) => {
       return res.status(404).json({ error: "Song not found" });
     }
 
-    // Filter tracks to prioritize singles
+    // Filter tracks to prioritize singles and match the artist exactly
     const singleTrack = searchData.tracks.items.find(
-      (track) => track.album.album_type === "single"
+      (track) =>
+        track.album.album_type === "single" &&
+        track.artists.some((a) => a.name.toLowerCase() === artist.toLowerCase())
     );
 
     if (singleTrack) {
       return res.status(200).json(singleTrack);
     }
 
-    // If no single is found, return the first track as a fallback
+    // If no single is found, try to match the artist exactly in any track
+    const exactMatchTrack = searchData.tracks.items.find((track) =>
+      track.artists.some((a) => a.name.toLowerCase() === artist.toLowerCase())
+    );
+
+    if (exactMatchTrack) {
+      return res.status(200).json(exactMatchTrack);
+    }
+
+    // If no exact match is found, return the first track as a fallback
     return res.status(200).json(searchData.tracks.items[0]);
 
   } catch (error) {
