@@ -37,7 +37,7 @@ const handler = async (req, res) => {
 
     // Fetch song details
     const searchResponse = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=1`,
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=10`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
 
@@ -54,7 +54,16 @@ const handler = async (req, res) => {
       return res.status(404).json({ error: "Song not found" });
     }
 
-    // Return the song details
+    // Filter tracks to prioritize singles
+    const singleTrack = searchData.tracks.items.find(
+      (track) => track.album.album_type === "single"
+    );
+
+    if (singleTrack) {
+      return res.status(200).json(singleTrack);
+    }
+
+    // If no single is found, return the first track as a fallback
     return res.status(200).json(searchData.tracks.items[0]);
 
   } catch (error) {
