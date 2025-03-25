@@ -37,7 +37,7 @@ const handler = async (req, res) => {
 
     // Fetch song details
     const searchResponse = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=10`,
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}%20${encodeURIComponent(song)}&type=track&limit=2`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
 
