@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 interface Track {
   name: string;
@@ -10,25 +10,40 @@ interface Track {
 }
 
 export default function Page() {
-  const searchParams = useSearchParams();
-  const artist = searchParams.get("artist") || ""; // Ensure it's a string
-  const song = searchParams.get("song") || ""; // Ensure it's a string
+  const { artist, song } = useParams() as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
-        const response = await fetch(
-          `/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`
-        );
-        const trackData = await response.json();
-        setTrack(trackData);
+        try {
+          const response = await fetch(
+            `/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            setError(errorData.error || "Failed to fetch song details");
+            return;
+          }
+          const trackData = await response.json();
+          setTrack(trackData);
+        } catch (err) {
+          console.error("Error fetching song details:", err);
+          setError("An unexpected error occurred");
+        }
       }
       fetchData();
     }
   }, [artist, song]);
 
-  if (!track) return <h1>Song not found</h1>;
+  if (error) {
+    return <h1>{error}</h1>;
+  }
+
+  if (!track) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
