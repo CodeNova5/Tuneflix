@@ -13,6 +13,7 @@ export default function Page() {
   const { artist, song } = useParams() as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
   const [videoId, setVideoId] = React.useState<string | null>(null);
+  const [lyrics, setLyrics] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -39,6 +40,17 @@ export default function Page() {
           if (videoData.videoId) {
             setVideoId(videoData.videoId);
           }
+
+          // Fetch lyrics
+          const lyricsResponse = await fetch(
+            `/api/lyrics/${encodeURIComponent(artist)}/${encodeURIComponent(song)}`
+          );
+          const lyricsData = await lyricsResponse.json();
+          if (lyricsData.lyrics) {
+            setLyrics(formatLyrics(lyricsData.lyrics));
+          } else {
+            setLyrics("Lyrics not found.");
+          }
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
@@ -47,6 +59,12 @@ export default function Page() {
       fetchData();
     }
   }, [artist, song]);
+
+  function formatLyrics(lyrics: string) {
+    return lyrics
+      .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
+      .replace(/\n/g, '<br><br>');
+  }
 
   if (error) {
     return <h1>{error}</h1>;
@@ -78,6 +96,14 @@ export default function Page() {
           ></iframe>
         ) : (
           <p>No video available for this song.</p>
+        )}
+      </div>
+      <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
+        <h3>Lyrics:</h3>
+        {lyrics ? (
+          <div dangerouslySetInnerHTML={{ __html: lyrics }} />
+        ) : (
+          <p>Loading lyrics...</p>
         )}
       </div>
     </div>
