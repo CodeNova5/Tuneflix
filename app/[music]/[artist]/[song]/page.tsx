@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 
 interface Track {
   name: string;
@@ -10,17 +10,13 @@ interface Track {
 }
 
 export default function Page() {
-  const router = useRouter();
-  const { artist, song } = router.query as { artist: string; song: string };
+  const searchParams = useSearchParams();
+  const artist = searchParams.get("artist");
+  const song = searchParams.get("song");
   const [track, setTrack] = React.useState<Track | null>(null);
-  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  React.useEffect(() => {
-    if (isClient && router.isReady && artist && song) {
+    if (artist && song) {
       async function fetchData() {
         const response = await fetch(`/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`);
         const trackData = await response.json();
@@ -28,7 +24,7 @@ export default function Page() {
       }
       fetchData();
     }
-  }, [isClient, router.isReady, artist, song]);
+  }, [artist, song]);
 
   if (!track) return <h1>Song not found</h1>;
 
