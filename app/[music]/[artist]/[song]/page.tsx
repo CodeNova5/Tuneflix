@@ -12,12 +12,14 @@ interface Track {
 export default function Page() {
   const { artist, song } = useParams() as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
+  const [videoId, setVideoId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
         try {
+          // Fetch song details
           const response = await fetch(
             `/api/song-details?artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`
           );
@@ -28,8 +30,17 @@ export default function Page() {
           }
           const trackData = await response.json();
           setTrack(trackData);
+
+          // Fetch YouTube video
+          const videoResponse = await fetch(
+            `/api/youtube-video/${encodeURIComponent(song)}/${encodeURIComponent(artist)}`
+          );
+          const videoData = await videoResponse.json();
+          if (videoData.videoId) {
+            setVideoId(videoData.videoId);
+          }
         } catch (err) {
-          console.error("Error fetching song details:", err);
+          console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
         }
       }
@@ -57,6 +68,18 @@ export default function Page() {
           Your browser does not support the audio tag.
         </audio>
       )}
+      <div id="youtube-video" style={{ marginTop: "20px" }}>
+        {videoId ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}`}
+            allowFullScreen
+            width="560"
+            height="315"
+          ></iframe>
+        ) : (
+          <p>No video available for this song.</p>
+        )}
+      </div>
     </div>
   );
 }
