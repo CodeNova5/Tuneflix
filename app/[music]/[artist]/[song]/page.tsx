@@ -20,7 +20,7 @@ export default function Page() {
       async function fetchData() {
         try {
           // Fetch song details
-          const response = await fetch(`/api/music?type=spotify&artist=${encodeURIComponent(artist)}&song=${encodeURIComponent(song)}`
+          const response = await fetch(`/api/Music?type=spotify&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
 );
           if (!response.ok) {
             const errorData = await response.json();
@@ -32,7 +32,7 @@ export default function Page() {
 
           // Fetch YouTube video
           const videoResponse = await fetch(
-  `/api/music?type=youtube&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
+  `/api/Music?type=youtube&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
 );    
 const videoData = await videoResponse.json();
           if (videoData.videoId) {
