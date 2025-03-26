@@ -91,7 +91,32 @@ const query = `${decodedArtistName} ${decodedSongName}`;
         return res.status(500).json({ error: "Failed to fetch YouTube video" });
       }
     } 
-
+    else if (type === "lyrics") {
+      if (!artistName || !songName) {
+        return res.status(400).json({ error: "Missing artist name or song name" });
+      }
+    
+      try {
+        const lyricsApiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(decodedArtistName)}/${encodeURIComponent(decodedSongName)}`;
+        const response = await fetch(lyricsApiUrl);
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch lyrics");
+        }
+    
+        const data = await response.json();
+        if (!data.lyrics) {
+          return res.status(404).json({ error: "Lyrics not found" });
+        }
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json({ lyrics: data.lyrics });
+      } catch (err) {
+        console.error("Lyrics API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch lyrics" });
+      }
+    }
+    
     else {
       return res.status(400).json({ error: "Invalid type parameter (use 'spotify' or 'youtube')" });
     }
@@ -100,29 +125,6 @@ const query = `${decodedArtistName} ${decodedSongName}`;
     console.error("API Error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
-  else if (type === "lyrics") {
-    if (!artistName || !songName) {
-      return res.status(400).json({ error: "Missing artist name or song name" });
-    }
   
-    try {
-      const lyricsApiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(decodedArtistName)}/${encodeURIComponent(decodedSongName)}`;
-      const response = await fetch(lyricsApiUrl);
-  
-      if (!response.ok) {
-        throw new Error("Failed to fetch lyrics");
-      }
-  
-      const data = await response.json();
-      if (!data.lyrics) {
-        return res.status(404).json({ error: "Lyrics not found" });
-      }
-  
-      res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-      return res.status(200).json({ lyrics: data.lyrics });
-    } catch (err) {
-      console.error("Lyrics API Error:", err);
-      return res.status(500).json({ error: "Failed to fetch lyrics" });
-    }
-  }
+ 
 }

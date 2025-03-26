@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
-import axios from "axios";
 
 interface Track {
   name: string;
@@ -58,25 +57,30 @@ export default function Page() {
   }, [artist, song]);
 
   async function fetchAndDisplayLyrics(artistName: string, songName: string) {
-    try {
-      const response = await axios.get(`/api/lyrics/${artistName}/${songName}`);
-      if (response.data && response.data.lyrics) {
-        const formattedLyrics = formatLyrics(response.data.lyrics);
-        const lyricsContainer = document.getElementById("lyrics-container");
-        if (lyricsContainer) {
-          lyricsContainer.innerHTML = formattedLyrics;
-        }
-      } else {
-        throw new Error("Lyrics not found");
-      }
-    } catch (error) {
-      console.error("Error fetching lyrics:", error);
+  try {
+    const response = await fetch(`/api/Music/route?type=lyrics&artistName=${encodeURIComponent(artistName)}&songName=${encodeURIComponent(songName)}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch lyrics");
+    }
+
+    const data = await response.json();
+    if (data.lyrics) {
+      const formattedLyrics = formatLyrics(data.lyrics);
       const lyricsContainer = document.getElementById("lyrics-container");
       if (lyricsContainer) {
-        lyricsContainer.textContent = "Failed to load lyrics.";
+        lyricsContainer.innerHTML = formattedLyrics;
       }
+    } else {
+      throw new Error("Lyrics not found");
+    }
+  } catch (error) {
+    console.error("Error fetching lyrics:", error);
+    const lyricsContainer = document.getElementById("lyrics-container");
+    if (lyricsContainer) {
+      lyricsContainer.textContent = "Failed to load lyrics.";
     }
   }
+}
 
   function formatLyrics(lyrics: string) {
     return lyrics
