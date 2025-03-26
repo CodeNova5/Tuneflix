@@ -5,8 +5,13 @@ import { useParams } from "next/navigation";
 interface Track {
   name: string;
   artists: { name: string }[];
-  album: { name: string; images: { url: string }[] };
+  album: { 
+    name: string; 
+    images: { url: string }[]; 
+    release_date: string; // Release date of the album
+  };
   preview_url: string | null;
+  duration_ms: number; // Duration of the track in milliseconds
 }
 
 export default function Page() {
@@ -85,7 +90,7 @@ export default function Page() {
   function formatLyrics(lyrics: string) {
     return lyrics
       .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
-      .replace(/\n/g, "<br><br>");
+      .replace(/\n/g, "<br>");
   }
 
   if (error) {
@@ -100,7 +105,41 @@ export default function Page() {
     <div style={{ textAlign: "center", padding: "20px" }}>
       <h1>{track.name}</h1>
       <h2>by {track.artists.map((a) => a.name).join(", ")}</h2>
-      <p>Album: {track.album.name}</p>
+  
+      {/* Song Details Table */}
+      <table style={{ margin: "20px auto", borderCollapse: "collapse", width: "80%" }}>
+        <tbody>
+          <tr>
+            <th style={{ border: "1px solid #ddd", padding: "8px", textAlign: "left" }}>Detail</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px", textAlign: "left" }}>Value</th>
+          </tr>
+          <tr>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>Artist(s)</td>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+              {track.artists.map((a) => a.name).join(", ")}
+            </td>
+          </tr>
+          <tr>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>Album</td>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>{track.album.name}</td>
+          </tr>
+          <tr>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>Duration</td>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+              {/* Assuming duration is in milliseconds */}
+              {track.duration_ms ? `${Math.floor(track.duration_ms / 60000)}:${((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}` : "N/A"}
+            </td>
+          </tr>
+          <tr>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>Release Date</td>
+            <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+              {/* Assuming release date is available in track.album.release_date */}
+              {track.album.release_date || "N/A"}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  
       <img src={track.album.images[0]?.url} alt={track.name} width="300" />
       {track.preview_url && (
         <audio controls>
