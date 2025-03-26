@@ -38,7 +38,7 @@ const decodedSongName = decodeURIComponent(songName);
         const tokenData = await tokenResponse.json();
         const accessToken = tokenData.access_token
 
-const query = `${decodedArtistName} ${decodedSongName}`;
+const query = `${decodedArtistName} ${decodedSongName} official music video`;
  const searchResponse = await fetch(
           `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
           { headers: { Authorization: `Bearer ${accessToken}` } }
