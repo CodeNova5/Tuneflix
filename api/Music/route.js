@@ -4,7 +4,7 @@ const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
 export default async function handler(req, res) {
   try {
-    const { artistName, songName } = req.query;
+    const { type, artistName, songName } = req.query;
 
     if (!type) {
       return res.status(400).json({ error: "Missing type parameter (spotify or youtube)" });
