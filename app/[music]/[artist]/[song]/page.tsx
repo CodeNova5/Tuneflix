@@ -19,6 +19,7 @@ export default function Page() {
   const [track, setTrack] = React.useState<Track | null>(null);
   const [videoId, setVideoId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [playlist, setPlaylist] = React.useState<{ name: string; image: string }[]>([]);
 
   React.useEffect(() => {
     if (artist && song) {
@@ -51,6 +52,9 @@ export default function Page() {
 
           // Fetch and display lyrics
           await fetchAndDisplayLyrics(artist, song);
+
+          // Fetch "This Is" playlist
+          await fetchThisIsPlaylist(artist);
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
@@ -62,30 +66,56 @@ export default function Page() {
   }, [artist, song]);
 
   async function fetchAndDisplayLyrics(artistName: string, songName: string) {
-  try {
-    const response = await fetch(`/api/Music/route?type=lyrics&artistName=${encodeURIComponent(artistName)}&songName=${encodeURIComponent(songName)}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch lyrics");
-    }
+    try {
+      const response = await fetch(
+        `/api/Music/route?type=lyrics&artistName=${encodeURIComponent(
+          artistName
+        )}&songName=${encodeURIComponent(songName)}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch lyrics");
+      }
 
-    const data = await response.json();
-    if (data.lyrics) {
-      const formattedLyrics = formatLyrics(data.lyrics);
+      const data = await response.json();
+      if (data.lyrics) {
+        const formattedLyrics = formatLyrics(data.lyrics);
+        const lyricsContainer = document.getElementById("lyrics-container");
+        if (lyricsContainer) {
+          lyricsContainer.innerHTML = formattedLyrics;
+        }
+      } else {
+        throw new Error("Lyrics not found");
+      }
+    } catch (error) {
+      console.error("Error fetching lyrics:", error);
       const lyricsContainer = document.getElementById("lyrics-container");
       if (lyricsContainer) {
-        lyricsContainer.innerHTML = formattedLyrics;
+        lyricsContainer.textContent = "Failed to load lyrics.";
       }
-    } else {
-      throw new Error("Lyrics not found");
-    }
-  } catch (error) {
-    console.error("Error fetching lyrics:", error);
-    const lyricsContainer = document.getElementById("lyrics-container");
-    if (lyricsContainer) {
-      lyricsContainer.textContent = "Failed to load lyrics.";
     }
   }
-}
+
+  async function fetchThisIsPlaylist(artistName: string) {
+    try {
+      const response = await fetch(
+        `/api/Music/route?type=thisIsPlaylist&artistName=${encodeURIComponent(artistName)}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch playlist");
+      }
+
+      const data = await response.json();
+      if (data.tracks) {
+        const playlistData = data.tracks.map((track: any) => ({
+          name: track.name,
+          image: track.album.images[0]?.url || "",
+        }));
+        setPlaylist(playlistData);
+      }
+    } catch (error) {
+      console.error("Error fetching playlist:", error);
+    }
+  }
 
   function formatLyrics(lyrics: string) {
     return lyrics
@@ -105,7 +135,7 @@ export default function Page() {
     <div style={{ textAlign: "center", padding: "20px" }}>
       <h1>{track.name}</h1>
       <h2>by {track.artists.map((a) => a.name).join(", ")}</h2>
-  
+
       {/* Song Details Table */}
       <table style={{ margin: "20px auto", borderCollapse: "collapse", width: "80%" }}>
         <tbody>
@@ -126,20 +156,25 @@ export default function Page() {
           <tr>
             <td style={{ border: "1px solid #ddd", padding: "8px" }}>Duration</td>
             <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-              {/* Assuming duration is in milliseconds */}
-              {track.duration_ms ? `${Math.floor(track.duration_ms / 60000)}:${((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}` : "N/A"}
+              {track.duration_ms
+                ? `${Math.floor(track.duration_ms / 60000)}:${(
+                    (track.duration_ms % 60000) /
+                    1000
+                  )
+                    .toFixed(0)
+                    .padStart(2, "0")}`
+                : "N/A"}
             </td>
           </tr>
           <tr>
             <td style={{ border: "1px solid #ddd", padding: "8px" }}>Release Date</td>
             <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-              {/* Assuming release date is available in track.album.release_date */}
               {track.album.release_date || "N/A"}
             </td>
           </tr>
         </tbody>
       </table>
-  
+
       <img src={track.album.images[0]?.url} alt={track.name} width="300" />
       {track.preview_url && (
         <audio controls>
@@ -162,6 +197,19 @@ export default function Page() {
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
+      </div>
+
+      {/* "This Is" Playlist Section */}
+      <div style={{ marginTop: "40px" }}>
+        <h3>"This Is {artist}" Playlist</h3>
+        <div style={{ display: "flex", overflowX: "scroll", gap: "20px", padding: "10px" }}>
+          {playlist.map((item, index) => (
+            <div key={index} style={{ textAlign: "center" }}>
+              <img src={item.image} alt={item.name} style={{ width: "150px", height: "150px", objectFit: "cover" }} />
+              <p style={{ marginTop: "10px" }}>{item.name}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

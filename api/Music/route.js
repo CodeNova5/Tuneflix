@@ -116,7 +116,73 @@ const query = `${decodedArtistName} ${decodedSongName}`;
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
     }
+    else if (type === "thisIsPlaylist") {
+      if (!artistName) {
+        return res.status(400).json({ error: "Missing artist name" });
+      }
     
+      if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET) {
+        console.error("Missing Spotify credentials.");
+        return res.status(500).json({ error: "Internal server error" });
+      }
+    
+      try {
+        // Get Spotify access token
+        const authString = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString("base64");
+        const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${authString}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: "grant_type=client_credentials",
+        });
+    
+        if (!tokenResponse.ok) throw new Error("Failed to get access token");
+    
+        const tokenData = await tokenResponse.json();
+        const accessToken = tokenData.access_token;
+    
+        // Search for the "This Is" playlist
+        const query = `This Is ${decodedArtistName}`;
+        const searchResponse = await fetch(
+          `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=1`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+    
+        if (!searchResponse.ok) throw new Error("Failed to fetch playlist");
+    
+        const searchData = await searchResponse.json();
+        if (!searchData.playlists?.items?.length) {
+          return res.status(404).json({ error: "Playlist not found" });
+        }
+    
+        const playlistId = searchData.playlists.items[0].id;
+    
+        // Fetch playlist tracks
+        const playlistResponse = await fetch(
+          `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+    
+        if (!playlistResponse.ok) throw new Error("Failed to fetch playlist tracks");
+    
+        const playlistData = await playlistResponse.json();
+        const tracks = playlistData.items.map((item) => ({
+          name: item.track.name,
+          album: {
+            name: item.track.album.name,
+            images: item.track.album.images,
+          },
+        }));
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json({ tracks });
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch playlist" });
+      }
+    }
     else {
       return res.status(400).json({ error: "Invalid type parameter (use 'spotify' or 'youtube')" });
     }
