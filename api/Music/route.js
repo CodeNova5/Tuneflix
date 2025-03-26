@@ -128,7 +128,7 @@ export default async function handler(req, res) {
       try {
         const accessToken = await getSpotifyAccessToken();    
         // Search for the "This Is" playlist
-        const query = `This Is ${decodedArtistName}`;
+        const query = `${decodedArtistName}`;
         const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=5`;
         
         const searchResponse = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
@@ -163,7 +163,7 @@ export default async function handler(req, res) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch playlist" });
       }
-      
+
     } else {
       return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics', or 'thisIsPlaylist')" });
     }
