@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
+import axios from "axios";
 
 interface Track {
   name: string;
@@ -20,8 +21,11 @@ export default function Page() {
       async function fetchData() {
         try {
           // Fetch song details
-          const response = await fetch(`/api/Music/route?type=spotify&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
-);
+          const response = await fetch(
+            `/api/Music/route?type=songDetails&artistName=${encodeURIComponent(
+              artist
+            )}&songName=${encodeURIComponent(song)}`
+          );
           if (!response.ok) {
             const errorData = await response.json();
             setError(errorData.error || "Failed to fetch song details");
@@ -32,20 +36,53 @@ export default function Page() {
 
           // Fetch YouTube video
           const videoResponse = await fetch(
-  `/api/Music/route?type=youtube&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
-);    
-const videoData = await videoResponse.json();
+            `/api/Music/route?type=youtubeMusicVideo&artistName=${encodeURIComponent(
+              artist
+            )}&songName=${encodeURIComponent(song)}`
+          );
+          const videoData = await videoResponse.json();
           if (videoData.videoId) {
             setVideoId(videoData.videoId);
           }
+
+          // Fetch and display lyrics
+          await fetchAndDisplayLyrics(artist, song);
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
         }
       }
+
       fetchData();
     }
   }, [artist, song]);
+
+  async function fetchAndDisplayLyrics(artistName: string, songName: string) {
+    try {
+      const response = await axios.get(`/api/lyrics/${artistName}/${songName}`);
+      if (response.data && response.data.lyrics) {
+        const formattedLyrics = formatLyrics(response.data.lyrics);
+        const lyricsContainer = document.getElementById("lyrics-container");
+        if (lyricsContainer) {
+          lyricsContainer.innerHTML = formattedLyrics;
+        }
+      } else {
+        throw new Error("Lyrics not found");
+      }
+    } catch (error) {
+      console.error("Error fetching lyrics:", error);
+      const lyricsContainer = document.getElementById("lyrics-container");
+      if (lyricsContainer) {
+        lyricsContainer.textContent = "Failed to load lyrics.";
+      }
+    }
+  }
+
+  function formatLyrics(lyrics: string) {
+    return lyrics
+      .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
+      .replace(/\n/g, "<br><br>");
+  }
 
   if (error) {
     return <h1>{error}</h1>;
@@ -78,6 +115,10 @@ const videoData = await videoResponse.json();
         ) : (
           <p>No video available for this song.</p>
         )}
+      </div>
+      <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
+        <h3>Lyrics:</h3>
+        <p>Loading lyrics...</p>
       </div>
     </div>
   );

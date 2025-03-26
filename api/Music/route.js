@@ -12,7 +12,7 @@ export default async function handler(req, res) {
    // Decode before using
     const decodedArtistName = decodeURIComponent(artistName);
 const decodedSongName = decodeURIComponent(songName);
-    if (type === "spotify") {
+    if (type === "songDetails") {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist or song" });
       }
@@ -60,7 +60,7 @@ const query = `${decodedArtistName} ${decodedSongName}`;
       }
     } 
 
-    else if (type === "youtube") {
+    else if (type === "youtubeMusicVideo") {
       if (!YOUTUBE_API_KEY) {
         console.error("Missing YouTube API key.");
         return res.status(500).json({ error: "Internal server error" });
@@ -99,5 +99,30 @@ const query = `${decodedArtistName} ${decodedSongName}`;
   } catch (error) {
     console.error("API Error:", error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+  else if (type === "lyrics") {
+    if (!artistName || !songName) {
+      return res.status(400).json({ error: "Missing artist name or song name" });
+    }
+  
+    try {
+      const lyricsApiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(decodedArtistName)}/${encodeURIComponent(decodedSongName)}`;
+      const response = await fetch(lyricsApiUrl);
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch lyrics");
+      }
+  
+      const data = await response.json();
+      if (!data.lyrics) {
+        return res.status(404).json({ error: "Lyrics not found" });
+      }
+  
+      res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+      return res.status(200).json({ lyrics: data.lyrics });
+    } catch (err) {
+      console.error("Lyrics API Error:", err);
+      return res.status(500).json({ error: "Failed to fetch lyrics" });
+    }
   }
 }
