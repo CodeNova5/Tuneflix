@@ -135,6 +135,7 @@ export default function Page() {
     <div style={{ textAlign: "center", padding: "20px" }}>
       <h1>{track.name}</h1>
       <h2>by {track.artists.map((a) => a.name).join(", ")}</h2>
+      <img src={track.album.images[0]?.url} alt={track.name} width="300" />
 
       {/* Song Details Table */}
       <table style={{ margin: "20px auto", borderCollapse: "collapse", width: "80%" }}>
@@ -175,8 +176,7 @@ export default function Page() {
         </tbody>
       </table>
 
-      <img src={track.album.images[0]?.url} alt={track.name} width="300" />
-      {track.preview_url && (
+        {track.preview_url && (
         <audio controls>
           <source src={track.preview_url} type="audio/mpeg" />
           Your browser does not support the audio tag.

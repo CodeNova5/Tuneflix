@@ -153,7 +153,7 @@ const query = `${decodedArtistName} ${decodedSongName}`;
         if (!searchResponse.ok) throw new Error("Failed to fetch playlist");
     
         const searchData = await searchResponse.json();
-        if (!searchData.playlists?.items?.length) {
+        if (!searchData.playlists || !searchData.playlists.items || searchData.playlists.items.length === 0) {
           return res.status(404).json({ error: "Playlist not found" });
         }
     
