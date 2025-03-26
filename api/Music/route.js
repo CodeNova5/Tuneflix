@@ -35,9 +35,9 @@ export default async function handler(req, res) {
 
         const tokenData = await tokenResponse.json();
         const accessToken = tokenData.access_token;
-
+const query = `${artistName} ${songName}`;
         const searchResponse = await fetch(
-          `https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}%20${encodeURIComponent(songName)}&type=track&limit=1`,
+          `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );
 
