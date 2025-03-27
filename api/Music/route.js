@@ -98,32 +98,23 @@ export default async function handler(req, res) {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist name or song name" });
       }
-    
+
       try {
         const lyricsApiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(decodedArtistName)}/${encodeURIComponent(decodedSongName)}`;
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 9000); // Set timeout to 9 seconds
-    
-        const response = await fetch(lyricsApiUrl, { signal: controller.signal });
-    
-        clearTimeout(timeout); // Clear the timeout if the request completes
-    
+        const response = await fetch(lyricsApiUrl);
+
         if (!response.ok) {
           throw new Error("Failed to fetch lyrics");
         }
-    
+
         const data = await response.json();
         if (!data.lyrics) {
           return res.status(404).json({ error: "Lyrics not found" });
         }
-    
+
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json({ lyrics: data.lyrics });
       } catch (err) {
-        if (err.name === "AbortError") {
-          console.error("Lyrics API Timeout:", err);
-          return res.status(504).json({ error: "Lyrics API request timed out" });
-        }
         console.error("Lyrics API Error:", err);
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
@@ -157,6 +148,48 @@ export default async function handler(req, res) {
       } catch (err) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch artist's songs" });
+      }
+    }
+    else if (type === "relatedTracks") {
+      const { trackId } = req.query;
+    
+      if (!trackId) {
+        return res.status(400).json({ error: "Missing track ID" });
+      }
+    
+      try {
+        console.log("Received trackId:", trackId);
+    
+        const accessToken = await getSpotifyAccessToken();
+        console.log("Spotify Access Token:", accessToken);
+    
+        const apiUrl = `https://api.spotify.com/v1/recommendations?seed_tracks=${encodeURIComponent(
+          trackId
+        )}&limit=20`;
+        console.log("Spotify API URL:", apiUrl);
+    
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        console.log("Spotify API Response Status:", response.status);
+    
+        const responseBody = await response.text();
+        console.log("Spotify API Response Body:", responseBody);
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch related tracks");
+        }
+    
+        const data = JSON.parse(responseBody);
+        if (!data.tracks?.length) {
+          return res.status(404).json({ error: "No related tracks found" });
+        }
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(data.tracks);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch related tracks" });
       }
     }
      else {
