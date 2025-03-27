@@ -185,7 +185,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "No related tracks found" });
         }
     
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
         return res.status(200).json(data.tracks);
       } catch (err) {
         console.error("Spotify API Error:", err);
