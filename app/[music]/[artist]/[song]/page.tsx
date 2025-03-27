@@ -5,9 +5,9 @@ import { useParams } from "next/navigation";
 interface Track {
   name: string;
   artists: { name: string }[];
-  album: {
-    name: string;
-    images: { url: string }[];
+  album: { 
+    name: string; 
+    images: { url: string }[]; 
     release_date: string; // Release date of the album
   };
   preview_url: string | null;
@@ -20,9 +20,7 @@ export default function Page() {
   const [videoId, setVideoId] = React.useState<string | null>(null);
   const [songs, setSongs] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-  const [relatedTracks, setRelatedTracks] = React.useState<any[]>([]); // State for related tracks
-
-  React.useEffect(() => {
+   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
         try {
@@ -53,9 +51,6 @@ export default function Page() {
 
           // Fetch and display lyrics
           await fetchAndDisplayLyrics(artist, song);
-
-          // Fetch related tracks
-          fetchRelatedTracks(trackData.id); // Pass the track ID to fetch related tracks
 
         } catch (err) {
           console.error("Error fetching data:", err);
@@ -97,7 +92,7 @@ export default function Page() {
     }
   }
 
-
+  
   function formatLyrics(lyrics: string) {
     return lyrics
       .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
@@ -114,7 +109,7 @@ export default function Page() {
         return;
       }
       const songsData = await response.json();
-
+  
       // Filter out duplicates and the current song
       const filteredSongs = songsData
         .filter(
@@ -128,25 +123,7 @@ export default function Page() {
       setError("An unexpected error occurred");
     }
   }
-  fetchSongs(song);
-
-  async function fetchRelatedTracks(trackId: string) {
-    try {
-      const response = await fetch(
-        `/api/Music/route?type=relatedSongs&trackId=${encodeURIComponent(trackId)}`
-      );
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to fetch related tracks");
-        return;
-      }
-      const relatedTracksData = await response.json();
-      setRelatedTracks(relatedTracksData);
-    } catch (err) {
-      console.error("Error fetching related tracks:", err);
-      setError("An unexpected error occurred");
-    }
-  }
+      fetchSongs(song);
   if (error) {
     return <h1>{error}</h1>;
   }
@@ -183,11 +160,11 @@ export default function Page() {
             <td style={{ border: "1px solid #ddd", padding: "8px" }}>
               {track.duration_ms
                 ? `${Math.floor(track.duration_ms / 60000)}:${(
-                  (track.duration_ms % 60000) /
-                  1000
-                )
-                  .toFixed(0)
-                  .padStart(2, "0")}`
+                    (track.duration_ms % 60000) /
+                    1000
+                  )
+                    .toFixed(0)
+                    .padStart(2, "0")}`
                 : "N/A"}
             </td>
           </tr>
@@ -200,7 +177,7 @@ export default function Page() {
         </tbody>
       </table>
 
-      {track.preview_url && (
+        {track.preview_url && (
         <audio controls>
           <source src={track.preview_url} type="audio/mpeg" />
           Your browser does not support the audio tag.
@@ -222,7 +199,7 @@ export default function Page() {
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
       </div>
-      <h1>Songs by {artist}</h1>
+       <h1>Songs by {artist}</h1>
       <div
         style={{
           display: "flex",
@@ -250,39 +227,6 @@ export default function Page() {
             <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
             <p style={{ fontSize: "14px", color: "#555" }}>
               {song.artists.map((a: any) => a.name).join(", ")}
-            </p>
-          </div>
-        ))}
-      </div>
-      {/* Related Tracks Section */}
-      <h1>Related Tracks</h1>
-      <div
-        style={{
-          display: "flex",
-          overflowX: "auto",
-          gap: "20px",
-          padding: "10px",
-        }}
-      >
-        {relatedTracks.map((relatedTrack, index) => (
-          <div
-            key={index}
-            style={{
-              minWidth: "200px",
-              textAlign: "center",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              padding: "10px",
-            }}
-          >
-            <img
-              src={relatedTrack.album.images[0]?.url || "/placeholder.jpg"}
-              alt={relatedTrack.name}
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{relatedTrack.name}</h3>
-            <p style={{ fontSize: "14px", color: "#555" }}>
-              {relatedTrack.artists.map((a: any) => a.name).join(", ")}
             </p>
           </div>
         ))}
