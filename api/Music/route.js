@@ -98,23 +98,32 @@ export default async function handler(req, res) {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist name or song name" });
       }
-
+    
       try {
         const lyricsApiUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(decodedArtistName)}/${encodeURIComponent(decodedSongName)}`;
-        const response = await fetch(lyricsApiUrl);
-
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 9000); // Set timeout to 9 seconds
+    
+        const response = await fetch(lyricsApiUrl, { signal: controller.signal });
+    
+        clearTimeout(timeout); // Clear the timeout if the request completes
+    
         if (!response.ok) {
           throw new Error("Failed to fetch lyrics");
         }
-
+    
         const data = await response.json();
         if (!data.lyrics) {
           return res.status(404).json({ error: "Lyrics not found" });
         }
-
+    
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json({ lyrics: data.lyrics });
       } catch (err) {
+        if (err.name === "AbortError") {
+          console.error("Lyrics API Timeout:", err);
+          return res.status(504).json({ error: "Lyrics API request timed out" });
+        }
         console.error("Lyrics API Error:", err);
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
