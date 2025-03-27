@@ -118,61 +118,8 @@ export default async function handler(req, res) {
         console.error("Lyrics API Error:", err);
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
-    } else if (type === "thisIsPlaylist") {
-      if (!artistName) {
-        return res.status(400).json({ error: "Missing artist name" });
-      }
-    
-     
-    
-      try {
-        const accessToken = await getSpotifyAccessToken();    
-        // Search for the "This Isb" playlist
-        const query = `This Is ${decodedArtistName}`;
-        const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=5`;
-        
-        const searchResponse = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-        if (!searchResponse.ok) throw new Error("Failed to fetch playlist");
-        
-        const searchData = await searchResponse.json();
-        if (!searchData.playlists || !searchData.playlists.items || searchData.playlists.items.length === 0) {
-          return res.status(404).json({ error: `No 'This Is' playlist found for artist: ${artistName}` });
-        }
-        
-        const playlist = searchData.playlists.items.find(p => p.name.toLowerCase().includes("this is"));
-        if (!playlist) {
-          return res.status(404).json({ error: `No 'This Is' playlist found for artist: ${artistName}` });
-        }
-         
-        if (!playlist) {
-          return res.status(404).json({ error: `No 'This Is' playlist found for artist: ${artistName}` });
-        }
-
-        const playlistResponse = await fetch(
-          `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`,
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-
-        if (!playlistResponse.ok) throw new Error("Failed to fetch playlist tracks");
-
-        const playlistData = await playlistResponse.json();
-        const tracks = playlistData.items.map(item => ({
-          name: item.track.name,
-          album: {
-            name: item.track.album.name,
-            images: item.track.album.images,
-          },
-        }));
-
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json({ tracks });
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch playlist" });
-      }
-      
     } else {
-      return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics', or 'thisIsPlaylist')" });
+      return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics')" });
     }
   } catch (error) {
     console.error("API Error:", error);

@@ -19,9 +19,7 @@ export default function Page() {
   const [track, setTrack] = React.useState<Track | null>(null);
   const [videoId, setVideoId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [playlist, setPlaylist] = React.useState<{ name: string; image: string }[]>([]);
-
-  React.useEffect(() => {
+   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
         try {
@@ -53,8 +51,6 @@ export default function Page() {
           // Fetch and display lyrics
           await fetchAndDisplayLyrics(artist, song);
 
-          // Fetch "This Is" playlist
-          await fetchThisIsPlaylist(artist);
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
@@ -95,28 +91,7 @@ export default function Page() {
     }
   }
 
-  async function fetchThisIsPlaylist(artistName: string) {
-    try {
-      const response = await fetch(
-        `/api/Music/route?type=thisIsPlaylist&artistName=${encodeURIComponent(artistName)}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch playlist");
-      }
-
-      const data = await response.json();
-      if (data.tracks) {
-        const playlistData = data.tracks.map((track: any) => ({
-          name: track.name,
-          image: track.album.images[0]?.url || "",
-        }));
-        setPlaylist(playlistData);
-      }
-    } catch (error) {
-      console.error("Error fetching playlist:", error);
-    }
-  }
-
+  
   function formatLyrics(lyrics: string) {
     return lyrics
       .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
@@ -197,19 +172,6 @@ export default function Page() {
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
-      </div>
-
-      {/* "This Is" Playlist Section */}
-      <div style={{ marginTop: "40px" }}>
-        <h3>"This Is {artist}" Playlist</h3>
-        <div style={{ display: "flex", overflowX: "scroll", gap: "20px", padding: "10px" }}>
-          {playlist.map((item, index) => (
-            <div key={index} style={{ textAlign: "center" }}>
-              <img src={item.image} alt={item.name} style={{ width: "150px", height: "150px", objectFit: "cover" }} />
-              <p style={{ marginTop: "10px" }}>{item.name}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
