@@ -59,7 +59,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "Song not found" });
         }
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=6000, stale-while-revalidate");
         return res.status(200).json(searchData.tracks.items[0]);
       } catch (err) {
         console.error("Spotify API Error:", err);
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
         }
 
         const videoId = data.items[0].id.videoId;
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=6000, stale-while-revalidate");
         return res.status(200).json({ videoId });
       } catch (err) {
         console.error("YouTube API Error:", err);
@@ -112,7 +112,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "Lyrics not found" });
         }
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=6000, stale-while-revalidate");
         return res.status(200).json({ lyrics: data.lyrics });
       } catch (err) {
         console.error("Lyrics API Error:", err);
@@ -143,7 +143,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "No songs found for this artist" });
         }
     
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=6000, stale-while-revalidate");
         return res.status(200).json(data.tracks.items);
       } catch (err) {
         console.error("Spotify API Error:", err);
@@ -176,7 +176,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "No related tracks found" });
         }
     
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=6000, stale-while-revalidate");
         return res.status(200).json(data.tracks);
       } catch (err) {
         console.error("Spotify API Error:", err);
