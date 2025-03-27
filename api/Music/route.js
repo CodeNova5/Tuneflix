@@ -118,8 +118,9 @@ export default async function handler(req, res) {
         console.error("Lyrics API Error:", err);
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
+      
     } else {
-      return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics')" });
+      return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics', or 'thisIsPlaylist')" });
     }
   } catch (error) {
     console.error("API Error:", error);
