@@ -18,6 +18,7 @@ export default function Page() {
   const { artist, song } = useParams() as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
   const [videoId, setVideoId] = React.useState<string | null>(null);
+  const [songs, setSongs] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
    React.useEffect(() => {
     if (artist && song) {
@@ -97,7 +98,25 @@ export default function Page() {
       .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
       .replace(/\n/g, "<br>");
   }
+    async function fetchSongs() {
+        try {
+          const response = await fetch(
+            `/api/Music/route?type=artistSongs&artistName=${encodeURIComponent(artist)}`
+          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            setError(errorData.error || "Failed to fetch songs");
+            return;
+          }
+          const songsData = await response.json();
+          setSongs(songsData.slice(0, 20)); // Limit to 20 songs
+        } catch (err) {
+          console.error("Error fetching songs:", err);
+          setError("An unexpected error occurred");
+        }
+      }
 
+      fetchSongs();
   if (error) {
     return <h1>{error}</h1>;
   }
@@ -172,6 +191,38 @@ export default function Page() {
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
+      </div>
+       <h1>Songs by {artist}</h1>
+      <div
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          gap: "20px",
+          padding: "10px",
+        }}
+      >
+        {songs.map((song, index) => (
+          <div
+            key={index}
+            style={{
+              minWidth: "200px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <img
+              src={song.album.images[0]?.url || "/placeholder.jpg"}
+              alt={song.name}
+              style={{ width: "100%", borderRadius: "8px" }}
+            />
+            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+            <p style={{ fontSize: "14px", color: "#555" }}>
+              {song.artists.map((a: any) => a.name).join(", ")}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
