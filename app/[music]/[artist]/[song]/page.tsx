@@ -98,25 +98,32 @@ export default function Page() {
       .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
       .replace(/\n/g, "<br>");
   }
-    async function fetchSongs() {
-        try {
-          const response = await fetch(
-            `/api/Music/route?type=artistSongs&artistName=${encodeURIComponent(artist)}`
-          );
-          if (!response.ok) {
-            const errorData = await response.json();
-            setError(errorData.error || "Failed to fetch songs");
-            return;
-          }
-          const songsData = await response.json();
-          setSongs(songsData.slice(0, 20)); // Limit to 20 songs
-        } catch (err) {
-          console.error("Error fetching songs:", err);
-          setError("An unexpected error occurred");
-        }
+  async function fetchSongs(songName: string) {
+    try {
+      const response = await fetch(
+        `/api/Music/route?type=artistSongs&artistName=${encodeURIComponent(artist)}`
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to fetch songs");
+        return;
       }
-
-      fetchSongs();
+      const songsData = await response.json();
+  
+      // Filter out duplicates and the current song
+      const filteredSongs = songsData
+        .filter(
+          (song: any, index: number, self: any[]) =>
+            song.name.toLowerCase() !== songName.toLowerCase() && // Exclude the current song
+            self.findIndex((s) => s.name.toLowerCase() === song.name.toLowerCase()) === index // Remove duplicates
+        )
+      setSongs(filteredSongs);
+    } catch (err) {
+      console.error("Error fetching songs:", err);
+      setError("An unexpected error occurred");
+    }
+  }
+      fetchSongs(song);
   if (error) {
     return <h1>{error}</h1>;
   }
