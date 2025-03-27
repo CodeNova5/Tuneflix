@@ -133,7 +133,7 @@ export default function Page() {
   async function fetchRelatedTracks(trackId: string) {
     try {
       const response = await fetch(
-        `/api/Music/route?type=relatedTracks&trackId=${encodeURIComponent(trackId)}`
+        `/api/Music/route?type=relatedSongs&trackId=${encodeURIComponent(trackId)}`
       );
       if (!response.ok) {
         const errorData = await response.json();
