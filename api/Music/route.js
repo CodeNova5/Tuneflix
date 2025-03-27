@@ -118,60 +118,69 @@ export default async function handler(req, res) {
         console.error("Lyrics API Error:", err);
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
-    } else if (type === "thisIsPlaylist") {
-      if (!artistName) {
-        return res.status(400).json({ error: "Missing artist name" });
-      }
+    } } else if (type === "thisIsPlaylist") {
+  if (!artistName) {
+    return res.status(400).json({ error: "Missing artist name" });
+  }
+
+  try {
+    const accessToken = await getSpotifyAccessToken();
     
-     
-    
-      try {
-        const accessToken = await getSpotifyAccessToken();    
-        // Search for the "This Isb" playlist
-        const query = `This Is ${decodedArtistName}`;
-        const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=5`;
-        
-        const searchResponse = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-        if (!searchResponse.ok) throw new Error("Failed to fetch playlist");
-        
-        const searchData = await searchResponse.json();
-        if (!searchData.playlists || !searchData.playlists.items || searchData.playlists.items.length === 0) {
-          return res.status(404).json({ error: `No 'This Is' playlist found for artist: ${artistName}` });
-        }
-        
-        const playlist = searchData.playlists.items.find(p => p.name.toLowerCase().includes("this is"));
-        if (!playlist) {
-          return res.status(404).json({ error: `No 'This Is' playlist found for artist: ${artistName}` });
-        }
-         
-        if (!playlist) {
-          return res.status(404).json({ error: `No 'This Is' playlist found for artist: ${artistName}` });
-        }
+    // Step 1: Get Artist ID
+    const artistSearchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(decodedArtistName)}&type=artist&limit=1`;
+    const artistResponse = await fetch(artistSearchUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
-        const playlistResponse = await fetch(
-          `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`,
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
+    if (!artistResponse.ok) throw new Error("Failed to fetch artist ID");
 
-        if (!playlistResponse.ok) throw new Error("Failed to fetch playlist tracks");
+    const artistData = await artistResponse.json();
+    if (!artistData.artists?.items?.length) {
+      return res.status(404).json({ error: `Artist not found: ${decodedArtistName}` });
+    }
 
-        const playlistData = await playlistResponse.json();
-        const tracks = playlistData.items.map(item => ({
-          name: item.track.name,
-          album: {
-            name: item.track.album.name,
-            images: item.track.album.images,
-          },
-        }));
+    const artistId = artistData.artists.items[0].id;
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json({ tracks });
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch playlist" });
-      }
-      
-    } else {
+    // Step 2: Search for Playlists by Artist ID
+    const playlistSearchUrl = `https://api.spotify.com/v1/search?q=this+is+${encodeURIComponent(decodedArtistName)}&type=playlist&limit=10`;
+    const playlistResponse = await fetch(playlistSearchUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!playlistResponse.ok) throw new Error("Failed to fetch playlists");
+
+    const playlistData = await playlistResponse.json();
+    const playlist = playlistData.playlists?.items?.find(p => p.name.toLowerCase().includes(`this is ${decodedArtistName.toLowerCase()}`));
+
+    if (!playlist) {
+      return res.status(404).json({ error: `No 'This Is' playlist found for artist: ${decodedArtistName}` });
+    }
+
+    // Step 3: Get Tracks from the Playlist
+    const playlistTracksUrl = `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`;
+    const tracksResponse = await fetch(playlistTracksUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!tracksResponse.ok) throw new Error("Failed to fetch playlist tracks");
+
+    const playlistTracks = await tracksResponse.json();
+    const tracks = playlistTracks.items.map(item => ({
+      name: item.track.name,
+      album: {
+        name: item.track.album.name,
+        images: item.track.album.images,
+      },
+    }));
+
+    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+    return res.status(200).json({ tracks });
+
+  } catch (err) {
+    console.error("Spotify API Error:", err);
+    return res.status(500).json({ error: "Failed to fetch playlist" });
+  }
+} else {
       return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics', or 'thisIsPlaylist')" });
     }
   } catch (error) {
