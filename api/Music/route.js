@@ -157,49 +157,64 @@ export default async function handler(req, res) {
     
       try {
         const accessToken = await getSpotifyAccessToken();
-    
-        // Fetch artist details
-        const artistApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+        const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
           decodedArtistName
         )}&type=artist&limit=1`;
     
-        const artistResponse = await fetch(artistApiUrl, {
+        const response = await fetch(apiUrl, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
     
-        if (!artistResponse.ok) {
+        if (!response.ok) {
           throw new Error("Failed to fetch artist details");
         }
     
-        const artistData = await artistResponse.json();
-        if (!artistData.artists?.items?.length) {
+        const data = await response.json();
+        if (!data.artists?.items?.length) {
           return res.status(404).json({ error: "Artist not found" });
         }
     
-        const artist = artistData.artists.items[0];
-    
-        // Fetch top tracks
-        const topTracksApiUrl = `https://api.spotify.com/v1/artists/${artist.id}/top-tracks?market=US`;
-    
-        const topTracksResponse = await fetch(topTracksApiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
-        if (!topTracksResponse.ok) {
-          throw new Error("Failed to fetch top tracks");
-        }
-    
-        const topTracksData = await topTracksResponse.json();
-    
+        const artist = data.artists.items[0];
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json({
           name: artist.name,
           image: artist.images[0]?.url || null,
-          topTracks: topTracksData.tracks || [],
+          genres: artist.genres || [],
+          followers: artist.followers?.total || 0,
         });
       } catch (err) {
         console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch artist details or top tracks" });
+        return res.status(500).json({ error: "Failed to fetch artist details" });
+      }
+    } else if (type === "topTracks") {
+      if (!artistName) {
+        return res.status(400).json({ error: "Missing artist name" });
+      }
+    
+      try {
+        const accessToken = await getSpotifyAccessToken();
+        const apiUrl = `https://api.spotify.com/v1/artists/${encodeURIComponent(
+          decodedArtistName
+        )}/top-tracks?market=US`;
+    
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch top tracks");
+        }
+    
+        const data = await response.json();
+        if (!data.tracks?.length) {
+          return res.status(404).json({ error: "No top tracks found for this artist" });
+        }
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(data.tracks);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch top tracks" });
       }
     }
      else {
