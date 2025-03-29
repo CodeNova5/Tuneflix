@@ -32,17 +32,28 @@ export default function ArtistPage() {
           const artistData = await artistResponse.json();
           setArtistDetails(artistData);
 
-          // Fetch top tracks
           const tracksResponse = await fetch(
-            `/api/Music/route?type=artistTopSongs&artistName=${encodeURIComponent(artist)}`
+            `/api/Music/route?type=artistSongs&artistName=${encodeURIComponent(artist)}`
           );
+          if (!tracksResponse.ok) {
+            const errorData = await tracksResponse.json();
+            setError(errorData.error || "Failed to fetch songs");
+            return;
+          }
+          const tracksData = await tracksResponse.json();
+          
+          // Filter out duplicates
+          const filteredTracks = tracksData.filter(
+            (track: any, index: number, self: any[]) =>
+              index === self.findIndex((t) => t.name === track.name)
+          );
+          
           if (!tracksResponse.ok) {
             const errorData = await tracksResponse.json();
             setError(errorData.error || "Failed to fetch top tracks");
             return;
           }
-          const tracksData = await tracksResponse.json();
-          setTopTracks(tracksData);
+          setTopTracks(filteredTracks);
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
