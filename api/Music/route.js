@@ -119,39 +119,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
     }
-    else if (type === "songsByGenre") {
-      const { genre } = req.query;
-    
-      if (!genre) {
-        return res.status(400).json({ error: "Missing genre" });
-      }
-    
-      try {
-        const accessToken = await getSpotifyAccessToken();
-        const apiUrl = `https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(
-          genre
-        )}&type=track&limit=10`;
-    
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
-        if (!response.ok) {
-          throw new Error("Failed to fetch songs by genre");
-        }
-    
-        const data = await response.json();
-        if (!data.tracks?.items?.length) {
-          return res.status(404).json({ error: "No songs found for this genre" });
-        }
-    
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(data.tracks.items);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch songs by genre" });
-      }
-    }
+   
      else if (type === "artistSongs") {
       if (!artistName) {
         return res.status(400).json({ error: "Missing artist name" });
@@ -219,37 +187,7 @@ export default async function handler(req, res) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch artist details" });
       }
-    } else if (type === "artistTopSongs") {
-      if (!artistName) {
-        return res.status(400).json({ error: "Missing artist name" });
-      }
-    
-      try {
-        const accessToken = await getSpotifyAccessToken();
-        const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-          decodedArtistName
-        )}&type=track&limit=10`; // Limit to 10 songs
-    
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
-        if (!response.ok) {
-          throw new Error("Failed to fetch artist's songs");
-        }
-    
-        const data = await response.json();
-        if (!data.tracks?.items?.length) {
-          return res.status(404).json({ error: "No songs found for this artist" });
-        }
-    
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(data.tracks.items);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch artist's songs" });
-      }
-    }
+    } 
      else {
       return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics', or 'thisIsPlaylist')" });
     }
