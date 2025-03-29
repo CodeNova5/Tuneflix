@@ -3,6 +3,11 @@ const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 let spotifyAccessToken = null;
 let spotifyTokenExpiresAt = 0;
+import ytdl from 'ytdl-core';
+import ffmpeg from 'fluent-ffmpeg';
+import { Octokit } from '@octokit/rest';
+import fs from 'fs';
+import path from 'path';
 
 async function getSpotifyAccessToken() {
   if (spotifyAccessToken && Date.now() < spotifyTokenExpiresAt) {
