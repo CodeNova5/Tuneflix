@@ -150,48 +150,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch artist's songs" });
       }
     }
-    else if (type === "relatedTracks") {
-      const { trackId } = req.query;
     
-      if (!trackId) {
-        return res.status(400).json({ error: "Missing track ID" });
-      }
-    
-      try {
-        console.log("Received trackId:", trackId);
-    
-        const accessToken = await getSpotifyAccessToken();
-        console.log("Spotify Access Token:", accessToken);
-    
-        const apiUrl = `https://api.spotify.com/v1/recommendations?seed_tracks=${encodeURIComponent(
-          trackId
-        )}&limit=20`;
-        console.log("Spotify API URL:", apiUrl);
-    
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        console.log("Spotify API Response Status:", response.status);
-    
-        const responseBody = await response.text();
-        console.log("Spotify API Response Body:", responseBody);
-    
-        if (!response.ok) {
-          throw new Error("Failed to fetch related tracks");
-        }
-    
-        const data = JSON.parse(responseBody);
-        if (!data.tracks?.length) {
-          return res.status(404).json({ error: "No related tracks found" });
-        }
-    
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(data.tracks);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch related tracks" });
-      }
-    }
      else {
       return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics', or 'thisIsPlaylist')" });
     }
