@@ -9,7 +9,6 @@ interface Track {
     name: string;
     images: { url: string }[];
     release_date: string; // Release date of the album
-    genres: string[]; // Genres of the album
     type: string; // Type of the album (e.g., "album", "single")
   };
   preview_url: string | null;
@@ -290,7 +289,7 @@ export default function Page() {
           </div>
         ))}
       </div>
-      <h1>Recommended Songs (Genre: {track.album.genres?.[0] || "N/A"})</h1>
+      <h1>Recommended Songs (Genre: {artistDetails?.genres?.[0] || "N/A"})</h1>
       <div
         style={{
           display: "flex",
