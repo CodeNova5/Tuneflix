@@ -21,7 +21,9 @@ export default function Page() {
   const [videoId, setVideoId] = React.useState<string | null>(null);
   const [songs, setSongs] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-  
+  const [uploadedFileUrl, setUploadedFileUrl] = React.useState<string | null>(null);
+  const [isUploading, setIsUploading] = React.useState<boolean>(false);
+
  
   const [artistDetails, setArtistDetails] = React.useState<{ genres: string[] } | null>(null);
 
@@ -153,6 +155,39 @@ export default function Page() {
   }
   fetchSongs(song);
 
+  async function handleConvertToMp3() {
+    if (!videoId) {
+      setError("No YouTube video available to convert.");
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/Music/route?type=youtubeToMp3&videoId=${videoId}&fileName=${encodeURIComponent(
+          `${artist}-${song}`
+        )}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to convert video to MP3");
+        setIsUploading(false);
+        return;
+      }
+
+      const data = await response.json();
+      setUploadedFileUrl(data.url);
+    } catch (err) {
+      console.error("Error converting video to MP3:", err);
+      setError("An unexpected error occurred");
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
 
   if (error) {
     return <h1>{error}</h1>;
@@ -225,6 +260,33 @@ export default function Page() {
           <p>No video available for this song.</p>
         )}
       </div>
+      {/* Convert to MP3 Button */}
+      <div style={{ marginTop: "20px" }}>
+        <button
+          onClick={handleConvertToMp3}
+          disabled={isUploading}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: isUploading ? "#ccc" : "#0070f3",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: isUploading ? "not-allowed" : "pointer",
+          }}
+        >
+          {isUploading ? "Converting..." : "Convert to MP3"}
+        </button>
+      </div>
+
+      {/* Uploaded File Link */}
+      {uploadedFileUrl && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>MP3 File Uploaded:</h3>
+          <a href={uploadedFileUrl} target="_blank" rel="noopener noreferrer">
+            {uploadedFileUrl}
+          </a>
+        </div>
+      )}
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
