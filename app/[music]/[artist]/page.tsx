@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
-
+import Link from "next/link";
 interface Track {
   name: string;
   album: {
@@ -90,27 +90,31 @@ export default function ArtistPage() {
         }}
       >
         {topTracks.map((track, index) => (
-          <div
-            key={index}
-            style={{
-              minWidth: "200px",
-              textAlign: "center",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              padding: "10px",
-            }}
-          >
-            <img
-              src={track.album.images[0]?.url || "/placeholder.jpg"}
-              alt={track.name}
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{track.name}</h3>
-            <p style={{ fontSize: "14px", color: "#555" }}>
-              {track.artists.map((a) => a.name).join(", ")}
-            </p>
-          </div>
-        ))}
+        <div
+          key={index}
+          style={{
+            minWidth: "200px",
+            textAlign: "center",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            padding: "10px",
+          }}
+        >
+          <Link href={`/music/${artist}/${encodeURIComponent(track.name)}`}>
+            <a style={{ textDecoration: "none", color: "inherit" }}>
+              <img
+                src={track.album.images[0]?.url || "/placeholder.jpg"}
+                alt={track.name}
+                style={{ width: "100%", borderRadius: "8px" }}
+              />
+              <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{track.name}</h3>
+              <p style={{ fontSize: "14px", color: "#555" }}>
+                {track.artists.map((a) => a.name).join(", ")}
+              </p>
+            </a>
+          </Link>
+        </div>
+      ))}
       </div>
     </div>
   );
