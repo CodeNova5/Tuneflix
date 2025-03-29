@@ -119,37 +119,48 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch lyrics" });
       }
     }
-    else if (type === "songsByGenre") {
-      const { genre } = req.query;
-    
-      if (!genre) {
-        return res.status(400).json({ error: "Missing genre" });
+    else if (type === "relatedArtists") {
+      const { artistId } = req.query;
+
+      if (!artistId) {
+        return res.status(400).json({ error: "Missing artist ID" });
       }
     
       try {
         const accessToken = await getSpotifyAccessToken();
-        const apiUrl = `https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(
-          genre
-        )}&type=track&limit=10`;
+        const apiUrl = `https://api.spotify.com/v1/artists/${artistId}/related-artists`;
     
         const response = await fetch(apiUrl, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
     
         if (!response.ok) {
-          throw new Error("Failed to fetch songs by genre");
+          throw new Error("Failed to fetch related artists");
         }
     
         const data = await response.json();
-        if (!data.tracks?.items?.length) {
-          return res.status(404).json({ error: "No songs found for this genre" });
+        if (!data.artists?.length) {
+          return res.status(404).json({ error: "No related artists found" });
         }
     
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(data.tracks.items);
+        // Fetch top tracks for the first related artist as an example
+        const relatedArtistId = data.artists[0].id;
+        const topTracksResponse = await fetch(
+          `https://api.spotify.com/v1/artists/${relatedArtistId}/top-tracks?market=US`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
+    
+        if (!topTracksResponse.ok) {
+          throw new Error("Failed to fetch top tracks for related artist");
+        }
+    
+        const topTracksData = await topTracksResponse.json();
+        return res.status(200).json(topTracksData.tracks);
       } catch (err) {
         console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch songs by genre" });
+        return res.status(500).json({ error: "Failed to fetch related artists or tracks" });
       }
     }
      else if (type === "artistSongs") {

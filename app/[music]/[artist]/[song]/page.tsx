@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 interface Track {
   name: string;
-  artists: { name: string }[];
+  artists: { name: string; id: string }[];
   album: {
     name: string;
     images: { url: string }[];
@@ -24,11 +24,6 @@ export default function Page() {
   const [error, setError] = React.useState<string | null>(null);
   const [genreSongs, setGenreSongs] = React.useState<any[]>([]);
 
-  React.useEffect(() => {
-    if (track?.album?.genres?.[0]) {
-      fetchSongsByGenre(track.album.genres[0]);
-    }
-  }, [track]);
 
   React.useEffect(() => {
     if (artist && song) {
@@ -136,23 +131,29 @@ export default function Page() {
   }
   fetchSongs(song);
 
-  async function fetchSongsByGenre(genre: string) {
+  async function fetchRelatedSongs(artistId: string) {
     try {
       const response = await fetch(
-        `/api/Music/route?type=songsByGenre&genre=${encodeURIComponent(genre)}`
+        `/api/Music/route?type=relatedArtists&artistId=${encodeURIComponent(artistId)}`
       );
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "Failed to fetch songs by genre");
+        setError(errorData.error || "Failed to fetch related songs");
         return;
       }
-      const genreSongsData = await response.json();
-      setGenreSongs(genreSongsData);
+      const relatedSongsData = await response.json();
+      setGenreSongs(relatedSongsData); // Reusing genreSongs state for simplicity
     } catch (err) {
-      console.error("Error fetching songs by genre:", err);
+      console.error("Error fetching related songs:", err);
       setError("An unexpected error occurred");
     }
   }
+
+  React.useEffect(() => {
+    if (track?.artists?.[0]?.id) {
+      fetchRelatedSongs(track.artists[0].id);
+    }
+  }, [track]);
 
   if (error) {
     return <h1>{error}</h1>;
@@ -266,7 +267,7 @@ export default function Page() {
           </div>
         ))}
       </div>
-      <h1>Recommended Songs (Genre: {track.album.genres?.[0] || "N/A"})</h1>
+      <h1>Recommended Songs (Related Artists)</h1>
       <div
         style={{
           display: "flex",
