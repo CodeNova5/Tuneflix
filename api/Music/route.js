@@ -150,7 +150,58 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch artist's songs" });
       }
     }
+    else if (type === "artistDetails") {
+      if (!artistName) {
+        return res.status(400).json({ error: "Missing artist name" });
+      }
     
+      try {
+        const accessToken = await getSpotifyAccessToken();
+    
+        // Fetch artist details
+        const artistApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+          decodedArtistName
+        )}&type=artist&limit=1`;
+    
+        const artistResponse = await fetch(artistApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!artistResponse.ok) {
+          throw new Error("Failed to fetch artist details");
+        }
+    
+        const artistData = await artistResponse.json();
+        if (!artistData.artists?.items?.length) {
+          return res.status(404).json({ error: "Artist not found" });
+        }
+    
+        const artist = artistData.artists.items[0];
+    
+        // Fetch top tracks
+        const topTracksApiUrl = `https://api.spotify.com/v1/artists/${artist.id}/top-tracks?market=US`;
+    
+        const topTracksResponse = await fetch(topTracksApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!topTracksResponse.ok) {
+          throw new Error("Failed to fetch top tracks");
+        }
+    
+        const topTracksData = await topTracksResponse.json();
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json({
+          name: artist.name,
+          image: artist.images[0]?.url || null,
+          topTracks: topTracksData.tracks || [],
+        });
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch artist details or top tracks" });
+      }
+    }
      else {
       return res.status(400).json({ error: "Invalid type parameter (use 'spotify', 'youtube', 'lyrics', or 'thisIsPlaylist')" });
     }
