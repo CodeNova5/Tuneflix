@@ -34,7 +34,7 @@ export default function ArtistPage() {
 
           // Fetch top tracks
           const tracksResponse = await fetch(
-            `/api/Music/route?type=topTracks&artistName=${encodeURIComponent(artist)}`
+            `/api/Music/route?type=artistTopSongs&artistName=${encodeURIComponent(artist)}`
           );
           if (!tracksResponse.ok) {
             const errorData = await tracksResponse.json();
