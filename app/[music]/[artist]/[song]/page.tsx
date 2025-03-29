@@ -9,6 +9,8 @@ interface Track {
     name: string;
     images: { url: string }[];
     release_date: string; // Release date of the album
+    genres: string[]; // Genres of the album
+    type: string; // Type of the album (e.g., "album", "single")
   };
   preview_url: string | null;
   duration_ms: number; // Duration of the track in milliseconds
@@ -20,6 +22,13 @@ export default function Page() {
   const [videoId, setVideoId] = React.useState<string | null>(null);
   const [songs, setSongs] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
+  const [genreSongs, setGenreSongs] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    if (track?.album?.genres?.[0]) {
+      fetchSongsByGenre(track.album.genres[0]);
+    }
+  }, [track]);
 
   React.useEffect(() => {
     if (artist && song) {
@@ -127,6 +136,23 @@ export default function Page() {
   }
   fetchSongs(song);
 
+  async function fetchSongsByGenre(genre: string) {
+    try {
+      const response = await fetch(
+        `/api/Music/route?type=songsByGenre&genre=${encodeURIComponent(genre)}`
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to fetch songs by genre");
+        return;
+      }
+      const genreSongsData = await response.json();
+      setGenreSongs(genreSongsData);
+    } catch (err) {
+      console.error("Error fetching songs by genre:", err);
+      setError("An unexpected error occurred");
+    }
+  }
 
   if (error) {
     return <h1>{error}</h1>;
@@ -226,6 +252,42 @@ export default function Page() {
             <Link href={`/music/${artist}/${encodeURIComponent(song.name)}`}>
               <a style={{ textDecoration: "none", color: "inherit" }}>
 
+                <img
+                  src={song.album.images[0]?.url || "/placeholder.jpg"}
+                  alt={song.name}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+                <p style={{ fontSize: "14px", color: "#555" }}>
+                  {song.artists.map((a: any) => a.name).join(", ")}
+                </p>
+              </a>
+            </Link>
+          </div>
+        ))}
+      </div>
+      <h1>Recommended Songs (Genre: {track.album.genres?.[0] || "N/A"})</h1>
+      <div
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          gap: "20px",
+          padding: "10px",
+        }}
+      >
+        {genreSongs.map((song, index) => (
+          <div
+            key={index}
+            style={{
+              minWidth: "200px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <Link href={`/music/${song.artists[0].name}/${encodeURIComponent(song.name)}`}>
+              <a style={{ textDecoration: "none", color: "inherit" }}>
                 <img
                   src={song.album.images[0]?.url || "/placeholder.jpg"}
                   alt={song.name}
