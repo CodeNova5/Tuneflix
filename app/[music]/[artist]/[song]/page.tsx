@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
-
+import Link from "next/link";
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -20,7 +20,7 @@ export default function Page() {
   const [videoId, setVideoId] = React.useState<string | null>(null);
   const [songs, setSongs] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-  
+
   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
@@ -53,7 +53,7 @@ export default function Page() {
           // Fetch and display lyrics
           await fetchAndDisplayLyrics(artist, song);
 
-          
+
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
@@ -127,7 +127,7 @@ export default function Page() {
   }
   fetchSongs(song);
 
-  
+
   if (error) {
     return <h1>{error}</h1>;
   }
@@ -223,15 +223,20 @@ export default function Page() {
               padding: "10px",
             }}
           >
-            <img
-              src={song.album.images[0]?.url || "/placeholder.jpg"}
-              alt={song.name}
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
-            <p style={{ fontSize: "14px", color: "#555" }}>
-              {song.artists.map((a: any) => a.name).join(", ")}
-            </p>
+            <Link href={`/music/${artist}/${encodeURIComponent(song.name)}`}>
+              <a style={{ textDecoration: "none", color: "inherit" }}>
+
+                <img
+                  src={song.album.images[0]?.url || "/placeholder.jpg"}
+                  alt={song.name}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+                <p style={{ fontSize: "14px", color: "#555" }}>
+                  {song.artists.map((a: any) => a.name).join(", ")}
+                </p>
+              </a>
+            </Link>
           </div>
         ))}
       </div>
