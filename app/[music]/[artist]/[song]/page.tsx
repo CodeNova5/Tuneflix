@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 interface Track {
   name: string;
-  artists: { name: string; id: string }[];
+  artists: { name: string }[];
   album: {
     name: string;
     images: { url: string }[];
@@ -24,7 +24,37 @@ export default function Page() {
   const [error, setError] = React.useState<string | null>(null);
   const [genreSongs, setGenreSongs] = React.useState<any[]>([]);
 
+ 
+  const [artistDetails, setArtistDetails] = React.useState<{ genres: string[] } | null>(null);
 
+  React.useEffect(() => {
+    async function fetchArtistDetails() {
+      try {
+        const response = await fetch(
+          `/api/Music/route?type=artistDetails&artistName=${encodeURIComponent(artist)}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch artist details");
+        }
+        const data = await response.json();
+        setArtistDetails(data);
+      } catch (err) {
+        console.error("Error fetching artist details:", err);
+        setError("An unexpected error occurred");
+      }
+    }
+
+    if (artist) {
+      fetchArtistDetails();
+    }
+  }, [artist]);
+
+  React.useEffect(() => {
+    if (artistDetails?.genres?.[0]) {
+      fetchSongsByGenre(artistDetails.genres[0]);
+    }
+  }, [artistDetails]);
+  
   React.useEffect(() => {
     if (artist && song) {
       async function fetchData() {
@@ -131,30 +161,23 @@ export default function Page() {
   }
   fetchSongs(song);
 
-  async function fetchRelatedSongs(artistId: string) {
+  async function fetchSongsByGenre(genre: string) {
     try {
       const response = await fetch(
-        `/api/Music/route?type=relatedArtists&artistId=${encodeURIComponent(artistId)}`
+        `/api/Music/route?type=songsByGenre&genre=${encodeURIComponent(genre)}`
       );
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "Failed to fetch related songs");
+        setError(errorData.error || "Failed to fetch songs by genre");
         return;
       }
-      const relatedSongsData = await response.json();
-      setGenreSongs(relatedSongsData); // Reusing genreSongs state for simplicity
+      const genreSongsData = await response.json();
+      setGenreSongs(genreSongsData);
     } catch (err) {
-      console.error("Error fetching related songs:", err);
+      console.error("Error fetching songs by genre:", err);
       setError("An unexpected error occurred");
     }
   }
-
-  React.useEffect(() => {
-    if (track?.artists?.[0]?.id) {
-      fetchRelatedSongs(track.artists[0].id);
-    }
-  }, [track]);
-
   if (error) {
     return <h1>{error}</h1>;
   }
@@ -267,7 +290,7 @@ export default function Page() {
           </div>
         ))}
       </div>
-      <h1>Recommended Songs (Related Artists)</h1>
+      <h1>Recommended Songs (Genre: {track.album.genres?.[0] || "N/A"})</h1>
       <div
         style={{
           display: "flex",
