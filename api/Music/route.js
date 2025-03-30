@@ -5,10 +5,11 @@ let spotifyAccessToken = null;
 let spotifyTokenExpiresAt = 0;
 import ytdl from 'ytdl-core';
 import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from '@ffmpeg-installer/ffmpeg';
 import { Octokit } from '@octokit/rest';
 import fs from 'fs';
 import path from 'path';
-
+ffmpeg.setFfmpegPath(ffmpegPath.path);
 async function getSpotifyAccessToken() {
   if (spotifyAccessToken && Date.now() < spotifyTokenExpiresAt) {
     return spotifyAccessToken;
@@ -195,16 +196,16 @@ export default async function handler(req, res) {
     }
     else if (type === "youtubeToMp3") {
       const { videoId, fileName } = req.query;
+
       if (!videoId || !fileName) {
         return res.status(400).json({ error: "Missing videoId or fileName" });
       }
-
+    
       const tempFilePath = path.join(process.cwd(), `${fileName}.mp3`);
-
-      // Step 1: Download the YouTube video and convert it to MP3
+    
       try {
         const videoStream = ytdl(`https://www.youtube.com/watch?v=${videoId}`, { quality: 'highestaudio' });
-
+    
         await new Promise((resolve, reject) => {
           ffmpeg(videoStream)
             .audioCodec('libmp3lame')
@@ -213,13 +214,14 @@ export default async function handler(req, res) {
             .on('end', resolve)
             .on('error', reject);
         });
-
+    
         console.log('MP3 file created:', tempFilePath);
+    
+        // Continue with the rest of your logic (e.g., uploading to GitHub)
       } catch (error) {
         console.error('Error converting video to MP3:', error);
         return res.status(500).json({ error: "Failed to convert video to MP3" });
       }
-
       // Step 2: Read the MP3 file and encode it to Base64
       let fileContent;
       try {
