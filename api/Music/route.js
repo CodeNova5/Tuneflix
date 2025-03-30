@@ -206,6 +206,11 @@ export default async function handler(req, res) {
       try {
         const videoStream = ytdl(`https://www.youtube.com/watch?v=${videoId}`, { quality: 'highestaudio' });
     
+        videoStream.on('error', (err) => {
+          console.error('Error with YouTube stream:', err);
+          return res.status(500).json({ error: "Failed to download video from YouTube" });
+        });
+    
         await new Promise((resolve, reject) => {
           ffmpeg(videoStream)
             .audioCodec('libmp3lame')
