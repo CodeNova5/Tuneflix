@@ -275,25 +275,24 @@ export default function Page() {
           {isUploading ? "Converting..." : "Convert to MP3"}
         </button>
       </div>
-
-    {/* Uploaded File Link */}
-{uploadedFileUrl && (
-  <div style={{ marginTop: "20px" }}>
-    <h3>MP3 File Ready:</h3>
-    <a
-      href={uploadedFileUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        color: "#0070f3",
-        textDecoration: "underline",
-        fontWeight: "bold",
-      }}
-    >
-      Download MP3
-    </a>
-  </div>
-)}
+      {/* Uploaded File Link */}
+      {uploadedFileUrl && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>MP3 File Ready:</h3>
+          <a
+            href={uploadedFileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#0070f3",
+              textDecoration: "underline",
+              fontWeight: "bold",
+            }}
+          >
+            Download MP3
+          </a>
+        </div>
+      )}
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
