@@ -3,12 +3,8 @@ const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 let spotifyAccessToken = null;
 let spotifyTokenExpiresAt = 0;
-import { exec } from "child_process";
-import { PassThrough } from "stream";
 import { Octokit } from '@octokit/rest';
-import fs from 'fs';
-import path from 'path';
-import ffmpegPath from "ffmpeg-static";
+import ytdlp from "yt-dlp-exec";
 
 async function getSpotifyAccessToken() {
   if (spotifyAccessToken && Date.now() < spotifyTokenExpiresAt) {
@@ -203,64 +199,55 @@ export default async function handler(req, res) {
     
       try {
         const url = `https://www.youtube.com/watch?v=${videoId}`;
-        const command = `yt-dlp -x --audio-format mp3 -o - "${url}"`;
     
-       
-        const stream = new PassThrough();
+        // Use yt-dlp-exec to download the audio
+        const audioBuffer = await ytdlp(url, {
+          extractAudio: true,
+          audioFormat: "mp3",
+          output: "-",
+        });
     
-        exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
-          if (error) {
-            console.error("Error downloading audio:", error);
-            return res.status(500).json({ error: "Failed to download audio from YouTube" });
-          }
+        // Convert the audio buffer to Base64
+        const fileContent = audioBuffer.toString("base64");
     
-          try {
-            // Convert the audio buffer to Base64
-            const audioBuffer = Buffer.from(stdout, "binary");
-            const fileContent = audioBuffer.toString("base64");
+        // Upload the MP3 file to GitHub using Octokit
+        const octokit = new Octokit({
+          auth: process.env.GITHUB_TOKEN, // Ensure this is set in .env.local
+        });
     
-            // Upload the MP3 file to GitHub using Octokit
-            const octokit = new Octokit({
-              auth: process.env.GITHUB_TOKEN, // Ensure this is set in .env.local
-            });
+        const owner = "Netdot12";
+        const repo = "next";
+        const path = `public/music/${fileName}.mp3`;
     
-            const owner = "Netdot12";
-            const repo = "next";
-            const path = `public/music/${fileName}.mp3`;
+        let sha;
+        try {
+          const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
+          sha = data.sha;
+        } catch (error) {
+          console.log("File does not exist and will be created.");
+        }
     
-            let sha;
-            try {
-              const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
-              sha = data.sha;
-            } catch (error) {
-              console.log("File does not exist and will be created.");
-            }
+        const commitMessage = sha ? "Update MP3 file" : "Add new MP3 file";
     
-            const commitMessage = sha ? "Update MP3 file" : "Add new MP3 file";
+        const response = await octokit.rest.repos.createOrUpdateFileContents({
+          owner,
+          repo,
+          path,
+          message: commitMessage,
+          content: fileContent,
+          sha,
+        });
     
-            const response = await octokit.rest.repos.createOrUpdateFileContents({
-              owner,
-              repo,
-              path,
-              message: commitMessage,
-              content: fileContent,
-              sha,
-            });
-    
-            return res.status(200).json({
-              message: "MP3 file uploaded successfully",
-              url: `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${path}`,
-            });
-          } catch (uploadError) {
-            console.error("Error uploading MP3 file:", uploadError);
-            return res.status(500).json({ error: "Failed to upload MP3 file" });
-          }
+        return res.status(200).json({
+          message: "MP3 file uploaded successfully",
+          url: `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${path}`,
         });
       } catch (error) {
         console.error("Error processing request:", error);
         return res.status(500).json({ error: "Internal server error" });
       }
-    } else {
+    }
+    else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
   } catch (error) {
@@ -268,12 +255,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
-
-const command = `"${ffmpegPath}" -i input.mp4 output.mp3`;
-exec(command, (error, stdout, stderr) => {
-  if (error) {
-    console.error("Error executing ffmpeg:", error);
-    return;
-  }
-  console.log("ffmpeg output:", stdout);
-});

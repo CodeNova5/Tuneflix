@@ -32,6 +32,7 @@
     "react-dom": "^19.0.0",
     "timeago.js": "^4.0.2",
     "youtube-dl-exec": "^3.0.20",
+    "yt-dlp-exec": "^1.0.2",
     "ytdl-core": "^4.11.5",
     "ytdlp-nodejs": "^2.0.4"
   },
