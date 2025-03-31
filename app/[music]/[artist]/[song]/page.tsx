@@ -160,26 +160,24 @@ export default function Page() {
       setError("No YouTube video available to convert.");
       return;
     }
-
+  
     setIsUploading(true);
     setError(null);
-
+  
     try {
       const response = await fetch(
-        `/api/Music/route?type=youtubeToMp3&videoId=${videoId}&fileName=${encodeURIComponent(
-          `${artist}-${song}`
-        )}`
+        `/api/Music/route?type=youtubeToMp3&videoUrl=https://www.youtube.com/watch?v=${videoId}&quality=128`
       );
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.error || "Failed to convert video to MP3");
         setIsUploading(false);
         return;
       }
-
+  
       const data = await response.json();
-      setUploadedFileUrl(data.url);
+      setUploadedFileUrl(data.url); // Set the URL from the response
     } catch (err) {
       console.error("Error converting video to MP3:", err);
       setError("An unexpected error occurred");
@@ -278,15 +276,24 @@ export default function Page() {
         </button>
       </div>
 
-      {/* Uploaded File Link */}
-      {uploadedFileUrl && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>MP3 File Uploaded:</h3>
-          <a href={uploadedFileUrl} target="_blank" rel="noopener noreferrer">
-            {uploadedFileUrl}
-          </a>
-        </div>
-      )}
+    {/* Uploaded File Link */}
+{uploadedFileUrl && (
+  <div style={{ marginTop: "20px" }}>
+    <h3>MP3 File Ready:</h3>
+    <a
+      href={uploadedFileUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: "#0070f3",
+        textDecoration: "underline",
+        fontWeight: "bold",
+      }}
+    >
+      Download MP3
+    </a>
+  </div>
+)}
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
