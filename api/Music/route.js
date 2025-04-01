@@ -306,7 +306,10 @@ export default async function handler(req, res) {
       try {
         const result = await ytmp3(videoUrl, quality || 128);
         if (result.status) {
+          res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
           return res.status(200).json(result.download);
+          
+          console.log(result.download);
         } else {
           return res.status(500).json({ error: result.message });
         }
