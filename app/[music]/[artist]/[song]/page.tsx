@@ -21,7 +21,6 @@ export default function Page() {
   const [videoId, setVideoId] = React.useState<string | null>(null);
   const [songs, setSongs] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-  const [uploadedFileUrl, setUploadedFileUrl] = React.useState<string | null>(null);
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
 
  
@@ -160,13 +159,13 @@ export default function Page() {
       setError("No YouTube video available to convert.");
       return;
     }
-  
+    const songName = `${artist.replace(/\s+/g, "_")}_${track?.name.replace(/\s+/g, "_")}`;
     setIsUploading(true);
     setError(null);
   
     try {
       const response = await fetch(
-        `/api/Music/route?type=youtubeToMp3&videoUrl=https://www.youtube.com/watch?v=${videoId}&quality=128`
+        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${videoId}&type=audio&filename=${songName}`
       );
   
       if (!response.ok) {
@@ -176,8 +175,14 @@ export default function Page() {
         return;
       }
   
-      const data = await response.json();
-      setUploadedFileUrl(data.url); // Set the URL from the response
+      // Automatically triggers download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${videoId}.mp3`;
+      a.click();
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error converting video to MP3:", err);
       setError("An unexpected error occurred");
@@ -185,8 +190,7 @@ export default function Page() {
       setIsUploading(false);
     }
   }
-
-
+  
   if (error) {
     return <h1>{error}</h1>;
   }
@@ -275,24 +279,6 @@ export default function Page() {
           {isUploading ? "Converting..." : "Convert to MP3"}
         </button>
       </div>
-      {/* Uploaded File Link */}
-      {uploadedFileUrl && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>MP3 File Ready:</h3>
-          <a
-            href={uploadedFileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: "#0070f3",
-              textDecoration: "underline",
-              fontWeight: "bold",
-            }}
-          >
-            Download MP3
-          </a>
-        </div>
-      )}
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
