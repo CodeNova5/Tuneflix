@@ -162,25 +162,25 @@ export default function Page() {
     const songName = `${artist.replace(/\s+/g, "_")}_${track?.name.replace(/\s+/g, "_")}`;
     setIsUploading(true);
     setError(null);
-  
+    
     try {
       const response = await fetch(
-        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${videoId}&type=audio&filename=${songName}`
+      `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${videoId}&type=audio&filename=${songName}`
       );
-  
+    
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to convert video to MP3");
-        setIsUploading(false);
-        return;
+      const errorData = await response.json();
+      setError(errorData.error || "Failed to convert video to MP3");
+      setIsUploading(false);
+      return;
       }
-  
-      // Automatically triggers download
+    
+      // Automatically triggers download with a proper filename
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${videoId}.mp3`;
+      a.download = `${songName}.mp3`; // Use the formatted song name as the filename
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (err) {
