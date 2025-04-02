@@ -93,7 +93,40 @@ export default async function handler(req, res) {
         console.error("YouTube API Error:", err);
         return res.status(500).json({ error: "Failed to fetch YouTube video" });
       }
-    } else if (type === "lyrics") {
+    }
+
+else if (type === "lyricsVideo") {
+  if (!YOUTUBE_API_KEY) {
+    console.error("Missing YouTube API key.");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+
+  if (!songName || !artistName) {
+    return res.status(400).json({ error: "Missing song name or artist name" });
+  }
+
+  try {
+    const query = `${decodedArtistName} ${decodedSongName} lyrics video`;
+    const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}&maxResults=1`;
+
+    const response = await fetch(apiUrl);
+    if (!response.ok) throw new Error("Failed to fetch YouTube video");
+
+    const data = await response.json();
+    if (!data.items || data.items.length === 0) {
+      return res.status(404).json({ error: "No lyrics video found for this song" });
+    }
+
+    const videoId = data.items[0].id.videoId;
+    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+    return res.status(200).json({ videoId });
+  } catch (err) {
+    console.error("YouTube API Error:", err);
+    return res.status(500).json({ error: "Failed to fetch YouTube lyrics video" });
+  }
+}
+
+ else if (type === "lyrics") {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist name or song name" });
       }
