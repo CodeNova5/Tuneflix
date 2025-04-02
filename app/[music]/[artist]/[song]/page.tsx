@@ -451,7 +451,7 @@ export default function Page() {
         <h3>Lyrics:</h3>
         <p>Loading lyrics...</p>
       </div>
-      <h1>Songs by {artist}</h1>
+      <h1>Songs by {track.artists[0]?.name}</h1>
       <div
         style={{
           display: "flex",
@@ -471,18 +471,17 @@ export default function Page() {
               padding: "10px",
             }}
           >
-            <Link href={`/music/${artist}/${encodeURIComponent(song.name)}`}>
+            <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/${encodeURIComponent(song.name)}`}>
               <a style={{ textDecoration: "none", color: "inherit" }}>
-
-                <img
-                  src={song.album.images[0]?.url || "/placeholder.jpg"}
-                  alt={song.name}
-                  style={{ width: "100%", borderRadius: "8px" }}
-                />
-                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
-                <p style={{ fontSize: "14px", color: "#555" }}>
-                  {song.artists.map((a: any) => a.name).join(", ")}
-                </p>
+              <img
+                src={song.album.images[0]?.url || "/placeholder.jpg"}
+                alt={song.name}
+                style={{ width: "100%", borderRadius: "8px" }}
+              />
+              <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+              <p style={{ fontSize: "14px", color: "#555" }}>
+                {song.artists.map((a: any) => a.name).join(", ")}
+              </p>
               </a>
             </Link>
           </div>
