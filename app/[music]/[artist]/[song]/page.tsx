@@ -159,7 +159,12 @@ export default function Page() {
       setError("No YouTube video available to convert.");
       return;
     }
-    const songName = `${artist.replace(/\s+/g, "_")}_${track?.name.replace(/\s+/g, "_")}`;
+    const formatTitle = (title) => title
+  .split(" ")
+  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  .join("-");
+
+const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name)}`;
     setIsUploading(true);
     setError(null);
     
