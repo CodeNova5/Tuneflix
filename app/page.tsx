@@ -1,50 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CommentSection from "../components/CommentSection";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  // Disable background scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden"; // Disable scrolling
+    } else {
+      document.body.style.overflow = ""; // Reset scrolling
+    }
+
+    // Cleanup on component unmount
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isModalOpen]);
 
   return (
     <div
       style={{
-        backgroundColor: isDarkMode ? "#121212" : "#f9f9f9",
-        color: isDarkMode ? "#ffffff" : "#000000",
+        backgroundColor: "#121212", // Dark mode background
+        color: "#ffffff", // Dark mode text color
         minHeight: "100vh",
         padding: "20px",
       }}
     >
       <h1>Welcome to the Music App</h1>
       <button
-        onClick={toggleDarkMode}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: isDarkMode ? "#333333" : "#0070f3",
-          color: "#ffffff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          marginRight: "10px",
-        }}
-      >
-        {isDarkMode ? "Light Mode" : "Dark Mode"}
-      </button>
-      <button
         onClick={toggleModal}
         style={{
           padding: "10px 20px",
-          backgroundColor: isDarkMode ? "#333333" : "#0070f3",
-          color: "#ffffff",
+          backgroundColor: "#333333", // Dark mode button background
+          color: "#ffffff", // Button text color
           border: "none",
           borderRadius: "5px",
           cursor: "pointer",
@@ -61,8 +56,8 @@ export default function Home() {
             left: 0,
             width: "100%",
             height: "80%",
-            backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
-            color: isDarkMode ? "#ffffff" : "#000000",
+            backgroundColor: "#1e1e1e", // Dark mode modal background
+            color: "#ffffff", // Modal text color
             boxShadow: "0 -4px 8px rgba(0, 0, 0, 0.2)",
             borderTopLeftRadius: "16px",
             borderTopRightRadius: "16px",
@@ -72,11 +67,15 @@ export default function Home() {
         >
           <div
             style={{
+              position: "sticky", // Keeps the header fixed at the top
+              top: 0,
+              backgroundColor: "#1e1e1e", // Match modal background
+              zIndex: 1001, // Ensure it stays above the content
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
               padding: "10px 20px",
-              borderBottom: isDarkMode ? "1px solid #444" : "1px solid #ddd",
+              borderBottom: "1px solid #444", // Dark mode border
             }}
           >
             <h2>Comments</h2>
@@ -86,7 +85,7 @@ export default function Home() {
                 backgroundColor: "transparent",
                 border: "none",
                 fontSize: "20px",
-                color: isDarkMode ? "#ffffff" : "#000000",
+                color: "#ffffff", // Close button color
                 cursor: "pointer",
               }}
             >
