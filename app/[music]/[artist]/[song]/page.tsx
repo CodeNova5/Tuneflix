@@ -19,6 +19,9 @@ export default function Page() {
   const { artist, song } = useParams() as { artist: string; song: string };
   const [track, setTrack] = React.useState<Track | null>(null);
   const [videoId, setVideoId] = React.useState<string | null>(null);
+// Add a new state for lyrics video ID
+const [lyricsVideoId, setLyricsVideoId] = React.useState<string | null>(null);
+
   const [songs, setSongs] = React.useState<any[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
@@ -80,6 +83,16 @@ export default function Page() {
           // Fetch and display lyrics
           await fetchAndDisplayLyrics(artist, song);
 
+// Fetch lyrics video
+        const lyricsVideoResponse = await fetch(
+          `/api/Music/route?type=lyricsVideo&artistName=${encodeURIComponent(
+            artist
+          )}&songName=${encodeURIComponent(song)}`
+        );
+        const lyricsVideoData = await lyricsVideoResponse.json();
+        if (lyricsVideoData.videoId) {
+          setLyricsVideoId(lyricsVideoData.videoId);
+        }
 
         } catch (err) {
           console.error("Error fetching data:", err);
