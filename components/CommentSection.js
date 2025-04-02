@@ -488,7 +488,7 @@ const CommentSection = () => {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden'; // Prevent scrolling
     modal.style.overflowY = 'scroll'; // Enable vertical scrolling
-
+    modal.zIndex = 1001; // Ensure modal is on top
     try {
       const response = await fetch(`/api/comments/${commentId}/reply`);
       const replies = await response.json();
