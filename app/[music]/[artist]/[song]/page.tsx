@@ -159,15 +159,13 @@ export default function Page() {
       setError("No YouTube video available to convert.");
       return;
     }
-    const formatTitle = (title) => title
-  .split(" ")
-  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-  .join("-");
+    const formatTitle = (title: string): string =>
+  title
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-");
 
-const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name)}`;
-    setIsUploading(true);
-    setError(null);
-    
+const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name ?? "")}`;    
     try {
       const response = await fetch(
       `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${videoId}&type=audio&filename=${songName}`
