@@ -2,6 +2,7 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import CommentSection from "../components/CommentSection";
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -30,7 +31,28 @@ export default function Page() {
 
   const [artistDetails, setArtistDetails] = React.useState<{ genres: string[] } | null>(null);
 
+
   React.useEffect(() => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  // Disable background scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden"; // Disable scrolling
+    } else {
+      document.body.style.overflow = ""; // Reset scrolling
+    }
+
+    // Cleanup on component unmount
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isModalOpen]);
+
     async function fetchArtistDetails() {
       try {
         const response = await fetch(
