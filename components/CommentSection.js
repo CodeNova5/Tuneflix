@@ -232,10 +232,10 @@ const CommentSection = () => {
     if (!content) return alert('Comment cannot be empty');
     if (!currentUser) return alert('User not found');
     if (!pageUrl) return alert('Page URL not found');
-        // Show the spinner
-        const spinner = document.getElementById('spinner');
-        if (spinner) spinner.style.display = 'block';
-    
+    // Show the spinner
+    const spinner = document.getElementById('spinner');
+    if (spinner) spinner.style.display = 'block';
+
     const formData = new FormData();
     formData.append('pageUrl', pageUrl);
     formData.append('content', content);
@@ -320,8 +320,15 @@ const CommentSection = () => {
   <p id="reply-error" style="color: red; display: none; padding: 5px;">Error submitting reply. Please try again.</p>
 `;
     modal.style.display = 'block';
-    showReplies(commentId);
+    showReplies(commentId); // Show replies in the modal
     const textarea = document.getElementById("reply-content");
+    textarea.addEventListener("input", () => {
+      textarea.style.height = "auto"; // Reset height to calculate new height
+      textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
+    });
+
+    textarea.focus(); // Focus the textarea
+
     textarea.focus(); // Focus the textarea
     const form = document.getElementById('reply-form');
     const errorMsg = document.getElementById('reply-error');
@@ -631,8 +638,8 @@ const CommentSection = () => {
 
   return (
     <div className={styles.commentSection}>
-      <div id="spinner" className={styles.spinner} style={{ display: "none"}}>
-        
+      <div id="spinner" className={styles.spinner} style={{ display: "none" }}>
+
       </div>
       <h1 className={styles.commentTitle}>Comment Section</h1>
       <div style={{ position: "fixed", bottom: "0", left: "0", width: "100%", backgroundColor: "black", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: "1px solid #ccc" }}>
