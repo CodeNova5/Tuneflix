@@ -181,7 +181,7 @@ const [lyricsVideoId, setLyricsVideoId] = React.useState<string | null>(null);
 const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name ?? "")}`;    
     try {
       const response = await fetch(
-      `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${videoId}&type=audio&filename=${songName}`
+      `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}`
       );
     
       if (!response.ok) {
