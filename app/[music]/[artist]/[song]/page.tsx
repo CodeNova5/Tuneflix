@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import CommentSection from "../components/CommentSection";
+import CommentSection from '../../../components/CommentSection';
 interface Track {
   name: string;
   artists: { name: string }[];
