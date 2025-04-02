@@ -4,7 +4,7 @@
     gap: 8px;
     padding: 12px;
     border-bottom: 1px solid #ddd;
-    
+    text-align: left;
 }
 .commentContainer:last-child {
   margin-bottom: 100px;
