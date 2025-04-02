@@ -27,20 +27,15 @@ export default function Page() {
   const [error, setError] = React.useState<string | null>(null);
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
   const [modalMessage, setModalMessage] = React.useState<string | null>(null);
-
-
   const [artistDetails, setArtistDetails] = React.useState<{ genres: string[] } | null>(null);
-
-
-  React.useEffect(() => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
   // Disable background scroll when modal is open
-  useEffect(() => {
+  React.useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden"; // Disable scrolling
     } else {
@@ -52,6 +47,9 @@ export default function Page() {
       document.body.style.overflow = "";
     };
   }, [isModalOpen]);
+
+
+  React.useEffect(() => {
 
     async function fetchArtistDetails() {
       try {
