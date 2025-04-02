@@ -271,8 +271,9 @@ const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name ?? "")}`;
           <iframe
             src={`https://www.youtube.com/embed/${videoId}`}
             allowFullScreen
-            width="560"
+           
             height="315"
+style={{ width: "90%" }}
           ></iframe>
         ) : (
           <p>No video available for this song.</p>
