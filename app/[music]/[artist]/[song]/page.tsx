@@ -168,7 +168,7 @@ const [lyricsVideoId, setLyricsVideoId] = React.useState<string | null>(null);
   fetchSongs(song);
 
   async function handleConvertToMp3() {
-    if (!lyricsvideoId) {
+    if (!lyricsVideoId) {
       setError("No YouTube video available to convert.");
       return;
     }
