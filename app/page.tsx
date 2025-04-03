@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import CommentSection from "../components/CommentSection";
-import React from 'react';
 import RelatedSongsFetcher from '../RelatedSongsFetcher';
 
 export default function Home() {
