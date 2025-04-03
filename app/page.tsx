@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import CommentSection from "../components/CommentSection";
-import RelatedSongsFetcher from '../RelatedSongsFetcher';
+import RelatedSongsFetcher from './RelatedSongsFetcher';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
