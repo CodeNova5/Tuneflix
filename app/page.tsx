@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import CommentSection from "../components/CommentSection";
-import RelatedSongsFetcher from './RelatedSongsFetcher';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,7 +95,6 @@ export default function Home() {
           <div style={{ padding: "20px" }}>
             <CommentSection />
           </div>
-<RelatedSongsFetcher />
         </div>
       )}
     </div>
