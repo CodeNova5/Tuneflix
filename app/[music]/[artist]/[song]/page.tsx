@@ -383,12 +383,7 @@ export default function Page() {
         }
       `}</style>
 
-      {isReadyToDownload && downloadUrl && (
-        <a href={downloadUrl} download={`${songName}.mp3`}>
-          <button>⬇️ Click to Download</button>
-        </a>
-      )}
-
+      
       <button
         onClick={toggleModal}
         style={{
