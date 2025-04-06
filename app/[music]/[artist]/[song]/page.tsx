@@ -208,7 +208,7 @@ export default function Page() {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join("-");
 
-    const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name ?? "")}`;
+    const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
 
     try {
       const response = await fetch(
@@ -226,7 +226,7 @@ export default function Page() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = songName+'.mp3' ; // Use the formatted song name as the filename
+      a.download = songName + '.mp3'; // Use the formatted song name as the filename
       a.click();
       window.URL.revokeObjectURL(url);
       setDownloadUrl(url); // 🔥 Store blob URL
@@ -241,7 +241,20 @@ export default function Page() {
       }, 2000);
     }
   }
-
+  function confirmDownload() {
+    if (downloadUrl) {
+      setTimeout(() => {
+        setModalMessage("✅ Download Completed!");
+        setIsUploading(false);
+      }, 2000);
+    }
+    else {
+      setTimeout(() => {
+        setModalMessage("Downloading Please Wait...");
+        setIsUploading(false);
+      }, 2000);
+    }
+  }
 
   if (error) {
     return <h1>{error}</h1>;
@@ -329,9 +342,8 @@ export default function Page() {
       </div>
 
       {downloadUrl && (
-        <a
-          href={downloadUrl}
-          download={`${artist.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`}
+        <button
+          onClick={confirmDownload}
           style={{
             display: "inline-block",
             marginTop: "15px",
@@ -343,7 +355,7 @@ export default function Page() {
           }}
         >
           🎵 Download MP3
-        </a>
+        </button>
       )}
 
 
