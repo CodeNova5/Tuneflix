@@ -29,20 +29,10 @@ export default function Page() {
   const [modalMessage, setModalMessage] = React.useState<string | null>(null);
   const [artistDetails, setArtistDetails] = React.useState<{ genres: string[] } | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [downloadUrl, setDownloadUrl] = React.useState<string | null>(null);
-  const [isReadyToDownload, setIsReadyToDownload] = React.useState(false);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
-  const formatTitle = (title: string): string =>
-    title
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join("-");
-
-
-  const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name ?? "")}`;
 
   // Disable background scroll when modal is open
   React.useEffect(() => {
@@ -123,7 +113,7 @@ export default function Page() {
           const lyricsVideoData = await lyricsVideoResponse.json();
           if (lyricsVideoData.videoId) {
             setLyricsVideoId(lyricsVideoData.videoId);
-                     }
+          }
 
         } catch (err) {
           console.error("Error fetching data:", err);
@@ -199,7 +189,6 @@ export default function Page() {
   fetchSongs(song);
 
 
-
   async function handleConvertToMp3() {
     if (!lyricsVideoId) {
       setModalMessage("No YouTube video available to convert.");
@@ -209,7 +198,13 @@ export default function Page() {
     setIsUploading(true);
     setModalMessage("Downloading Song...");
 
+    const formatTitle = (title: string): string =>
+      title
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join("-");
 
+    const songName = `${formatTitle(artist)}_-_${formatTitle(track?.name ?? "")}`;
 
     try {
       const response = await fetch(
@@ -223,22 +218,26 @@ export default function Page() {
         return;
       }
 
+      // Automatically triggers download with a proper filename
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      setDownloadUrl(url); // Save the blob URL
-      setIsReadyToDownload(true); // Show download button
-      setModalMessage("✅ Ready to download!");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${songName}.mp3`; // Use the formatted song name as the filename
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      setModalMessage("✅ Download Completed!");
     } catch (err) {
       console.error("Error converting video to MP3:", err);
       setModalMessage("An unexpected error occurred");
     } finally {
-      setIsUploading(false);
+      setTimeout(() => {
+        setModalMessage(null); // Hide modal after a short delay
+        setIsUploading(false);
+      }, 2000);
     }
   }
-   if (lyricsVideoId) {
-     handleConvertToMp3(); // Call the function to convert to MP3
-
-    }
 
   if (error) {
     return <h1>{error}</h1>;
@@ -383,8 +382,7 @@ export default function Page() {
         }
       `}</style>
 
-      
-      <button
+         <button
         onClick={toggleModal}
         style={{
           padding: "10px 20px",
@@ -475,15 +473,15 @@ export default function Page() {
           >
             <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/${encodeURIComponent(song.name)}`}>
               <a style={{ textDecoration: "none", color: "inherit" }}>
-                <img
-                  src={song.album.images[0]?.url || "/placeholder.jpg"}
-                  alt={song.name}
-                  style={{ width: "100%", borderRadius: "8px" }}
-                />
-                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
-                <p style={{ fontSize: "14px", color: "#555" }}>
-                  {song.artists.map((a: any) => a.name).join(", ")}
-                </p>
+              <img
+                src={song.album.images[0]?.url || "/placeholder.jpg"}
+                alt={song.name}
+                style={{ width: "100%", borderRadius: "8px" }}
+              />
+              <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+              <p style={{ fontSize: "14px", color: "#555" }}>
+                {song.artists.map((a: any) => a.name).join(", ")}
+              </p>
               </a>
             </Link>
           </div>
