@@ -123,8 +123,7 @@ export default function Page() {
           const lyricsVideoData = await lyricsVideoResponse.json();
           if (lyricsVideoData.videoId) {
             setLyricsVideoId(lyricsVideoData.videoId);
-            handleConvertToMp3(); // Call the function to convert to MP3
-          }
+                     }
 
         } catch (err) {
           console.error("Error fetching data:", err);
@@ -236,8 +235,10 @@ export default function Page() {
       setIsUploading(false);
     }
   }
+   if (lyricsVideoId) {
+     handleConvertToMp3(); // Call the function to convert to MP3
 
-
+    }
 
   if (error) {
     return <h1>{error}</h1>;
