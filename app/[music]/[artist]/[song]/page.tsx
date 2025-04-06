@@ -29,6 +29,7 @@ export default function Page() {
   const [modalMessage, setModalMessage] = React.useState<string | null>(null);
   const [artistDetails, setArtistDetails] = React.useState<{ genres: string[] } | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [downloadUrl, setDownloadUrl] = React.useState<string | null>(null);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -47,6 +48,12 @@ export default function Page() {
       document.body.style.overflow = "";
     };
   }, [isModalOpen]);
+
+  React.useEffect(() => {
+    if (lyricsVideoId && !downloadUrl) {
+      handleConvertToMp3();
+    }
+  }, [lyricsVideoId]);
 
 
   React.useEffect(() => {
@@ -190,10 +197,7 @@ export default function Page() {
 
 
   async function handleConvertToMp3() {
-    if (!lyricsVideoId) {
-      setModalMessage("No YouTube video available to convert.");
-      return;
-    }
+    if (!lyricsVideoId) return;
 
     setIsUploading(true);
     setModalMessage("Downloading Song...");
@@ -218,26 +222,21 @@ export default function Page() {
         return;
       }
 
-      // Automatically triggers download with a proper filename
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${songName}.mp3`; // Use the formatted song name as the filename
-      a.click();
-      window.URL.revokeObjectURL(url);
-
-      setModalMessage("✅ Download Completed!");
+      setDownloadUrl(url); // 🔥 Store blob URL
+      setModalMessage("✅ Download Ready!");
     } catch (err) {
       console.error("Error converting video to MP3:", err);
       setModalMessage("An unexpected error occurred");
     } finally {
       setTimeout(() => {
-        setModalMessage(null); // Hide modal after a short delay
+        setModalMessage(null);
         setIsUploading(false);
       }, 2000);
     }
   }
+
 
   if (error) {
     return <h1>{error}</h1>;
@@ -324,6 +323,25 @@ export default function Page() {
         </button>
       </div>
 
+      {downloadUrl && (
+        <a
+          href={downloadUrl}
+          download={`${artist.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`}
+          style={{
+            display: "inline-block",
+            marginTop: "15px",
+            padding: "10px 20px",
+            backgroundColor: "#28a745",
+            color: "#fff",
+            borderRadius: "5px",
+            textDecoration: "none",
+          }}
+        >
+          🎵 Download MP3
+        </a>
+      )}
+
+
       {/* Spinner Modal */}
       {modalMessage && (
         <div
@@ -382,7 +400,7 @@ export default function Page() {
         }
       `}</style>
 
-         <button
+      <button
         onClick={toggleModal}
         style={{
           padding: "10px 20px",
@@ -473,15 +491,15 @@ export default function Page() {
           >
             <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/${encodeURIComponent(song.name)}`}>
               <a style={{ textDecoration: "none", color: "inherit" }}>
-              <img
-                src={song.album.images[0]?.url || "/placeholder.jpg"}
-                alt={song.name}
-                style={{ width: "100%", borderRadius: "8px" }}
-              />
-              <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
-              <p style={{ fontSize: "14px", color: "#555" }}>
-                {song.artists.map((a: any) => a.name).join(", ")}
-              </p>
+                <img
+                  src={song.album.images[0]?.url || "/placeholder.jpg"}
+                  alt={song.name}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+                <p style={{ fontSize: "14px", color: "#555" }}>
+                  {song.artists.map((a: any) => a.name).join(", ")}
+                </p>
               </a>
             </Link>
           </div>
