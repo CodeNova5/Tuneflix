@@ -224,6 +224,11 @@ export default function Page() {
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = songName+'.mp3' ; // Use the formatted song name as the filename
+      a.click();
+      window.URL.revokeObjectURL(url);
       setDownloadUrl(url); // 🔥 Store blob URL
       setModalMessage("✅ Download Ready!");
     } catch (err) {
