@@ -333,16 +333,21 @@ export default function Page() {
             setIsUploading(true);
             setModalMessage("Downloading Song...");
 
-            if (downloadUrl) {
-              setModalMessage("✅ Download Ready!");
-              // Auto-trigger the download
-              const link = document.createElement("a");
-              link.href = downloadUrl;
-              link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }
+            // Polling for downloadUrl to be set
+            const interval = setInterval(() => {
+              if (downloadUrl) {
+                clearInterval(interval); // Stop polling
+                setModalMessage("✅ Download Ready!");
+
+                // Trigger download
+                const link = document.createElement("a");
+                link.href = downloadUrl;
+                link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }
+            }, 2000); // Check every 2s
           }
         }}
 
@@ -362,52 +367,54 @@ export default function Page() {
 
 
       {/* Spinner Modal */}
-      {modalMessage && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.7)", // darker overlay
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
+      {
+        modalMessage && (
           <div
             style={{
-              backgroundColor: "#1e1e1e", // dark background
-              padding: "20px",
-              borderRadius: "8px",
-              textAlign: "center",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.6)",
-              color: "#fff", // white text
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.7)", // darker overlay
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 1000,
             }}
           >
-            {modalMessage === "Downloading Song..." ? (
-              <div>
-                <div
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    border: "5px solid #444",
-                    borderTop: "5px solid #00bfff", // bright spinner color
-                    borderRadius: "50%",
-                    animation: "spin 1s linear infinite",
-                    margin: "0 auto 20px",
-                  }}
-                ></div>
-                <p>{modalMessage}</p>
-              </div>
-            ) : (
-              <p style={{ fontSize: "18px", fontWeight: "bold" }}>{modalMessage}</p>
-            )}
+            <div
+              style={{
+                backgroundColor: "#1e1e1e", // dark background
+                padding: "20px",
+                borderRadius: "8px",
+                textAlign: "center",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.6)",
+                color: "#fff", // white text
+              }}
+            >
+              {modalMessage === "Downloading Song..." ? (
+                <div>
+                  <div
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      border: "5px solid #444",
+                      borderTop: "5px solid #00bfff", // bright spinner color
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite",
+                      margin: "0 auto 20px",
+                    }}
+                  ></div>
+                  <p>{modalMessage}</p>
+                </div>
+              ) : (
+                <p style={{ fontSize: "18px", fontWeight: "bold" }}>{modalMessage}</p>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <style jsx>{`
         @keyframes spin {
@@ -434,55 +441,57 @@ export default function Page() {
         {isModalOpen ? "Close Comments" : "Open Comments"}
       </button>
 
-      {isModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "80%",
-            backgroundColor: "#1e1e1e", // Dark mode modal background
-            color: "#ffffff", // Modal text color
-            boxShadow: "0 -4px 8px rgba(0, 0, 0, 0.2)",
-            borderTopLeftRadius: "16px",
-            borderTopRightRadius: "16px",
-            overflowY: "auto",
-            zIndex: 1000,
-          }}
-        >
+      {
+        isModalOpen && (
           <div
             style={{
-              position: "sticky", // Keeps the header fixed at the top
-              top: 0,
-              backgroundColor: "#1e1e1e", // Match modal background
-              zIndex: 1001, // Ensure it stays above the content
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "10px 20px",
-              borderBottom: "1px solid #444", // Dark mode border
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "80%",
+              backgroundColor: "#1e1e1e", // Dark mode modal background
+              color: "#ffffff", // Modal text color
+              boxShadow: "0 -4px 8px rgba(0, 0, 0, 0.2)",
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
+              overflowY: "auto",
+              zIndex: 1000,
             }}
           >
-            <h2>Comments</h2>
-            <button
-              onClick={toggleModal}
+            <div
               style={{
-                backgroundColor: "transparent",
-                border: "none",
-                fontSize: "20px",
-                color: "#ffffff", // Close button color
-                cursor: "pointer",
+                position: "sticky", // Keeps the header fixed at the top
+                top: 0,
+                backgroundColor: "#1e1e1e", // Match modal background
+                zIndex: 1001, // Ensure it stays above the content
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "10px 20px",
+                borderBottom: "1px solid #444", // Dark mode border
               }}
             >
-              ✖
-            </button>
+              <h2>Comments</h2>
+              <button
+                onClick={toggleModal}
+                style={{
+                  backgroundColor: "transparent",
+                  border: "none",
+                  fontSize: "20px",
+                  color: "#ffffff", // Close button color
+                  cursor: "pointer",
+                }}
+              >
+                ✖
+              </button>
+            </div>
+            <div style={{ padding: "20px" }}>
+              <CommentSection />
+            </div>
           </div>
-          <div style={{ padding: "20px" }}>
-            <CommentSection />
-          </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Lyrics Section */}
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
@@ -525,6 +534,6 @@ export default function Page() {
           </div>
         ))}
       </div>
-    </div>
+    </div >
   );
 }
