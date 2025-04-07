@@ -335,6 +335,13 @@ export default function Page() {
 
             if (downloadUrl) {
               setModalMessage("✅ Download Ready!");
+              // Auto-trigger the download
+              const link = document.createElement("a");
+              link.href = downloadUrl;
+              link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
             }
           }
         }}
@@ -363,7 +370,7 @@ export default function Page() {
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)", // darker overlay
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -372,11 +379,12 @@ export default function Page() {
         >
           <div
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: "#1e1e1e", // dark background
               padding: "20px",
               borderRadius: "8px",
               textAlign: "center",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.6)",
+              color: "#fff", // white text
             }}
           >
             {modalMessage === "Downloading Song..." ? (
@@ -385,8 +393,8 @@ export default function Page() {
                   style={{
                     width: "50px",
                     height: "50px",
-                    border: "5px solid #ccc",
-                    borderTop: "5px solid #0070f3",
+                    border: "5px solid #444",
+                    borderTop: "5px solid #00bfff", // bright spinner color
                     borderRadius: "50%",
                     animation: "spin 1s linear infinite",
                     margin: "0 auto 20px",
