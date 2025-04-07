@@ -227,8 +227,6 @@ export default function Page() {
       const a = document.createElement("a");
       a.href = url;
       a.download = songName + '.mp3'; // Use the formatted song name as the filename
-      a.click();
-      window.URL.revokeObjectURL(url);
       setDownloadUrl(url); // 🔥 Store blob URL
       setModalMessage("✅ Download Ready!");
     } catch (err) {
@@ -237,20 +235,6 @@ export default function Page() {
     } finally {
       setTimeout(() => {
         setModalMessage(null);
-        setIsUploading(false);
-      }, 2000);
-    }
-  }
-  function confirmDownload() {
-    if (downloadUrl) {
-      setTimeout(() => {
-        setModalMessage("✅ Download Completed!");
-        setIsUploading(false);
-      }, 2000);
-    }
-    else {
-      setTimeout(() => {
-        setModalMessage("Downloading Please Wait...");
         setIsUploading(false);
       }, 2000);
     }
@@ -342,8 +326,9 @@ export default function Page() {
       </div>
 
       {downloadUrl && (
-        <button
-          onClick={confirmDownload}
+        <a
+          href={downloadUrl}
+          download={`${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`}
           style={{
             display: "inline-block",
             marginTop: "15px",
@@ -355,7 +340,7 @@ export default function Page() {
           }}
         >
           🎵 Download MP3
-        </button>
+        </a>
       )}
 
 
