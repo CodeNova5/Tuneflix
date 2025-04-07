@@ -325,23 +325,38 @@ export default function Page() {
         </button>
       </div>
 
-      {downloadUrl && (
-        <a
-          href={downloadUrl}
-          download={`${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`}
-          style={{
-            display: "inline-block",
-            marginTop: "15px",
-            padding: "10px 20px",
-            backgroundColor: "#28a745",
-            color: "#fff",
-            borderRadius: "5px",
-            textDecoration: "none",
-          }}
-        >
-          🎵 Download MP3
-        </a>
-      )}
+      <a
+        href={downloadUrl ?? "#"}
+        download={
+          downloadUrl
+            ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
+            : undefined
+        }
+        onClick={async (e) => {
+          if (!downloadUrl) {
+            e.preventDefault(); // Stop default link action
+            setIsUploading(true);
+            setModalMessage("Downloading Song...");
+
+            if (downloadUrl) {
+              setModalMessage("✅ Download Ready!");
+            }
+          }
+        }}
+
+        style={{
+          display: "inline-block",
+          marginTop: "15px",
+          padding: "10px 20px",
+          backgroundColor: "#28a745",
+          color: "#fff",
+          borderRadius: "5px",
+          textDecoration: "none",
+          cursor: "pointer",
+        }}
+      >
+        🎵 Download MP3
+      </a>
 
 
       {/* Spinner Modal */}
