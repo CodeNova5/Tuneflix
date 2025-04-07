@@ -329,7 +329,7 @@ export default function Page() {
         }
         onClick={async (e) => {
           if (!downloadUrl) {
-            e.preventDefault(); // Stop default link action
+            e.preventDefault(); // Stop default link behavior
             setIsUploading(true);
             setModalMessage("Downloading Song...");
 
@@ -344,10 +344,11 @@ export default function Page() {
                 link.href = downloadUrl;
                 link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
                 document.body.appendChild(link);
+
+                // Trigger the download programmatically
                 link.click();
-                document.body.removeChild(link);
               }
-            }, 2000); // Check every 2s
+            }, 500); // Check every 500ms
           }
         }}
 
