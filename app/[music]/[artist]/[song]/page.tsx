@@ -198,10 +198,6 @@ export default function Page() {
 
   async function handleConvertToMp3() {
     if (!lyricsVideoId) return;
-
-    setIsUploading(true);
-    setModalMessage("Downloading Song...");
-
     const formatTitle = (title: string): string =>
       title
         .split(" ")
