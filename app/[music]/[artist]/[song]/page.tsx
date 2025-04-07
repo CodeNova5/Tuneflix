@@ -227,8 +227,6 @@ export default function Page() {
       const a = document.createElement("a");
       a.href = url;
       a.download = songName + '.mp3'; // Use the formatted song name as the filename
-      setDownloadUrl(url); // 🔥 Store blob URL
-      setModalMessage("✅ Download Ready!");
     } catch (err) {
       console.error("Error converting video to MP3:", err);
       setModalMessage("An unexpected error occurred");
