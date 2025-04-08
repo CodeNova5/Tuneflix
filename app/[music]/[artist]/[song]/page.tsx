@@ -196,12 +196,8 @@ export default function Page() {
   fetchSongs(song);
 
 
-  let cachedMp3DownloadPromise: Promise<void> | null = null;
-  let downloadUrlBlob: string | null = null;
-
   async function handleConvertToMp3() {
     if (!lyricsVideoId) return;
-
     const formatTitle = (title: string): string =>
       title
         .split(" ")
@@ -210,61 +206,35 @@ export default function Page() {
 
     const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
 
-    // If request is already in progress
-    if (cachedMp3DownloadPromise) {
-      console.log("Conversion already in progress. Waiting for result...");
+    try {
+      const response = await fetch(
+        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}`
+      );
 
-      // Wait for the original fetch to complete
-      await cachedMp3DownloadPromise;
-
-      // If blob URL is ready, trigger download
-      if (downloadUrlBlob) {
-        const a = document.createElement("a");
-        a.href = downloadUrlBlob;
-        a.download = songName + ".mp3";
-        a.click();
+      if (!response.ok) {
+        const errorData = await response.json();
+        setModalMessage(errorData.error || "Failed to convert video to MP3");
+        setIsUploading(false);
+        return;
       }
 
-      return;
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.id = "download-link"; // Set an ID for the link
+      a.href = url;
+      a.download = songName + '.mp3'; // Use the formatted song name as the filename
+      document.body.appendChild(a);
+      setDownloadUrl(url); // 🔥 Store blob URL
+    } catch (err) {
+      console.error("Error converting video to MP3:", err);
+      setModalMessage("An unexpected error occurred");
+    } finally {
+      setTimeout(() => {
+        setModalMessage(null);
+        setIsUploading(false);
+      }, 2000);
     }
-
-    cachedMp3DownloadPromise = (async () => {
-      try {
-        const response = await fetch(
-          `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}`
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          setModalMessage(errorData.error || "Failed to convert video to MP3");
-          setIsUploading(false);
-          cachedMp3DownloadPromise = null;
-          return;
-        }
-
-        const blob = await response.blob();
-        downloadUrlBlob = window.URL.createObjectURL(blob);
-
-        // Create download link element but DO NOT auto-click here
-        const a = document.createElement("a");
-        a.id = "download-link";
-        a.href = downloadUrlBlob;
-        a.download = songName + ".mp3";
-        document.body.appendChild(a);
-        setDownloadUrl(downloadUrlBlob); // Store for other use if needed
-      } catch (err) {
-        console.error("Error converting video to MP3:", err);
-        setModalMessage("An unexpected error occurred");
-        cachedMp3DownloadPromise = null;
-      } finally {
-        setTimeout(() => {
-          setModalMessage(null);
-          setIsUploading(false);
-        }, 2000);
-      }
-    })();
-
-    return cachedMp3DownloadPromise;
   }
 
 
@@ -363,11 +333,28 @@ export default function Page() {
           if (!downloadUrl) {
             e.preventDefault(); // Prevent default anchor behavior
             setIsUploading(true);
-            setModalMessage("Downloading song...");
-            handleConvertToMp3();
+            setModalMessage(" Preparing Your song For Download...");
+            // MutationObserver to monitor for the addition of the #download-link element
+            const observer = new MutationObserver((mutationsList) => {
+              mutationsList.forEach((mutation) => {
+                // Check if the added node is the download-link element
+                if (mutation.type === 'childList') {
+                  mutation.addedNodes.forEach((node) => {
+                    if ((node as HTMLElement).id === 'download-link') {
+                      console.log('Download link has been added to the DOM');
+                      // Perform any other action needed once the element is found
+                      observer.disconnect(); // Stop observing once the element is found
+                    }
+                  });
+                }
+              });
+            });
+
+            // Configure the MutationObserver to watch for child node additions to the body
+            observer.observe(document.body, { childList: true, subtree: true });
+
           }
-        }
-        }
+        }}
         style={{
           display: "inline-block",
           marginTop: "15px",
