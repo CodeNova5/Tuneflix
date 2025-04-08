@@ -334,7 +334,7 @@ export default function Page() {
           if (!downloadUrl) {
             e.preventDefault(); // Prevent default anchor behavior
             setIsUploading(true);
-            setModalMessage(" Preparing Your song For Download...");
+            setModalMessage("Preparing download...");
             // MutationObserver to monitor for the addition of the #download-link element
             const observer = new MutationObserver((mutationsList) => {
               mutationsList.forEach((mutation) => {
@@ -342,9 +342,13 @@ export default function Page() {
                 if (mutation.type === 'childList') {
                   mutation.addedNodes.forEach((node) => {
                     if ((node as HTMLElement).id === 'download-link') {
-                      console.log('Download link has been added to the DOM');
+                      setModalMessage("✅ Download has started!");
                       // Perform any other action needed once the element is found
                       (node as HTMLElement).click(); // Click the link once it is added
+                      setTimeout(() => {
+                        setModalMessage(null);
+                        setIsUploading(false);
+                      }, 2000);
                       observer.disconnect(); // Stop observing once the element is found
                     }
                   });
