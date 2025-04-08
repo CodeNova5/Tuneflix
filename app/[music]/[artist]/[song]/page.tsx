@@ -324,6 +324,7 @@ export default function Page() {
       </div>
 
       <a
+      href="downloadUrl"
         download={
           downloadUrl
             ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
