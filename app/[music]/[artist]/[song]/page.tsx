@@ -371,7 +371,6 @@ export default function Page() {
 
             // Simulate setting the downloadUrl (replace this with your actual logic)
             setTimeout(() => {
-
               if (downloadUrl) {
                 document.body.setAttribute("data-download-url", downloadUrl); // Trigger MutationObserver
               }
