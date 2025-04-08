@@ -330,6 +330,7 @@ export default function Page() {
   }
   onClick={async (e) => {
     if (!downloadUrl) {
+      e.preventDefault(); // Prevent default anchor behavior
       setIsUploading(true);
       setModalMessage("Downloading ...");
 
@@ -339,10 +340,14 @@ export default function Page() {
           clearInterval(interval); // Stop polling
           setModalMessage("✅ Download!");
 
-        const link = document.getElementById("download-link") as HTMLAnchorElement;
-          if (link) {
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+          document.body.appendChild(link);
+    
+          // Trigger the download programmatically
           link.click();
-          }
+          document.body.removeChild(link);
           setIsUploading(false);
           setModalMessage(null);
     
