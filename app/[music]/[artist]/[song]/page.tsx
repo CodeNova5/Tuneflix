@@ -344,6 +344,7 @@ export default function Page() {
                     if ((node as HTMLElement).id === 'download-link') {
                       console.log('Download link has been added to the DOM');
                       // Perform any other action needed once the element is found
+                      (node as HTMLElement).click(); // Click the link once it is added
                       observer.disconnect(); // Stop observing once the element is found
                     }
                   });
