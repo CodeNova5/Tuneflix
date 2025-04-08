@@ -196,8 +196,12 @@ export default function Page() {
   fetchSongs(song);
 
 
+  let cachedMp3DownloadPromise: Promise<void> | null = null;
+  let downloadUrlBlob: string | null = null;
+
   async function handleConvertToMp3() {
     if (!lyricsVideoId) return;
+
     const formatTitle = (title: string): string =>
       title
         .split(" ")
@@ -206,35 +210,61 @@ export default function Page() {
 
     const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
 
-    try {
-      const response = await fetch(
-        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}`
-      );
+    // If request is already in progress
+    if (cachedMp3DownloadPromise) {
+      console.log("Conversion already in progress. Waiting for result...");
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setModalMessage(errorData.error || "Failed to convert video to MP3");
-        setIsUploading(false);
-        return;
+      // Wait for the original fetch to complete
+      await cachedMp3DownloadPromise;
+
+      // If blob URL is ready, trigger download
+      if (downloadUrlBlob) {
+        const a = document.createElement("a");
+        a.href = downloadUrlBlob;
+        a.download = songName + ".mp3";
+        a.click();
       }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.id = "download-link"; // Set an ID for the link
-      a.href = url;
-      a.download = songName + '.mp3'; // Use the formatted song name as the filename
-      document.body.appendChild(a);
-      setDownloadUrl(url); // 🔥 Store blob URL
-    } catch (err) {
-      console.error("Error converting video to MP3:", err);
-      setModalMessage("An unexpected error occurred");
-    } finally {
-      setTimeout(() => {
-        setModalMessage(null);
-        setIsUploading(false);
-      }, 2000);
+      return;
     }
+
+    cachedMp3DownloadPromise = (async () => {
+      try {
+        const response = await fetch(
+          `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}`
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          setModalMessage(errorData.error || "Failed to convert video to MP3");
+          setIsUploading(false);
+          cachedMp3DownloadPromise = null;
+          return;
+        }
+
+        const blob = await response.blob();
+        downloadUrlBlob = window.URL.createObjectURL(blob);
+
+        // Create download link element but DO NOT auto-click here
+        const a = document.createElement("a");
+        a.id = "download-link";
+        a.href = downloadUrlBlob;
+        a.download = songName + ".mp3";
+        document.body.appendChild(a);
+        setDownloadUrl(downloadUrlBlob); // Store for other use if needed
+      } catch (err) {
+        console.error("Error converting video to MP3:", err);
+        setModalMessage("An unexpected error occurred");
+        cachedMp3DownloadPromise = null;
+      } finally {
+        setTimeout(() => {
+          setModalMessage(null);
+          setIsUploading(false);
+        }, 2000);
+      }
+    })();
+
+    return cachedMp3DownloadPromise;
   }
 
 
@@ -326,47 +356,18 @@ export default function Page() {
       <a
         download={
           downloadUrl
-        ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
-        : undefined
+            ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
+            : undefined
         }
         onClick={async (e) => {
           if (!downloadUrl) {
-        e.preventDefault(); // Prevent default anchor behavior
-        setIsUploading(true);
-        setModalMessage("Downloading song...");
-
-        const handleDownloadReady = () => {
-          if (downloadUrl) {
-            setModalMessage("✅ Download!");
-            const link = document.createElement("a");
-            link.href = downloadUrl;
-            link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
-            document.body.appendChild(link);
-
-            // Trigger the download programmatically
-            link.click();
-            document.body.removeChild(link);
-
-            setIsUploading(false);
-            setModalMessage(null);
-
-            // Remove the event listener after download
-            document.removeEventListener("downloadReady", handleDownloadReady);
+            e.preventDefault(); // Prevent default anchor behavior
+            setIsUploading(true);
+            setModalMessage("Downloading song...");
+            handleConvertToMp3();
           }
-        };
-
-        // Add event listener for download readiness
-        document.addEventListener("downloadReady", handleDownloadReady);
-
-        // Simulate download readiness by dispatching a custom event when downloadUrl is set
-        const checkDownloadReady = setInterval(() => {
-          if (downloadUrl) {
-            clearInterval(checkDownloadReady);
-            document.dispatchEvent(new Event("downloadReady"));
-          }
-        }, 200);
-          } 
-        }}
+        }
+        }
         style={{
           display: "inline-block",
           marginTop: "15px",
