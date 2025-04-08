@@ -221,8 +221,10 @@ export default function Page() {
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
+      a.id = "download-link"; // Set an ID for the link
       a.href = url;
       a.download = songName + '.mp3'; // Use the formatted song name as the filename
+      document.body.appendChild(a);
       setDownloadUrl(url); // 🔥 Store blob URL
     } catch (err) {
       console.error("Error converting video to MP3:", err);
@@ -330,7 +332,6 @@ export default function Page() {
   }
   onClick={async (e) => {
     if (!downloadUrl) {
-      e.preventDefault(); // Stop default link behavior
       setIsUploading(true);
       setModalMessage("Downloading Song...");
 
@@ -340,29 +341,16 @@ export default function Page() {
           clearInterval(interval); // Stop polling
           setModalMessage("✅ Download Ready!");
 
-          // Trigger download
-          const link = document.createElement("a");
-          link.href = downloadUrl;
-          link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
-          document.body.appendChild(link);
-
-          // Trigger the download programmatically
+        const link = document.getElementById("download-link") as HTMLAnchorElement;
+          if (link) {
           link.click();
-          
+          }
+          setIsUploading(false);
+          setModalMessage(null);
+    
         }
-      }, 500); // Check every 500ms
-    } else {
-      // If the downloadUrl is ready, trigger the download immediately
-      setModalMessage("✅ Download Ready!");
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
-      document.body.appendChild(link);
-
-      // Trigger the download programmatically
-      link.click();
-      document.body.removeChild(link);
-    }
+      }, 2000); // Check every 2000ms
+    } 
   }}
   style={{
     display: "inline-block",
