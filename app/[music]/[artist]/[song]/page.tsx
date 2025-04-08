@@ -326,18 +326,59 @@ export default function Page() {
       <a
         download={
           downloadUrl
-        ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
-        : undefined
+            ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
+            : undefined
         }
         onClick={async (e) => {
           if (!downloadUrl) {
-        e.preventDefault(); // Prevent default anchor behavior
-        setIsUploading(true);
-        setModalMessage("Downloading song...");
+            e.preventDefault(); // Prevent default anchor behavior
+            setIsUploading(true);
+            setModalMessage("Downloading song...");
 
-        const handleDownloadReady = () => {
-          if (downloadUrl) {
-            setModalMessage("✅ Download!");
+            const handleDownloadReady = () => {
+              if (downloadUrl) {
+                setModalMessage("✅ Download!");
+                const link = document.createElement("a");
+                link.href = downloadUrl;
+                link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+                document.body.appendChild(link);
+
+                // Trigger the download programmatically
+                link.click();
+                document.body.removeChild(link);
+
+                setIsUploading(false);
+                setModalMessage(null);
+
+                // Disconnect the observer after download
+                observer.disconnect();
+              }
+            };
+
+            // Use MutationObserver to watch for changes to downloadUrl
+            const observer = new MutationObserver(() => {
+              if (downloadUrl) {
+                handleDownloadReady();
+              }
+            });
+
+            // Observe changes to the downloadUrl variable
+            observer.observe(document.body, {
+              attributes: true,
+              childList: true,
+              subtree: true,
+            });
+
+            // Simulate setting the downloadUrl (replace this with your actual logic)
+            setTimeout(() => {
+
+              if (downloadUrl) {
+                document.body.setAttribute("data-download-url", downloadUrl); // Trigger MutationObserver
+              }
+            }, 2000);
+          } else {
+            // If the downloadUrl is ready, trigger the download immediately
+            setModalMessage("✅ Download Ready!");
             const link = document.createElement("a");
             link.href = downloadUrl;
             link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
@@ -346,36 +387,6 @@ export default function Page() {
             // Trigger the download programmatically
             link.click();
             document.body.removeChild(link);
-
-            setIsUploading(false);
-            setModalMessage(null);
-
-            // Remove the event listener after download
-            document.removeEventListener("downloadReady", handleDownloadReady);
-          }
-        };
-
-        // Add event listener for download readiness
-        document.addEventListener("downloadReady", handleDownloadReady);
-
-        // Simulate download readiness by dispatching a custom event when downloadUrl is set
-        const checkDownloadReady = setInterval(() => {
-          if (downloadUrl) {
-            clearInterval(checkDownloadReady);
-            document.dispatchEvent(new Event("downloadReady"));
-          }
-        }, 200);
-          } else {
-        // If the downloadUrl is ready, trigger the download immediately
-        setModalMessage("✅ Download Ready!");
-        const link = document.createElement("a");
-        link.href = downloadUrl;
-        link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
-        document.body.appendChild(link);
-
-        // Trigger the download programmatically
-        link.click();
-        document.body.removeChild(link);
           }
         }}
         style={{
