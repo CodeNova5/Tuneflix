@@ -237,6 +237,7 @@ export default function Page() {
     }
   }
 
+
   if (error) {
     return <h1>{error}</h1>;
   }
@@ -323,63 +324,73 @@ export default function Page() {
       </div>
 
       <a
-  download={
-    downloadUrl
-      ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
-      : undefined
-  }
-  onClick={async (e) => {
-    if (!downloadUrl) {
-      e.preventDefault(); // Prevent default anchor behavior
-      setIsUploading(true);
-      setModalMessage("Downloading ...");
-
-      // Polling for downloadUrl to be set
-      const interval = setInterval(() => {
-        if (downloadUrl) {
-          clearInterval(interval); // Stop polling
-          setModalMessage("✅ Download!");
-
-          const link = document.createElement("a");
-          link.href = downloadUrl;
-          link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
-          document.body.appendChild(link);
-    
-          // Trigger the download programmatically
-          link.click();
-          document.body.removeChild(link);
-          setIsUploading(false);
-          setModalMessage(null);
-    
+        download={
+          downloadUrl
+        ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
+        : undefined
         }
-      }, 2000); // Check every 2000ms
-    } 
-    else {
-      // If the downloadUrl is ready, trigger the download immediately
-      setModalMessage("✅ Download Ready!");
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
-      document.body.appendChild(link);
+        onClick={async (e) => {
+          if (!downloadUrl) {
+        e.preventDefault(); // Prevent default anchor behavior
+        setIsUploading(true);
+        setModalMessage("Downloading song...");
 
-      // Trigger the download programmatically
-      link.click();
-      document.body.removeChild(link);
-    }
-  }}
-  style={{
-    display: "inline-block",
-    marginTop: "15px",
-    padding: "10px 20px",
-    backgroundColor: "#28a745",
-    color: "#fff",
-    borderRadius: "5px",
-    textDecoration: "none",
-    cursor: "pointer",
-  }}
->
-  🎵 Download MP3
-</a>
+        const handleDownloadReady = () => {
+          if (downloadUrl) {
+            setModalMessage("✅ Download!");
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+            document.body.appendChild(link);
+
+            // Trigger the download programmatically
+            link.click();
+            document.body.removeChild(link);
+
+            setIsUploading(false);
+            setModalMessage(null);
+
+            // Remove the event listener after download
+            document.removeEventListener("downloadReady", handleDownloadReady);
+          }
+        };
+
+        // Add event listener for download readiness
+        document.addEventListener("downloadReady", handleDownloadReady);
+
+        // Simulate download readiness by dispatching a custom event when downloadUrl is set
+        const checkDownloadReady = setInterval(() => {
+          if (downloadUrl) {
+            clearInterval(checkDownloadReady);
+            document.dispatchEvent(new Event("downloadReady"));
+          }
+        }, 200);
+          } else {
+        // If the downloadUrl is ready, trigger the download immediately
+        setModalMessage("✅ Download Ready!");
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+        document.body.appendChild(link);
+
+        // Trigger the download programmatically
+        link.click();
+        document.body.removeChild(link);
+          }
+        }}
+        style={{
+          display: "inline-block",
+          marginTop: "15px",
+          padding: "10px 20px",
+          backgroundColor: "#28a745",
+          color: "#fff",
+          borderRadius: "5px",
+          textDecoration: "none",
+          cursor: "pointer",
+        }}
+      >
+        🎵 Download MP3
+      </a>
 
       {/* Spinner Modal */}
       {
