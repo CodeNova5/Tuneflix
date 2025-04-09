@@ -220,7 +220,49 @@ else if (type === "lyricsVideo") {
         return res.status(500).json({ error: "Failed to fetch artist details" });
       }
     }
-   
+    else if (type === "relatedTracks") {
+      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd";
+    
+      if (!LAST_FM_API_KEY) {
+        console.error("Missing Last.fm API key.");
+        return res.status(500).json({ error: "Internal server error" });
+      }
+    
+      if (!artistName || !songName) {
+        return res.status(400).json({ error: "Missing artist name or song name" });
+      }
+    
+      try {
+        const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodeURIComponent(
+          decodedArtistName
+        )}&track=${encodeURIComponent(decodedSongName)}&api_key=${LAST_FM_API_KEY}&format=json`;
+    
+        const response = await fetch(apiUrl);
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch related tracks");
+        }
+    
+        const data = await response.json();
+    
+        if (!data.similartracks?.track?.length) {
+          return res.status(404).json({ error: "No related tracks found" });
+        }
+    
+        const relatedTracks = data.similartracks.track.map((track) => ({
+          name: track.name,
+          artist: track.artist.name,
+          url: track.url,
+          image: track.image?.[2]?.["#text"] || null, // Medium-sized image
+        }));
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(relatedTracks);
+      } catch (err) {
+        console.error("Last.fm API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch related tracks" });
+      }
+    }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
