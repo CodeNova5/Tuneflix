@@ -145,6 +145,7 @@ export default function Page() {
         }
 
         const relatedTracks = await response.json();
+        console.log("Related Tracks:", relatedTracks);
         setRelatedSongs(relatedTracks);
       } catch (err) {
         console.error("Error fetching related tracks:", err);
