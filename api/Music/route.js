@@ -255,7 +255,7 @@ else if (type === "lyricsVideo") {
           url: track.url,
           image: track.image?.[2]?.["#text"] || null, // Medium-sized image
         }));
-    
+        console.log(data.similartracks.track);
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(relatedTracks);
       } catch (err) {
