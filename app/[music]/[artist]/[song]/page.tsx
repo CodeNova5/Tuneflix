@@ -324,7 +324,7 @@ export default function Page() {
       </div>
 
       <a
-      href="downloadUrl"
+      
         download={
           downloadUrl
             ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
@@ -360,6 +360,21 @@ export default function Page() {
             observer.observe(document.body, { childList: true, subtree: true });
 
           }
+          else [
+            setModalMessage("✅ Download has started");
+            setIsUploading(false);
+           
+    
+            // Auto-trigger the download
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+    
+            setTimeout(() => setModalMessage(null), 2000);
+          ]
         }}
         style={{
           display: "inline-block",
