@@ -360,7 +360,7 @@ export default function Page() {
             observer.observe(document.body, { childList: true, subtree: true });
 
           }
-          else [
+          else {
             setModalMessage("✅ Download has started");
             setIsUploading(false);
            
@@ -374,7 +374,7 @@ export default function Page() {
             document.body.removeChild(link);
     
             setTimeout(() => setModalMessage(null), 2000);
-          ]
+          }
         }}
         style={{
           display: "inline-block",
