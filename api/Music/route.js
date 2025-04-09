@@ -249,13 +249,38 @@ else if (type === "lyricsVideo") {
           return res.status(404).json({ error: "No related tracks found" });
         }
     
-        const relatedTracks = data.similartracks.track.map((track) => ({
-          name: track.name,
-          artist: track.artist.name,
-          url: track.url,
-          image: track.image?.[2]?.["#text"] || null, // Medium-sized image
-        }));
-        console.log(data.similartracks.track);
+        // Fetch album images for each related track using Last.fm's track.getInfo API
+        const relatedTracks = await Promise.all(
+          data.similartracks.track.map(async (track) => {
+            const trackInfoUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&artist=${encodeURIComponent(
+              track.artist.name
+            )}&track=${encodeURIComponent(track.name)}&api_key=${LAST_FM_API_KEY}&format=json`;
+    
+            try {
+              const trackInfoResponse = await fetch(trackInfoUrl);
+              const trackInfoData = await trackInfoResponse.json();
+    
+              const albumImage =
+                trackInfoData.track?.album?.image?.find((img) => img.size === "large")?.["#text"] || null;
+    
+              return {
+                name: track.name,
+                artist: track.artist.name,
+                url: track.url,
+                image: albumImage || "/placeholder.jpg", // Use album image or fallback to placeholder
+              };
+            } catch (err) {
+              console.error(`Failed to fetch album image for ${track.name}:`, err);
+              return {
+                name: track.name,
+                artist: track.artist.name,
+                url: track.url,
+                image: "/placeholder.jpg", // Fallback to placeholder if fetching fails
+              };
+            }
+          })
+        );
+    
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(relatedTracks);
       } catch (err) {
