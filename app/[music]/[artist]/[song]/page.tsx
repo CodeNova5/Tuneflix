@@ -612,6 +612,7 @@ export default function Page() {
                     src={song.image || "/placeholder.jpg"}
                     alt={song.name}
                     style={{ width: "100%", borderRadius: "8px" }}
+                    loading="lazy"
                   />
                   <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
                   <p style={{ fontSize: "14px", color: "#555" }}>{song.artist}</p>

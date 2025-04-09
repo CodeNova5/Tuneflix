@@ -1,6 +1,7 @@
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+import pLimit from "p-limit";
 let spotifyAccessToken = null;
 let spotifyTokenExpiresAt = 0;
 async function getSpotifyAccessToken() {
@@ -250,35 +251,41 @@ else if (type === "lyricsVideo") {
         }
     
         // Fetch album images for each related track using Last.fm's track.getInfo API
+        
+
+        const limit = pLimit(5); // Limit to 5 concurrent requests
+        
         const relatedTracks = await Promise.all(
-          data.similartracks.track.map(async (track) => {
-            const trackInfoUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&artist=${encodeURIComponent(
-              track.artist.name
-            )}&track=${encodeURIComponent(track.name)}&api_key=${LAST_FM_API_KEY}&format=json`;
-    
-            try {
-              const trackInfoResponse = await fetch(trackInfoUrl);
-              const trackInfoData = await trackInfoResponse.json();
-    
-              const albumImage =
-                trackInfoData.track?.album?.image?.find((img) => img.size === "large")?.["#text"] || null;
-    
-              return {
-                name: track.name,
-                artist: track.artist.name,
-                url: track.url,
-                image: albumImage || "/placeholder.jpg", // Use album image or fallback to placeholder
-              };
-            } catch (err) {
-              console.error(`Failed to fetch album image for ${track.name}:`, err);
-              return {
-                name: track.name,
-                artist: track.artist.name,
-                url: track.url,
-                image: "/placeholder.jpg", // Fallback to placeholder if fetching fails
-              };
-            }
-          })
+          data.similartracks.track.map((track) =>
+            limit(async () => {
+              const trackInfoUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&artist=${encodeURIComponent(
+                track.artist.name
+              )}&track=${encodeURIComponent(track.name)}&api_key=${LAST_FM_API_KEY}&format=json`;
+        
+              try {
+                const trackInfoResponse = await fetch(trackInfoUrl);
+                const trackInfoData = await trackInfoResponse.json();
+        
+                const albumImage =
+                  trackInfoData.track?.album?.image?.find((img) => img.size === "large")?.["#text"] || null;
+        
+                return {
+                  name: track.name,
+                  artist: track.artist.name,
+                  url: track.url,
+                  image: albumImage || "/placeholder.jpg",
+                };
+              } catch (err) {
+                console.error(`Failed to fetch album image for ${track.name}:`, err);
+                return {
+                  name: track.name,
+                  artist: track.artist.name,
+                  url: track.url,
+                  image: "/placeholder.jpg",
+                };
+              }
+            })
+          )
         );
     
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
