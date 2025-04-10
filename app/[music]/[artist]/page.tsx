@@ -119,7 +119,7 @@ export default function ArtistPage() {
               padding: "10px",
             }}
           >
-            <Link href={`/music/${track.artists[0].name}/${encodeURIComponent(track.name)}`}>
+            <Link href={`/music/${track.artists[0].name}/song/${encodeURIComponent(track.name)}`}>
               <a style={{ textDecoration: "none", color: "inherit" }}>
                 <img
                   src={track.album.images[0]?.url || "/placeholder.jpg"}
@@ -156,7 +156,7 @@ export default function ArtistPage() {
                 padding: "10px",
               }}
             >
-              <Link href={`/music/${album?.artists[0].name}/${encodeURIComponent(album.name)}`}>
+              <Link href={`/music/${album?.artists[0].name}/album/${encodeURIComponent(album.name)}`}>
                 <a
                   style={{ textDecoration: "none", color: "inherit" }}
                 >

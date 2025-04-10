@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import CommentSection from '../../../../components/CommentSection';
+import CommentSection from '../../../../../components/CommentSection';
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -567,7 +567,7 @@ export default function Page() {
               padding: "10px",
             }}
           >
-            <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/${encodeURIComponent(song.name)}`}>
+            <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/song/${encodeURIComponent(song.name)}`}>
               <a style={{ textDecoration: "none", color: "inherit" }}>
                 <img
                   src={song.album.images[0]?.url || "/placeholder.jpg"}
@@ -606,7 +606,7 @@ export default function Page() {
                 padding: "10px",
               }}
             >
-              <Link href={`/music/${encodeURIComponent(song.artist)}/${encodeURIComponent(song.name)}`}>
+              <Link href={`/music/${encodeURIComponent(song.artist)}/song/${encodeURIComponent(song.name)}`}>
                 <a style={{ textDecoration: "none", color: "inherit" }}>
                   <img
                     src={song.image || "/placeholder.jpg"}
