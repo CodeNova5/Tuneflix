@@ -399,7 +399,7 @@ export default async function handler(req, res) {
     
       try {
         // Get Spotify access token
-        const accessToken = await getArtistAccessToken();
+        const accessToken = await getSpotifyAccessToken();
     
         // Search for the artist to get their Spotify ID
         const searchApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
