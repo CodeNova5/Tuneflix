@@ -42,13 +42,13 @@ export default function ArtistPage() {
             return;
           }
           const tracksData = await tracksResponse.json();
-          
+
           // Filter out duplicates
           const filteredTracks = tracksData.filter(
             (track: any, index: number, self: any[]) =>
               index === self.findIndex((t) => t.name === track.name)
           );
-          
+
           if (!tracksResponse.ok) {
             const errorData = await tracksResponse.json();
             setError(errorData.error || "Failed to fetch top tracks");
@@ -69,15 +69,15 @@ export default function ArtistPage() {
         }
         const relatedArtistsData = await relatedArtistsResponse.json();
         setRelatedArtists(relatedArtistsData);
-      
-        
+
+
       }
 
       fetchArtistData();
     }
   }, [artist]);
 
-  
+
   if (error) {
     return <h1>{error}</h1>;
   }
@@ -104,31 +104,31 @@ export default function ArtistPage() {
         }}
       >
         {topTracks.map((track, index) => (
-        <div
-          key={index}
-          style={{
-            minWidth: "200px",
-            textAlign: "center",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "10px",
-          }}
-        >
-          <Link href={`/music/${artist}/${encodeURIComponent(track.name)}`}>
-            <a style={{ textDecoration: "none", color: "inherit" }}>
-              <img
-                src={track.album.images[0]?.url || "/placeholder.jpg"}
-                alt={track.name}
-                style={{ width: "100%", borderRadius: "8px" }}
-              />
-              <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{track.name}</h3>
-              <p style={{ fontSize: "14px", color: "#555" }}>
-                {track.artists.map((a) => a.name).join(", ")}
-              </p>
-            </a>
-          </Link>
-        </div>
-      ))}
+          <div
+            key={index}
+            style={{
+              minWidth: "200px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              padding: "10px",
+            }}
+          >
+            <Link href={`/music/${track?.artists[0]}/${encodeURIComponent(track.name)}`}>
+              <a style={{ textDecoration: "none", color: "inherit" }}>
+                <img
+                  src={track.album.images[0]?.url || "/placeholder.jpg"}
+                  alt={track.name}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{track.name}</h3>
+                <p style={{ fontSize: "14px", color: "#555" }}>
+                  {track.artists.map((a) => a.name).join(", ")}
+                </p>
+              </a>
+            </Link>
+          </div>
+        ))}
       </div>
       <h2>Related Artists</h2>
       <div
@@ -151,19 +151,18 @@ export default function ArtistPage() {
                 padding: "10px",
               }}
             >
-              <a
-                href={artist.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <img
-                  src={artist.image}
-                  alt={artist.name}
-                  style={{ width: "100%", borderRadius: "8px" }}
-                />
-                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{artist.name}</h3>
-              </a>
+              <Link href={`/music/${artist?.name[0]}`}>
+                <a
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <img
+                    src={artist.image}
+                    alt={artist.name}
+                    style={{ width: "100%", borderRadius: "8px" }}
+                  />
+                  <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{artist.name}</h3>
+                </a>
+              </Link>
             </div>
           ))
         ) : (
