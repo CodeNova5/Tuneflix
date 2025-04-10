@@ -394,41 +394,42 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "artistAlbums") {
-      if (!artistId) {
-        return res.status(400).json({ error: "Missing artist Id" });
+      if (!artistName) {
+        return res.status(400).json({ error: "Missing artist name" });
       }
     
       try {
         // Get Spotify access token
         const accessToken = await getArtistAccessToken();
-    
-    
-        // Fetch the artist's albums
-        const albumsApiUrl = `https://api.spotify.com/v1/artists/${artistId}/albums?limit=10&include_groups=album`;
-    
-        const albumsResponse = await fetch(albumsApiUrl, {
+
+        // Search for the artist's albums
+        const searchApiUrl = `https://api.spotify.com/v1/search?q=artist:${encodeURIComponent(
+          decodedArtistName
+        )}&type=album&limit=10`;
+
+        const searchResponse = await fetch(searchApiUrl, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-    
-        if (!albumsResponse.ok) {
+
+        if (!searchResponse.ok) {
           throw new Error("Failed to fetch artist albums from Spotify");
         }
-    
-        const albumsData = await albumsResponse.json();
-    
-        if (!albumsData.items?.length) {
+
+        const searchData = await searchResponse.json();
+
+        if (!searchData.albums?.items?.length) {
           return res.status(404).json({ error: "No albums found for this artist" });
         }
-    
+
         // Format the album data
-        const albums = albumsData.items.map((album) => ({
+        const albums = searchData.albums.items.map((album) => ({
           name: album.name,
           releaseDate: album.release_date,
           totalTracks: album.total_tracks,
           image: album.images?.[0]?.url || "/placeholder.jpg",
           url: album.external_urls.spotify,
         }));
-    
+
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(albums);
       } catch (err) {

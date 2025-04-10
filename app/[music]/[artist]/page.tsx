@@ -74,7 +74,7 @@ export default function ArtistPage() {
   async function fetchArtistAlbums() {
     // Fetch artist albums
     const albumsResponse = await fetch(
-      `/api/Music/route?type=artistAlbums&artistId=${encodeURIComponent(artistDetails.id)}`
+      `/api/Music/route?type=artistAlbums&artistName=${encodeURIComponent(artist)}`
     );
     if (!albumsResponse.ok) {
       const errorData = await albumsResponse.json();
@@ -162,10 +162,11 @@ export default function ArtistPage() {
               }}
             >
               <Link
-                href={`/music/${album?.artists?.[0]?.name || album?.artists?.name}/album/${encodeURIComponent(album?.name || "unknown")}`}
-              >                <a
-                style={{ textDecoration: "none", color: "inherit" }}
+                href={`/music/${decodeURIComponent(artist)}/album/${encodeURIComponent(album.name)}`}
               >
+                <a
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
                   <img
                     src={album.image}
                     alt={album.name}
