@@ -7,7 +7,7 @@ interface Track {
   album: {
     images: { url: string }[];
   };
-  artists: { name: string, id : string }[];
+  artists: { name: string, id: string }[];
 }
 
 export default function ArtistPage() {
@@ -71,19 +71,19 @@ export default function ArtistPage() {
     }
   }, [artist]);
 
-async function fetchArtistAlbums() {
-   // Fetch artist albums
-   const albumsResponse = await fetch(
-    `/api/Music/route?type=artistAlbums&artistId=${encodeURIComponent(artistDetails.id)}`
-  );
-  if (!albumsResponse.ok) {
-    const errorData = await albumsResponse.json();
-    setError(errorData.error || "Failed to fetch artist albums");
-    return;
+  async function fetchArtistAlbums() {
+    // Fetch artist albums
+    const albumsResponse = await fetch(
+      `/api/Music/route?type=artistAlbums&artistId=${encodeURIComponent(artistDetails.id)}`
+    );
+    if (!albumsResponse.ok) {
+      const errorData = await albumsResponse.json();
+      setError(errorData.error || "Failed to fetch artist albums");
+      return;
+    }
+    const albumsData = await albumsResponse.json();
+    setArtistAlbums(albumsData);
   }
-  const albumsData = await albumsResponse.json();
-  setArtistAlbums(albumsData);
-}
   // Call the function to fetch albums when artistDetails is available
   if (artistDetails) {
     fetchArtistAlbums();
@@ -161,10 +161,11 @@ async function fetchArtistAlbums() {
                 padding: "10px",
               }}
             >
-              <Link href={`/music/${album?.artists[0].name}/album/${encodeURIComponent(album.name)}`}>
-                <a
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
+              <Link
+                href={`/music/${album?.artists?.[0]?.name || album?.artists?.name}/album/${encodeURIComponent(album?.name || "unknown")}`}
+              >                <a
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                   <img
                     src={album.image}
                     alt={album.name}
