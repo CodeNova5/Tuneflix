@@ -114,7 +114,7 @@ export default function ArtistPage() {
               padding: "10px",
             }}
           >
-            <Link href={`/music/${track?.artists[0]}/${encodeURIComponent(track.name)}`}>
+            <Link href={`/music/${track.artists[0].name}/${encodeURIComponent(track.name)}`}>
               <a style={{ textDecoration: "none", color: "inherit" }}>
                 <img
                   src={track.album.images[0]?.url || "/placeholder.jpg"}
