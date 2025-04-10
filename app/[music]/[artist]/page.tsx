@@ -151,7 +151,7 @@ export default function ArtistPage() {
                 padding: "10px",
               }}
             >
-              <Link href={`/music/${artist?.name[0]}`}>
+              <Link href={`/music/${artist?.name}`}>
                 <a
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
