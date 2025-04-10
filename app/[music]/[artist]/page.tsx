@@ -61,17 +61,6 @@ export default function ArtistPage() {
           const relatedArtistsData = await relatedArtistsResponse.json();
           setRelatedArtists(relatedArtistsData);
 
-          // Fetch artist albums
-          const albumsResponse = await fetch(
-            `/api/Music/route?type=artistAlbums&artistId=${encodeURIComponent(artistDetails.id)}`
-          );
-          if (!albumsResponse.ok) {
-            const errorData = await albumsResponse.json();
-            setError(errorData.error || "Failed to fetch artist albums");
-            return;
-          }
-          const albumsData = await albumsResponse.json();
-          setArtistAlbums(albumsData);
         } catch (err) {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
@@ -82,7 +71,23 @@ export default function ArtistPage() {
     }
   }, [artist]);
 
-
+async function fetchArtistAlbums() {
+   // Fetch artist albums
+   const albumsResponse = await fetch(
+    `/api/Music/route?type=artistAlbums&artistId=${encodeURIComponent(artistDetails.id)}`
+  );
+  if (!albumsResponse.ok) {
+    const errorData = await albumsResponse.json();
+    setError(errorData.error || "Failed to fetch artist albums");
+    return;
+  }
+  const albumsData = await albumsResponse.json();
+  setArtistAlbums(albumsData);
+}
+  // Call the function to fetch albums when artistDetails is available
+  if (artistDetails) {
+    fetchArtistAlbums();
+  }
   if (error) {
     return <h1>{error}</h1>;
   }
