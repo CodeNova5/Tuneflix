@@ -318,41 +318,45 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "relatedArtists") {
+      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd";
+
+      if (!LAST_FM_API_KEY) {
+        console.error("Missing Last.fm API key.");
+        return res.status(500).json({ error: "Internal server error" });
+      }
+
       if (!artistName) {
         return res.status(400).json({ error: "Missing artist name" });
       }
-    
+
       try {
-        const accessToken = await getArtistAccessToken();
-        const apiUrl = `https://api.spotify.com/v1/artists/${encodeURIComponent(
+        const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}/related-artists`;
-    
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
+        )}&api_key=${LAST_FM_API_KEY}&format=json`;
+
+        const response = await fetch(apiUrl);
+
         if (!response.ok) {
           throw new Error("Failed to fetch related artists");
         }
-    
+
         const data = await response.json();
-        if (!data.artists?.length) {
+
+        if (!data.similarartists?.artist?.length) {
           return res.status(404).json({ error: "No related artists found" });
         }
-    
-        const relatedArtists = data.artists.map((artist) => ({
+
+        const relatedArtists = data.similarartists.artist.map((artist) => ({
           name: artist.name,
-          image: artist.images[0]?.url || "/placeholder.jpg",
-          genres: artist.genres || [],
-          followers: artist.followers?.total || 0,
-          url: artist.external_urls.spotify,
+          image:
+            artist.image?.find((img) => img.size === "large")?.["#text"] || "/placeholder.jpg",
+          url: artist.url,
         }));
-    
+
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(relatedArtists);
       } catch (err) {
-        console.error("Spotify API Error:", err);
+        console.error("Last.fm API Error:", err);
         return res.status(500).json({ error: "Failed to fetch related artists" });
       }
     }
