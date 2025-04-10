@@ -15,6 +15,7 @@ export default function ArtistPage() {
   const [artistDetails, setArtistDetails] = React.useState<any | null>(null);
   const [topTracks, setTopTracks] = React.useState<Track[]>([]);
   const [error, setError] = React.useState<string | null>(null);
+  const [relatedArtists, setRelatedArtists] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     if (artist) {
@@ -58,12 +59,25 @@ export default function ArtistPage() {
           console.error("Error fetching data:", err);
           setError("An unexpected error occurred");
         }
+        const relatedArtistsResponse = await fetch(
+          `/api/Music/route?type=relatedArtists&artistName=${encodeURIComponent(artist)}`
+        );
+        if (!relatedArtistsResponse.ok) {
+          const errorData = await relatedArtistsResponse.json();
+          setError(errorData.error || "Failed to fetch related artists");
+          return;
+        }
+        const relatedArtistsData = await relatedArtistsResponse.json();
+        setRelatedArtists(relatedArtistsData);
+      
+        
       }
 
       fetchArtistData();
     }
   }, [artist]);
 
+  
   if (error) {
     return <h1>{error}</h1>;
   }
