@@ -308,6 +308,7 @@ export default async function handler(req, res) {
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json({
           name: artist.name,
+          id: artist.id,
           image: artist.images[0]?.url || null,
           genres: artist.genres || [],
           followers: artist.followers?.total || 0,
