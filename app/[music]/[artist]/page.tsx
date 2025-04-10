@@ -176,19 +176,6 @@ export default function ArtistPage() {
                   <p style={{ fontSize: "14px", color: "#555" }}>
                     {album.releaseDate}
                   </p>
-                </a>
-                <a
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <img
-                    src={album.image}
-                    alt={album.name}
-                    style={{ width: "100%", borderRadius: "8px" }}
-                  />
-                  <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{album.name}</h3>
-                  <p style={{ fontSize: "14px", color: "#555" }}>
-                    {album.releaseDate}
-                  </p>
                   <p style={{ fontSize: "14px", color: "#555" }}>
                     Tracks: {album.totalTracks}
                   </p>
