@@ -318,7 +318,7 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "relatedArtists") {
-      const LAST_FM_API_KEY = process.env.LAST_FM_API_KEY;
+      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd";
     
       if (!LAST_FM_API_KEY) {
         console.error("Missing Last.fm API key.");
