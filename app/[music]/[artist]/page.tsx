@@ -7,7 +7,7 @@ interface Track {
   album: {
     images: { url: string }[];
   };
-  artists: { name: string }[];
+  artists: { name: string, id : string }[];
 }
 
 export default function ArtistPage() {
@@ -63,7 +63,7 @@ export default function ArtistPage() {
 
           // Fetch artist albums
           const albumsResponse = await fetch(
-            `/api/Music/route?type=artistAlbums&artistName=${encodeURIComponent(artist)}`
+            `/api/Music/route?type=artistAlbums&artistId=${encodeURIComponent(artistDetails.id)}`
           );
           if (!albumsResponse.ok) {
             const errorData = await albumsResponse.json();

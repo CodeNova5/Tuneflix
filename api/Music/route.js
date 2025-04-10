@@ -54,7 +54,7 @@ async function getArtistAccessToken() {
 }
 export default async function handler(req, res) {
   try {
-    const { type, artistName, songName } = req.query;
+    const { type, artistName, songName, artistId} = req.query;
 
     if (!type) {
       return res.status(400).json({ error: "Missing type parameter (spotify or youtube)" });
@@ -393,35 +393,14 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "artistAlbums") {
-      if (!artistName) {
-        return res.status(400).json({ error: "Missing artist name" });
+      if (!artistId) {
+        return res.status(400).json({ error: "Missing artist Id" });
       }
     
       try {
         // Get Spotify access token
-        const accessToken = await getSpotifyAccessToken();
+        const accessToken = await getArtistAccessToken();
     
-        // Search for the artist to get their Spotify ID
-        const searchApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-          decodedArtistName
-        )}&type=artist&limit=1`;
-    
-        const searchResponse = await fetch(searchApiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
-        if (!searchResponse.ok) {
-          throw new Error("Failed to fetch artist details from Spotify");
-        }
-    
-        const searchData = await searchResponse.json();
-        const artist = searchData.artists?.items?.[0];
-    
-        if (!artist) {
-          return res.status(404).json({ error: "Artist not found" });
-        }
-    
-        const artistId = artist.id;
     
         // Fetch the artist's albums
         const albumsApiUrl = `https://api.spotify.com/v1/artists/${artistId}/albums?limit=10&include_groups=album`;
