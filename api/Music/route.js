@@ -392,7 +392,132 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch related artists" });
       }
     }
+    else if (type === "artistAlbums") {
+      if (!artistName) {
+        return res.status(400).json({ error: "Missing artist name" });
+      }
     
+      try {
+        // Get Spotify access token
+        const accessToken = await getArtistAccessToken();
+    
+        // Search for the artist to get their Spotify ID
+        const searchApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+          decodedArtistName
+        )}&type=artist&limit=1`;
+    
+        const searchResponse = await fetch(searchApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!searchResponse.ok) {
+          throw new Error("Failed to fetch artist details from Spotify");
+        }
+    
+        const searchData = await searchResponse.json();
+        const artist = searchData.artists?.items?.[0];
+    
+        if (!artist) {
+          return res.status(404).json({ error: "Artist not found" });
+        }
+    
+        const artistId = artist.id;
+    
+        // Fetch the artist's albums
+        const albumsApiUrl = `https://api.spotify.com/v1/artists/${artistId}/albums?limit=10&include_groups=album`;
+    
+        const albumsResponse = await fetch(albumsApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!albumsResponse.ok) {
+          throw new Error("Failed to fetch artist albums from Spotify");
+        }
+    
+        const albumsData = await albumsResponse.json();
+    
+        if (!albumsData.items?.length) {
+          return res.status(404).json({ error: "No albums found for this artist" });
+        }
+    
+        // Format the album data
+        const albums = albumsData.items.map((album) => ({
+          name: album.name,
+          releaseDate: album.release_date,
+          totalTracks: album.total_tracks,
+          image: album.images?.[0]?.url || "/placeholder.jpg",
+          url: album.external_urls.spotify,
+        }));
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(albums);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch artist albums" });
+      }
+    }
+    else if (type === "albumDetails") {
+      if (!artistName || !albumName) {
+        return res.status(400).json({ error: "Missing artist name or album name" });
+      }
+    
+      try {
+        // Get Spotify access token
+        const accessToken = await getArtistAccessToken();
+    
+        // Search for the album to get its Spotify ID
+        const searchApiUrl = `https://api.spotify.com/v1/search?q=album:${encodeURIComponent(
+          decodedAlbumName
+        )}+artist:${encodeURIComponent(decodedArtistName)}&type=album&limit=1`;
+    
+        const searchResponse = await fetch(searchApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!searchResponse.ok) {
+          throw new Error("Failed to fetch album details from Spotify");
+        }
+    
+        const searchData = await searchResponse.json();
+        const album = searchData.albums?.items?.[0];
+    
+        if (!album) {
+          return res.status(404).json({ error: "Album not found" });
+        }
+    
+        const albumId = album.id;
+    
+        // Fetch album details
+        const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
+        const albumResponse = await fetch(albumApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!albumResponse.ok) {
+          throw new Error("Failed to fetch album details from Spotify");
+        }
+    
+        const albumData = await albumResponse.json();
+    
+        // Format the album data
+        const formattedAlbum = {
+          name: albumData.name,
+          releaseDate: albumData.release_date,
+          totalTracks: albumData.total_tracks,
+          image: albumData.images?.[0]?.url || "/placeholder.jpg",
+          tracks: albumData.tracks.items.map((track) => ({
+            name: track.name,
+            duration: track.duration_ms,
+          })),
+        };
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(formattedAlbum);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch album details" });
+      }
+    }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
