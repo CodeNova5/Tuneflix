@@ -318,45 +318,77 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "relatedArtists") {
-      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd";
-
+      const LAST_FM_API_KEY = process.env.LAST_FM_API_KEY;
+    
       if (!LAST_FM_API_KEY) {
         console.error("Missing Last.fm API key.");
         return res.status(500).json({ error: "Internal server error" });
       }
-
+    
       if (!artistName) {
         return res.status(400).json({ error: "Missing artist name" });
       }
-
+    
       try {
-        const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(
+        // Fetch related artists from Last.fm
+        const lastFmApiUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
         )}&api_key=${LAST_FM_API_KEY}&format=json`;
-
-        const response = await fetch(apiUrl);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch related artists");
+    
+        const lastFmResponse = await fetch(lastFmApiUrl);
+    
+        if (!lastFmResponse.ok) {
+          throw new Error("Failed to fetch related artists from Last.fm");
         }
-
-        const data = await response.json();
-
-        if (!data.similarartists?.artist?.length) {
+    
+        const lastFmData = await lastFmResponse.json();
+    
+        if (!lastFmData.similarartists?.artist?.length) {
           return res.status(404).json({ error: "No related artists found" });
         }
-
-        const relatedArtists = data.similarartists.artist.map((artist) => ({
-          name: artist.name,
-          image:
-            artist.image?.find((img) => img.size === "large")?.["#text"] || "/placeholder.jpg",
-          url: artist.url,
-        }));
-
+    
+        const relatedArtistNames = lastFmData.similarartists.artist.map((artist) => artist.name);
+    
+        // Fetch artist images from Spotify
+        const accessToken = await getArtistAccessToken();
+        const relatedArtists = await Promise.all(
+          relatedArtistNames.map(async (name) => {
+            try {
+              const spotifyApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+                name
+              )}&type=artist&limit=1`;
+    
+              const spotifyResponse = await fetch(spotifyApiUrl, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              });
+    
+              if (!spotifyResponse.ok) {
+                throw new Error(`Failed to fetch artist details for ${name}`);
+              }
+    
+              const spotifyData = await spotifyResponse.json();
+              const artist = spotifyData.artists?.items?.[0];
+    
+              return {
+                name: name,
+                image: artist?.images?.[0]?.url || "/placeholder.jpg",
+                url: artist?.external_urls?.spotify || null,
+              };
+            } catch (err) {
+              console.error(`Spotify API Error for artist ${name}:`, err);
+              return {
+                name: name,
+                image: "/placeholder.jpg",
+                url: null,
+              };
+            }
+          })
+        );
+    
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(relatedArtists);
       } catch (err) {
-        console.error("Last.fm API Error:", err);
+        console.error("API Error:", err);
         return res.status(500).json({ error: "Failed to fetch related artists" });
       }
     }
