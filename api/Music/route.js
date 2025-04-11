@@ -54,7 +54,7 @@ async function getArtistAccessToken() {
 }
 export default async function handler(req, res) {
   try {
-    const { type, artistName, songName, artistId} = req.query;
+    const { type, artistName, songName, artistId, albumId } = req.query;
 
     if (!type) {
       return res.status(400).json({ error: "Missing type parameter (spotify or youtube)" });
@@ -424,6 +424,7 @@ export default async function handler(req, res) {
         // Format the album data
         const albums = searchData.albums.items.map((album) => ({
           name: album.name,
+          id: album.id,
           releaseDate: album.release_date,
           totalTracks: album.total_tracks,
           image: album.images?.[0]?.url || "/placeholder.jpg",
@@ -438,36 +439,14 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "albumDetails") {
-      if (!artistName || !albumName) {
-        return res.status(400).json({ error: "Missing artist name or album name" });
+      if (!albumId) {
+        return res.status(400).json({ error: "Missing Album Id" });
       }
     
       try {
         // Get Spotify access token
         const accessToken = await getArtistAccessToken();
-    
-        // Search for the album to get its Spotify ID
-        const searchApiUrl = `https://api.spotify.com/v1/search?q=album:${encodeURIComponent(
-          decodedAlbumName
-        )}+artist:${encodeURIComponent(decodedArtistName)}&type=album&limit=1`;
-    
-        const searchResponse = await fetch(searchApiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
-        if (!searchResponse.ok) {
-          throw new Error("Failed to fetch album details from Spotify");
-        }
-    
-        const searchData = await searchResponse.json();
-        const album = searchData.albums?.items?.[0];
-    
-        if (!album) {
-          return res.status(404).json({ error: "Album not found" });
-        }
-    
-        const albumId = album.id;
-    
+      
         // Fetch album details
         const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
         const albumResponse = await fetch(albumApiUrl, {

@@ -3,18 +3,18 @@ import React from "react";
 import { useParams } from "next/navigation";
 
 export default function AlbumPage() {
-  const { artist, album } = useParams() as { artist: string; album: string };
+  const { artist, albumId } = useParams() as { artist: string; albumId: string };
   const [albumDetails, setAlbumDetails] = React.useState<any | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (artist && album) {
+    if (artist && albumId) {
       async function fetchAlbumDetails() {
         try {
           const response = await fetch(
             `/api/Music/route?type=albumDetails&artistName=${encodeURIComponent(
               artist
-            )}&albumName=${encodeURIComponent(album)}`
+            )}&albumId=${encodeURIComponent(albumId)}`
           );
           if (!response.ok) {
             const errorData = await response.json();
@@ -31,7 +31,7 @@ export default function AlbumPage() {
 
       fetchAlbumDetails();
     }
-  }, [artist, album]);
+  }, [artist, albumId]);
 
   if (error) {
     return <h1>{error}</h1>;

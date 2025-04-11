@@ -162,7 +162,7 @@ export default function ArtistPage() {
               }}
             >
               <Link
-                href={`/music/${decodeURIComponent(artist)}/album/${encodeURIComponent(album.name)}`}
+                href={`/music/${decodeURIComponent(artist)}/album/${encodeURIComponent(album.id)}`}
               >
                 <a
                   style={{ textDecoration: "none", color: "inherit" }}
