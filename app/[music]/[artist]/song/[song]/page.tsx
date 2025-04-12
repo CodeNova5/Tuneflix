@@ -174,7 +174,7 @@ export default function Page() {
         const formattedLyrics = formatLyrics(data.lyrics);
         const lyricsContainer = document.getElementById("lyrics-container");
         if (lyricsContainer) {
-          lyricsContainer.innerHTML = formattedLyrics;
+          lyricsContainer.innerHTML ='<h3>Lyrics:</h3>' + formattedLyrics;
         }
       } else {
         throw new Error("Lyrics not found");
@@ -331,26 +331,8 @@ export default function Page() {
           <p>No video available for this song.</p>
         )}
       </div>
-      {/* Convert to MP3 Button */}
-      <div style={{ marginTop: "20px" }}>
-        <button
-          onClick={handleConvertToMp3}
-          disabled={isUploading}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: isUploading ? "#ccc" : "#0070f3",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: isUploading ? "not-allowed" : "pointer",
-          }}
-        >
-          {isUploading ? "Converting..." : "Convert to MP3"}
-        </button>
-      </div>
 
       <a
-
         download={
           downloadUrl
             ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
@@ -476,7 +458,7 @@ export default function Page() {
           }
         }
       `}</style>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", marginTop: "20px" }}>
         <button
           onClick={toggleModal}
           style={{
