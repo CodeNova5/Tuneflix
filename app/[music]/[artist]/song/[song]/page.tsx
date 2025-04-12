@@ -174,7 +174,7 @@ export default function Page() {
         const formattedLyrics = formatLyrics(data.lyrics);
         const lyricsContainer = document.getElementById("lyrics-container");
         if (lyricsContainer) {
-          lyricsContainer.innerHTML ='<h3>Lyrics:</h3>' + formattedLyrics;
+          lyricsContainer.innerHTML = '<h3>Lyrics:</h3>' + formattedLyrics;
         }
       } else {
         throw new Error("Lyrics not found");
@@ -458,62 +458,64 @@ export default function Page() {
           }
         }
       `}</style>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", marginTop: "20px" }}>
-        <button
-          onClick={toggleModal}
-          style={{
-            padding: "10px",
-            backgroundColor: "transparent",
-            border: "none",
-            cursor: "pointer",
-            height: "40px", // Set a reasonable height
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          aria-label={isModalOpen ? "Close Comments" : "Open Comments"}
-        >
-          <i className="fas fa-comments" style={{ fontSize: "20px" }}></i>
-        </button>
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <h2 style={{ fontSize: "18px", color: "#333", marginBottom: "10px" }}>Comment and Share</h2>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "20px" }}>
+          <button
+            onClick={toggleModal}
+            style={{
+              padding: "10px",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer",
+              height: "40px", // Set a reasonable height
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            aria-label={isModalOpen ? "Close Comments" : "Open Comments"}
+          >
+            <i className="fas fa-comments" style={{ fontSize: "20px" }}></i>
+          </button>
 
-        <button
-          onClick={async () => {
-            const shareData = {
-              title: `${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
-              text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
-              url: window.location.href,
-            };
+          <button
+            onClick={async () => {
+              const shareData = {
+                title: `${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
+                text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
+                url: window.location.href,
+              };
 
-            if (navigator.share) {
-              try {
-                await navigator.share(shareData);
-              } catch (err) {
-                console.error("Error sharing the link:", err);
+              if (navigator.share) {
+                try {
+                  await navigator.share(shareData);
+                } catch (err) {
+                  console.error("Error sharing the link:", err);
+                }
+              } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert("Link copied to clipboard!");
               }
-            } else {
-              navigator.clipboard.writeText(window.location.href);
-              alert("Link copied to clipboard!");
-            }
-          }}
-          style={{
-            padding: "10px",
-            backgroundColor: "transparent",
-            border: "none",
-            cursor: "pointer",
-            height: "40px", // Set a reasonable height
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          aria-label="Share Song"
-        >
-          <i className="fas fa-share-nodes" style={{ fontSize: "20px" }}></i>
-        </button>
-      </div>
-      <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "10px" }}>
-        <span style={{ fontSize: "14px", color: "#555" }}>Comment</span>
-        <span style={{ fontSize: "14px", color: "#555" }}>Share</span>
-
+            }}
+            style={{
+              padding: "10px",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer",
+              height: "40px", // Set a reasonable height
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            aria-label="Share Song"
+          >
+            <i className="fas fa-share-nodes" style={{ fontSize: "20px" }}></i>
+          </button>
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "10px" }}>
+          <span style={{ fontSize: "14px", color: "#555" }}>Comment</span>
+          <span style={{ fontSize: "14px", color: "#555" }}>Share</span>
+        </div>
       </div>
 
       {
