@@ -528,7 +528,7 @@ export default function Page() {
           <i className="fas fa-share-nodes" style={{ fontSize: "20px" }}></i>
         </button>
       </div>
-      <div style={{ display: "flex", justifyContent: "center", gap: "50px", marginTop: "10px" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "10px" }}>
         <span style={{ fontSize: "14px", color: "#555" }}>Comment</span>
         <span style={{ fontSize: "14px", color: "#555" }}>Share</span>
 
