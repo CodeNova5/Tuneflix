@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function AlbumPage() {
   const { artist, albumId } = useParams() as { artist: string; albumId: string };
@@ -56,18 +57,25 @@ export default function AlbumPage() {
         Total Tracks: {albumDetails.totalTracks}
       </p>
       <h2>Tracks</h2>
+
       <ul style={{ listStyle: "none", padding: 0 }}>
+
         {albumDetails.tracks.map((track: any, index: number) => (
-          <li
-            key={index}
-            style={{
-              padding: "10px",
-              borderBottom: "1px solid #ddd",
-              textAlign: "left",
-            }}
+          <Link href={`/music/${decodeURIComponent(artist)}/song/${encodeURIComponent(track.name)}`}
           >
-            {index + 1}. {track.name}
-          </li>
+            <a style={{ textDecoration: "none", color: "inherit" }}>
+              <li
+                key={index}
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #ddd",
+                  textAlign: "left",
+                }}
+              >
+                {index + 1}. {track.name}
+              </li>
+            </a>
+          </Link>
         ))}
       </ul>
     </div>
