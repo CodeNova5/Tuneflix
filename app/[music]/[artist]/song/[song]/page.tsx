@@ -459,7 +459,7 @@ export default function Page() {
         }
       `}</style>
       <div style={{ marginTop: "20px", textAlign: "center" }}>
-        <h2 style={{ fontSize: "18px", color: "#333", marginBottom: "10px" }}>Comment and Share</h2>
+        <h2 style={{ fontSize: "20px", color: "#fff", marginBottom: "10px" }}>Comment and Share</h2>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "20px" }}>
           <button
             onClick={toggleModal}
