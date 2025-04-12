@@ -479,15 +479,22 @@ export default function Page() {
       <button
         onClick={toggleModal}
         style={{
-          padding: "10px 20px",
-          backgroundColor: "#333333", // Dark mode button background
-          color: "#ffffff", // Button text color
+          padding: "10px",
+          backgroundColor: "transparent",
           border: "none",
-          borderRadius: "5px",
           cursor: "pointer",
         }}
+        aria-label={isModalOpen ? "Close Comments" : "Open Comments"}
       >
-        {isModalOpen ? "Close Comments" : "Open Comments"}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          width="24px"
+          height="24px"
+        >
+          <path d="M20 2H4C2.9 2 2 2.9 2 4V20L6 16H20C21.1 16 22 15.1 22 14V4C22 2.9 21.1 2 20 2ZM20 14H5.17L4 15.17V4H20V14Z" />
+        </svg>
       </button>
 
       {
