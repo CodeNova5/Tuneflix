@@ -350,7 +350,7 @@ export default function Page() {
       </div>
 
       <a
-      
+
         download={
           downloadUrl
             ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
@@ -389,8 +389,8 @@ export default function Page() {
           else {
             setModalMessage("✅ Download has started");
             setIsUploading(false);
-           
-    
+
+
             // Auto-trigger the download
             const link = document.createElement("a");
             link.href = downloadUrl;
@@ -398,7 +398,7 @@ export default function Page() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-    
+
             setTimeout(() => setModalMessage(null), 2000);
           }
         }}
@@ -476,8 +476,7 @@ export default function Page() {
           }
         }
       `}</style>
-
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
         <button
           onClick={toggleModal}
           style={{
@@ -528,6 +527,11 @@ export default function Page() {
         >
           <i className="fas fa-share-nodes" style={{ fontSize: "20px" }}></i>
         </button>
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", gap: "50px", marginTop: "10px" }}>
+        <span style={{ fontSize: "14px", color: "#555" }}>Comment</span>
+        <span style={{ fontSize: "14px", color: "#555" }}>Share</span>
+
       </div>
 
       {
@@ -620,7 +624,7 @@ export default function Page() {
                 </p>
               </a>
             </Link>
-            
+
           </div>
         ))}
       </div>
@@ -652,7 +656,7 @@ export default function Page() {
                     src={song.image || "/placeholder.jpg"}
                     alt={song.name}
                     style={{ width: "100%", borderRadius: "8px" }}
-                    
+
                   />
                   <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
                   <p style={{ fontSize: "14px", color: "#555" }}>{song.artist}</p>
