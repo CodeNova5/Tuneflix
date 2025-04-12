@@ -477,54 +477,58 @@ export default function Page() {
         }
       `}</style>
 
-      <button
-        onClick={toggleModal}
-        style={{
-          padding: "10px",
-          backgroundColor: "transparent",
-          border: "none",
-          cursor: "pointer",
-        }}
-        aria-label={isModalOpen ? "Close Comments" : "Open Comments"}
-      >
-      <i className="fas fa-comments"></i>
-      </button>
-      // ...existing code...
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "20px" }}>
+        <button
+          onClick={toggleModal}
+          style={{
+            padding: "10px",
+            backgroundColor: "transparent",
+            border: "none",
+            cursor: "pointer",
+            height: "40px", // Set a reasonable height
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          aria-label={isModalOpen ? "Close Comments" : "Open Comments"}
+        >
+          <i className="fas fa-comments" style={{ fontSize: "20px" }}></i>
+        </button>
 
-<div style={{ marginTop: "20px" }}>
-  <button
-    onClick={async () => {
-      const shareData = {
-        title: `${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
-        text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
-        url: window.location.href,
-      };
+        <button
+          onClick={async () => {
+            const shareData = {
+              title: `${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
+              text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
+              url: window.location.href,
+            };
 
-      if (navigator.share) {
-        try {
-          await navigator.share(shareData);
-         
-        } catch (err) {
-          console.error("Error sharing the link:", err);
-        }
-      } else {
-        // Fallback for browsers that don't support the Web Share API
-        navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
-      }
-    }}
-    style={{
-      padding: "10px 20px",
-      backgroundColor: "#0070f3",
-      color: "#fff",
-      border: "none",
-      borderRadius: "5px",
-      cursor: "pointer",
-    }}
-  >
-    <i className="fas fa-share-nodes"></i>
-  </button>
-</div>
+            if (navigator.share) {
+              try {
+                await navigator.share(shareData);
+              } catch (err) {
+                console.error("Error sharing the link:", err);
+              }
+            } else {
+              navigator.clipboard.writeText(window.location.href);
+              alert("Link copied to clipboard!");
+            }
+          }}
+          style={{
+            padding: "10px",
+            backgroundColor: "transparent",
+            border: "none",
+            cursor: "pointer",
+            height: "40px", // Set a reasonable height
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          aria-label="Share Song"
+        >
+          <i className="fas fa-share-nodes" style={{ fontSize: "20px" }}></i>
+        </button>
+      </div>
 
       {
         isModalOpen && (
