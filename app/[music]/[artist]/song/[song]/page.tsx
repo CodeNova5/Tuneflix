@@ -3,6 +3,7 @@ import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import CommentSection from '../../../../../components/CommentSection';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -486,16 +487,44 @@ export default function Page() {
         }}
         aria-label={isModalOpen ? "Close Comments" : "Open Comments"}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          width="24px"
-          height="24px"
-        >
-          <path d="M20 2H4C2.9 2 2 2.9 2 4V20L6 16H20C21.1 16 22 15.1 22 14V4C22 2.9 21.1 2 20 2ZM20 14H5.17L4 15.17V4H20V14Z" />
-        </svg>
+      <i className="fas fa-comments"></i>
       </button>
+      // ...existing code...
+
+<div style={{ marginTop: "20px" }}>
+  <button
+    onClick={async () => {
+      const shareData = {
+        title: `${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
+        text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
+        url: window.location.href,
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+         
+        } catch (err) {
+          console.error("Error sharing the link:", err);
+        }
+      } else {
+        // Fallback for browsers that don't support the Web Share API
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard!");
+      }
+    }}
+    style={{
+      padding: "10px 20px",
+      backgroundColor: "#0070f3",
+      color: "#fff",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer",
+    }}
+  >
+    <i className="fas fa-share-nodes"></i>
+  </button>
+</div>
 
       {
         isModalOpen && (
