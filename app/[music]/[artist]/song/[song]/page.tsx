@@ -174,7 +174,7 @@ export default function Page() {
         const formattedLyrics = formatLyrics(data.lyrics);
         const lyricsContainer = document.getElementById("lyrics-container");
         if (lyricsContainer) {
-          lyricsContainer.innerHTML = '<h3>Lyrics:</h3>' + formattedLyrics;
+          lyricsContainer.innerHTML = '<h3 style="text-align:center; font-size:20px; margin:10px;" >Lyrics:</h3>' + formattedLyrics;
         }
       } else {
         throw new Error("Lyrics not found");
