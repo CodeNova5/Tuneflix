@@ -234,7 +234,7 @@ export default function Page() {
 
     try {
       const response = await fetch(
-        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}`
+        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}&artist=track?.artists[0]?.name&title=track?.name&year=track?.album.release_date`,
       );
 
       if (!response.ok) {
