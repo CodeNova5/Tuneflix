@@ -4,7 +4,6 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import CommentSection from '../../../../../components/CommentSection';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-const { ID3Writer } = await import('browser-id3-writer');
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -222,76 +221,37 @@ export default function Page() {
   }
   fetchSongs(song);
 
+
   async function handleConvertToMp3() {
     if (!lyricsVideoId) return;
-  
     const formatTitle = (title: string): string =>
       title
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join("-");
-  
-    const artistName = track?.artists[0]?.name ?? "";
-    const trackTitle = track?.name ?? "";
-    const albumTitle = track?.album?.name ?? "";
-    const albumYear = track?.album?.release_date?.split("-")[0] ?? "";
-    const songName = `${formatTitle(artistName)}_-_${formatTitle(trackTitle)}`;
-    const imageUrl = track?.album?.images?.[0]?.url; // Use Spotify album image or any other
-  
+
+    const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
+
     try {
       const response = await fetch(
-        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}`,
+        `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio&filename=${songName}&artist=track?.artists[0]?.name&title=track?.name&year=track?.album.release_date`,
       );
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         setModalMessage(errorData.error || "Failed to convert video to MP3");
         setIsUploading(false);
         return;
       }
-  
-      const blob = await response.blob();
-      const arrayBuffer = await blob.arrayBuffer();
-  
-      // 🔥 Fetch album image and convert to ArrayBuffer
-      let coverArrayBuffer: ArrayBuffer | null = null;
-      if (imageUrl) {
-        const imgResp = await fetch(imageUrl);
-        const imgBlob = await imgResp.blob();
-        coverArrayBuffer = await imgBlob.arrayBuffer();
-      }
-  
-     
-      
-      const writer = new ID3Writer(arrayBuffer);
 
-      // Safe frames — TypeScript will not complain
-      writer.setFrame('TIT2', trackTitle);             // Title
-      writer.setFrame('TPE1', [artistName]);           // Artist
-      writer.setFrame('TALB', albumTitle);             // Album
-      writer.setFrame('TCON', ['Pop']);                // Genre
-      
-      // Frames that require casting to any due to missing typings
-      (writer as any).setFrame('TDRC', albumYear);     // Year / Recording time
-      if (coverArrayBuffer) {
-      (writer as any).setFrame('APIC', {               // Album cover
-        type: 3,
-        data: new Uint8Array(coverArrayBuffer),
-        description: 'Cover',
-        mimeType: 'image/jpeg',
-      });
-    }
-  
-      writer.addTag();
-  
-      const taggedBlob = writer.getBlob();
-      const url = window.URL.createObjectURL(taggedBlob);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
+      a.id = "download-link"; // Set an ID for the link
       a.href = url;
-      a.download = songName + '.mp3';
-      a.click(); // Trigger download
-      setDownloadUrl(url);
-  
+      a.download = songName + '.mp3'; // Use the formatted song name as the filename
+      document.body.appendChild(a);
+      setDownloadUrl(url); // 🔥 Store blob URL
     } catch (err) {
       console.error("Error converting video to MP3:", err);
       setModalMessage("An unexpected error occurred");
@@ -302,7 +262,7 @@ export default function Page() {
       }, 2000);
     }
   }
-  
+
 
   if (error) {
     return <h1>{error}</h1>;
