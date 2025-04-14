@@ -64,6 +64,92 @@ export default async function handler(req, res) {
     const decodedArtistName = decodeURIComponent(artistName || "");
     const decodedSongName = decodeURIComponent(songName || "");
 
+    if (type === "topSongs") {
+      try {
+        const accessToken = await getSpotifyAccessToken();
+        const apiUrl = `https://api.spotify.com/v1/playlists/37i9dQZF1DXcBWIGoYBM5M/tracks?limit=10`; // Spotify's "Today's Top Hits" playlist
+
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch top songs");
+        }
+
+        const data = await response.json();
+        const topSongs = data.items.map((item) => ({
+          name: item.track.name,
+          artist: item.track.artists.map((artist) => artist.name).join(", "),
+          image: item.track.album.images[0]?.url || "/placeholder.jpg",
+          url: item.track.external_urls.spotify,
+        }));
+
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(topSongs);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch top songs" });
+      }
+    } 
+
+    if (type === "topArtists") {
+      try {
+        const accessToken = await getSpotifyAccessToken();
+        const playlistId = "37i9dQZF1DXcBWIGoYBM5M"; // "Today's Top Hits" playlist
+        const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`;
+
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch playlist tracks");
+        }
+
+        const data = await response.json();
+
+        // Extract unique artists from the playlist tracks
+        const artistsMap = new Map();
+        data.items.forEach((item) => {
+          item.track.artists.forEach((artist) => {
+            if (!artistsMap.has(artist.id)) {
+              artistsMap.set(artist.id, {
+                id: artist.id,
+                name: artist.name,
+                image: null, // Placeholder for artist image
+                url: artist.external_urls.spotify,
+              });
+            }
+          });
+        });
+
+        // Fetch artist images and additional details
+        const artistIds = Array.from(artistsMap.keys()).slice(0, 20); // Limit to top 20 artists
+        const artistsApiUrl = `https://api.spotify.com/v1/artists?ids=${artistIds.join(",")}`;
+        const artistsResponse = await fetch(artistsApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (artistsResponse.ok) {
+          const artistsData = await artistsResponse.json();
+          artistsData.artists.forEach((artist) => {
+            if (artistsMap.has(artist.id)) {
+              artistsMap.get(artist.id).image = artist.images[0]?.url || "/placeholder.jpg";
+            }
+          });
+        }
+
+        const topArtists = Array.from(artistsMap.values());
+
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(topArtists);
+      }
+      catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch top artists" });
+      }
+    }
     if (type === "songDetails") {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist or song" });

@@ -1,102 +1,138 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import CommentSection from "../components/CommentSection";
+import React from "react";
+import Link from "next/link";
 
-export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function MusicHomePage() {
+  const [topSongs, setTopSongs] = React.useState<any[]>([]);
+  const [topArtists, setTopArtists] = React.useState<any[]>([]);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
-  // Disable background scroll when modal is open
-  useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = "hidden"; // Disable scrolling
-    } else {
-      document.body.style.overflow = ""; // Reset scrolling
+  React.useEffect(() => {
+    async function fetchTopSongs() {
+      try {
+        const response = await fetch("/api/Music/route?type=topSongs");
+        if (!response.ok) {
+          throw new Error("Failed to fetch top songs");
+        }
+        const data = await response.json();
+        setTopSongs(data);
+      } catch (err) {
+        console.error("Error fetching top songs:", err);
+        setError("Failed to load top songs.");
+      }
     }
 
-    // Cleanup on component unmount
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isModalOpen]);
+    async function fetchTopArtists() {
+      try {
+        const response = await fetch("/api/Music/route?type=topArtists");
+        if (!response.ok) {
+          throw new Error("Failed to fetch top artists");
+        }
+        const data = await response.json();
+        setTopArtists(data);
+      } catch (err) {
+        console.error("Error fetching top artists:", err);
+        setError("Failed to load top artists.");
+      }
+    }
+
+    fetchTopSongs();
+    fetchTopArtists();
+  }, []);
+
+  if (error) {
+    return <h1>{error}</h1>;
+  }
 
   return (
-    <div
-      style={{
-        backgroundColor: "#121212", // Dark mode background
-        color: "#ffffff", // Dark mode text color
-        minHeight: "100vh",
-        padding: "20px",
-      }}
-    >
-      <h1>Welcome to the Music App</h1>
-      <button
-        onClick={toggleModal}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#333333", // Dark mode button background
-          color: "#ffffff", // Button text color
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        {isModalOpen ? "Close Comments" : "Open Comments"}
-      </button>
+    <div style={{ padding: "20px" }}>
+      <h1 style={{ textAlign: "center" }}>Music Homepage</h1>
 
-      {isModalOpen && (
+      {/* Top Songs Section */}
+      <section style={{ marginBottom: "40px" }}>
+        <h2>Top Songs Globally</h2>
         <div
           style={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "80%",
-            backgroundColor: "#1e1e1e", // Dark mode modal background
-            color: "#ffffff", // Modal text color
-            boxShadow: "0 -4px 8px rgba(0, 0, 0, 0.2)",
-            borderTopLeftRadius: "16px",
-            borderTopRightRadius: "16px",
-            overflowY: "auto",
-            zIndex: 1000,
+            display: "flex",
+            overflowX: "auto",
+            gap: "20px",
+            padding: "10px",
           }}
         >
-          <div
-            style={{
-              position: "sticky", // Keeps the header fixed at the top
-              top: 0,
-              backgroundColor: "#1e1e1e", // Match modal background
-              zIndex: 1001, // Ensure it stays above the content
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "10px 20px",
-              borderBottom: "1px solid #444", // Dark mode border
-            }}
-          >
-            <h2>Comments</h2>
-            <button
-              onClick={toggleModal}
+          {topSongs.map((song, index) => (
+            <div
+              key={index}
               style={{
-                backgroundColor: "transparent",
-                border: "none",
-                fontSize: "20px",
-                color: "#ffffff", // Close button color
-                cursor: "pointer",
+                minWidth: "200px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                padding: "10px",
               }}
             >
-              ✖
-            </button>
-          </div>
-          <div style={{ padding: "20px" }}>
-            <CommentSection />
-          </div>
+              <Link
+                href={`/music/${encodeURIComponent(
+                  song.artist
+                )}/song/${encodeURIComponent(song.name)}`}
+              >
+                <a style={{ textDecoration: "none", color: "inherit" }}>
+                  <img
+                    src={song.image || "/placeholder.jpg"}
+                    alt={song.name}
+                    style={{ width: "100%", borderRadius: "8px" }}
+                  />
+                  <h3 style={{ fontSize: "16px", margin: "10px 0" }}>
+                    {song.name}
+                  </h3>
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    {song.artist}
+                  </p>
+                </a>
+              </Link>
+            </div>
+          ))}
         </div>
-      )}
+      </section>
+
+      {/* Top Artists Section */}
+      <section>
+        <h2>Top Artists Globally</h2>
+        <div
+          style={{
+            display: "flex",
+            overflowX: "auto",
+            gap: "20px",
+            padding: "10px",
+          }}
+        >
+          {topArtists.map((artist, index) => (
+            <div
+              key={index}
+              style={{
+                minWidth: "200px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                padding: "10px",
+              }}
+            >
+              <Link href={`/music/${encodeURIComponent(artist.name)}`}>
+                <a style={{ textDecoration: "none", color: "inherit" }}>
+                  <img
+                    src={artist.image || "/placeholder.jpg"}
+                    alt={artist.name}
+                    style={{ width: "100%", borderRadius: "8px" }}
+                  />
+                  <h3 style={{ fontSize: "16px", margin: "10px 0" }}>
+                    {artist.name}
+                  </h3>
+                </a>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
