@@ -221,6 +221,9 @@ export default function Page() {
       setError("An unexpected error occurred");
     }
   }
+  if (song) {
+    fetchSongs(song);
+  }
 
   
   async function handleConvertToMp3() {
@@ -257,7 +260,6 @@ export default function Page() {
       writer.setFrame('TIT2', track?.name ?? 'Unknown Title') // Title
             .setFrame('TPE1', [artistName]) // Artist
             .setFrame('TALB', albumName) // Album
-            .setFrame('TYER', releaseYear) // Year  
       const coverImageUrl = track?.album?.images[0]?.url;
       if (coverImageUrl) {
         const coverResponse = await fetch(coverImageUrl);
