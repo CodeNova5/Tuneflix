@@ -257,8 +257,7 @@ export default function Page() {
       writer.setFrame('TIT2', track?.name ?? 'Unknown Title') // Title
             .setFrame('TPE1', [artistName]) // Artist
             .setFrame('TALB', albumName) // Album
-            .setFrame('TXXX', { description: 'Year', value: releaseYear }); // Year
-  
+            .setFrame('TYER', releaseYear) // Year  
       const coverImageUrl = track?.album?.images[0]?.url;
       if (coverImageUrl) {
         const coverResponse = await fetch(coverImageUrl);
