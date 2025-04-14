@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import CommentSection from '../../../../../components/CommentSection';
 import '@fortawesome/fontawesome-free/css/all.min.css'; 
-import * as ID3Writer from 'browser-id3-writer';
+import { ID3Writer } from 'browser-id3-writer';
 
 interface Track {
   name: string;
@@ -253,17 +253,22 @@ export default function Page() {
       const arrayBuffer = await blob.arrayBuffer();
   
       // Add metadata using browser-id3-writer
-      const writer = new ID3Writer.ID3Writer(arrayBuffer);
+      const writer = new ID3Writer(arrayBuffer);
       writer.setFrame('TIT2', track?.name ?? 'Unknown Title') // Title
             .setFrame('TPE1', [artistName]) // Artist
             .setFrame('TALB', albumName) // Album
-            
+            .setFrame('TXXX', { description: 'Year', value: releaseYear }); // Year
   
       const coverImageUrl = track?.album?.images[0]?.url;
       if (coverImageUrl) {
         const coverResponse = await fetch(coverImageUrl);
         const coverBlob = await coverResponse.blob();
         const coverArrayBuffer = await coverBlob.arrayBuffer();
+        (writer as any).setFrame('APIC', {
+          type: 3, // Front cover
+          data: new Uint8Array(coverArrayBuffer),
+          description: 'Cover',
+        });
       }
   
       writer.addTag();
@@ -276,7 +281,7 @@ export default function Page() {
       a.href = url;
       a.download = songName + ".mp3";
       document.body.appendChild(a);
-      a.click();
+     
       document.body.removeChild(a);
       setDownloadUrl(url);
     } catch (err) {
