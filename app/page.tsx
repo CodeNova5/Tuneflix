@@ -1,138 +1,61 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 
-export default function MusicHomePage() {
-  const [topSongs, setTopSongs] = React.useState<any[]>([]);
-  const [topArtists, setTopArtists] = React.useState<any[]>([]);
-  const [error, setError] = React.useState<string | null>(null);
+export default function HomePage() {
+  const [featuredPlaylist, setFeaturedPlaylist] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    async function fetchTopSongs() {
+  useEffect(() => {
+    async function fetchFeaturedPlaylist() {
       try {
-        const response = await fetch("/api/Music/route?type=topSongs");
-        if (!response.ok) {
-          throw new Error("Failed to fetch top songs");
-        }
+        // Replace with your API endpoint or logic to fetch the playlist
+        const response = await fetch(`/api/Music/route?type=featuredPlaylist`);
+        if (!response.ok) throw new Error("Failed to fetch featured playlist");
         const data = await response.json();
-        setTopSongs(data);
-      } catch (err) {
-        console.error("Error fetching top songs:", err);
-        setError("Failed to load top songs.");
+        setFeaturedPlaylist(data);
+      } catch (err: any) {
+        console.error(err.message);
+        setError(err.message);
       }
     }
 
-    async function fetchTopArtists() {
-      try {
-        const response = await fetch("/api/Music/route?type=topArtists");
-        if (!response.ok) {
-          throw new Error("Failed to fetch top artists");
-        }
-        const data = await response.json();
-        setTopArtists(data);
-      } catch (err) {
-        console.error("Error fetching top artists:", err);
-        setError("Failed to load top artists.");
-      }
-    }
-
-    fetchTopSongs();
-    fetchTopArtists();
+    fetchFeaturedPlaylist();
   }, []);
 
   if (error) {
-    return <h1>{error}</h1>;
+    return <h1>Error: {error}</h1>;
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1 style={{ textAlign: "center" }}>Music Homepage</h1>
-
-      {/* Top Songs Section */}
-      <section style={{ marginBottom: "40px" }}>
-        <h2>Top Songs Globally</h2>
-        <div
-          style={{
-            display: "flex",
-            overflowX: "auto",
-            gap: "20px",
-            padding: "10px",
-          }}
-        >
-          {topSongs.map((song, index) => (
-            <div
-              key={index}
-              style={{
-                minWidth: "200px",
-                textAlign: "center",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "10px",
-              }}
-            >
-              <Link
-                href={`/music/${encodeURIComponent(
-                  song.artist
-                )}/song/${encodeURIComponent(song.name)}`}
-              >
-                <a style={{ textDecoration: "none", color: "inherit" }}>
-                  <img
-                    src={song.image || "/placeholder.jpg"}
-                    alt={song.name}
-                    style={{ width: "100%", borderRadius: "8px" }}
-                  />
-                  <h3 style={{ fontSize: "16px", margin: "10px 0" }}>
-                    {song.name}
-                  </h3>
-                  <p style={{ fontSize: "14px", color: "#555" }}>
-                    {song.artist}
-                  </p>
-                </a>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Top Artists Section */}
-      <section>
-        <h2>Top Artists Globally</h2>
-        <div
-          style={{
-            display: "flex",
-            overflowX: "auto",
-            gap: "20px",
-            padding: "10px",
-          }}
-        >
-          {topArtists.map((artist, index) => (
-            <div
-              key={index}
-              style={{
-                minWidth: "200px",
-                textAlign: "center",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "10px",
-              }}
-            >
-              <Link href={`/music/${encodeURIComponent(artist.name)}`}>
-                <a style={{ textDecoration: "none", color: "inherit" }}>
-                  <img
-                    src={artist.image || "/placeholder.jpg"}
-                    alt={artist.name}
-                    style={{ width: "100%", borderRadius: "8px" }}
-                  />
-                  <h3 style={{ fontSize: "16px", margin: "10px 0" }}>
-                    {artist.name}
-                  </h3>
-                </a>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      {/* Hero Section */}
+      {featuredPlaylist ? (
+        <section>
+          <h1>🎵 {featuredPlaylist.name}</h1>
+          <img
+            src={featuredPlaylist.image || "/placeholder.jpg"}
+            alt={featuredPlaylist.name}
+            style={{ width: "100%", maxWidth: "600px", borderRadius: "8px" }}
+          />
+          <p>{featuredPlaylist.description}</p>
+          <button
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              backgroundColor: "#1DB954",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Play Now
+          </button>
+        </section>
+      ) : (
+        <p>Loading featured playlist...</p>
+      )}
     </div>
   );
 }
