@@ -90,43 +90,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch song details" });
       }
     } 
-    else if (type === "featuredPlaylist") {
-      try {
-        const accessToken = await getSpotifyAccessToken();
-    
-        // Replace with the Spotify playlist ID for the featured playlist
-        const playlistId = "37i9dQZF1DXcBWIGoYBM5M"; // Example: "Today's Top Hits"
-    
-        const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
-        if (!response.ok) {
-          throw new Error("Failed to fetch featured playlist");
-        }
-    
-        const data = await response.json();
-    
-        // Format the response to include only necessary fields
-        const formattedPlaylist = {
-          name: data.name,
-          description: data.description,
-          image: data.images?.[0]?.url || "/placeholder.jpg",
-          tracks: data.tracks.items.map((item) => ({
-            name: item.track.name,
-            artist: item.track.artists.map((artist) => artist.name).join(", "),
-            url: item.track.external_urls.spotify,
-          })),
-        };
-    
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(formattedPlaylist);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch featured playlist" });
-      }
-    }
+   
     else if (type === "youtubeMusicVideo") {
       if (!YOUTUBE_API_KEY) {
         console.error("Missing YouTube API key.");
@@ -513,6 +477,46 @@ export default async function handler(req, res) {
       } catch (err) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch album details" });
+      }
+    }
+    else if (type === "newReleases") {
+      try {
+        const accessToken = await getSpotifyAccessToken();
+        const apiUrl = "https://api.spotify.com/v1/browse/new-releases";
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch new releases");
+        }
+    
+        const data = await response.json();
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(data);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch new releases" });
+      }
+    }
+    else if (type === "featuredPlaylists") {
+      try {
+        const accessToken = await getSpotifyAccessToken();
+        const apiUrl = "https://api.spotify.com/v1/browse/featured-playlists";
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch featured playlists");
+        }
+    
+        const data = await response.json();
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(data);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch featured playlists" });
       }
     }
     else {
