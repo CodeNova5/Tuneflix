@@ -6,7 +6,62 @@ const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 let spotifyAccessToken = null;
 let spotifyTokenExpiresAt = 0;
 let artistAccessToken = null;
+import axios from "axios";
+import * as cheerio from "cheerio";
+
 let artistTokenExpiresAt = 0;
+
+async function getBillboardTopSongs() {
+  const hot100Url = "https://www.billboard.com/charts/hot-100/";
+  try {
+    const { data } = await axios.get(hot100Url);
+    const $ = cheerio.load(data);
+    const songs = [];
+
+    $(".o-chart-results-list-row-container").each((i, el) => {
+      const title = $(el).find("h3#title-of-a-story").first().text().trim();
+      const artist = $(el).find("span.c-label.a-no-trucate").first().text().trim();
+      if (title && artist) {
+        songs.push({ title, artist });
+      }
+    });
+
+    return songs.slice(0, 20); // Get the top 20 songs
+  } catch (error) {
+    console.error("Failed to fetch Billboard Hot 100:", error.message);
+    return [];
+  }
+}
+
+async function getSpotifySongDetails(title, artist) {
+  try {
+    const accessToken = await getSpotifyAccessToken();
+    const query = `${title} ${artist}`;
+    const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
+
+    const response = await fetch(apiUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch song details from Spotify");
+    }
+
+    const data = await response.json();
+    const track = data.tracks?.items?.[0];
+    if (!track) return null;
+
+    return {
+      title: track.name,
+      artist: track.artists.map((a) => a.name).join(", "),
+      image: track.album.images?.[0]?.url || "/placeholder.jpg",
+    };
+  } catch (error) {
+    console.error(`Failed to fetch Spotify details for ${title} - ${artist}:`, error.message);
+    return null;
+  }
+}
+
 async function getSpotifyAccessToken() {
   if (spotifyAccessToken && Date.now() < spotifyTokenExpiresAt) {
     return spotifyAccessToken;
@@ -479,45 +534,15 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch album details" });
       }
     }
-    else if (type === "newReleases") {
-      try {
-        const accessToken = await getSpotifyAccessToken();
-        const apiUrl = "https://api.spotify.com/v1/browse/new-releases";
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
     
-        if (!response.ok) {
-          throw new Error("Failed to fetch new releases");
-        }
-    
-        const data = await response.json();
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(data);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch new releases" });
-      }
-    }
-    else if (type === "featuredPlaylists") {
-      try {
-        const accessToken = await getSpotifyAccessToken();
-        const apiUrl = "https://api.spotify.com/v1/browse/featured-playlists";
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    
-        if (!response.ok) {
-          throw new Error("Failed to fetch featured playlists");
-        }
-    
-        const data = await response.json();
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(data);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch featured playlists" });
-      }
+   else if (type === "topSongs") {
+      const billboardSongs = await getBillboardTopSongs();
+      await Promise.all(
+        billboardSongs.map(async ({ title, artist }) => {
+          const details = await getSpotifySongDetails(title, artist);
+          return details || { title, artist, image: "/placeholder.jpg" };
+        })
+      );
     }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
