@@ -28,7 +28,10 @@ export default function HomePage() {
 
     fetchTopSongs();
   }, []);
-
+  const getFirstArtist = (artist: string): string => {
+    return artist.split(/[,&]|feat(?:uring)?|\sX\s/i)[0].trim();
+  };
+  
   if (error) {
     return <h1>Error: {error}</h1>;
   }
@@ -40,7 +43,7 @@ export default function HomePage() {
         {songs.map((song, idx) => (
           <Link
             key={idx}
-            href={`/music/${song.artist.split(/['"&]|feat(?:uring)?/i)[0].trim()}/song/${song.title}`}
+            href={`/music/${getFirstArtist(song.artist)}/song/${song.title}`}
           >
             <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer">
               <img
@@ -50,7 +53,7 @@ export default function HomePage() {
               />
               <h2 className="font-semibold mt-2">{song.title}</h2>
               <p className="text-gray-400">
-                {song.artist.split(/['"&]|feat(?:uring)?/i)[0].trim()}
+              {getFirstArtist(song.artist)}
               </p>
             </div>
           </Link>
