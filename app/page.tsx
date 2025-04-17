@@ -2,8 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 
+interface ChartItem {
+  title: string;
+  artist: string;
+  image: string;
+}
+
+
 export default function HomePage() {
-  const [topSongs, setTopSongs] = useState<any[]>([]);
+  const [songs, setSongs] = useState<ChartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -12,7 +19,7 @@ export default function HomePage() {
         const response = await fetch(`/api/Music/route?type=topSongs`);
         if (!response.ok) throw new Error("Failed to fetch top songs");
         const data = await response.json();
-        setTopSongs(data);
+        setSongs(data);
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
@@ -27,18 +34,14 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>🎵 Billboard Top 20 Songs</h1>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-        {topSongs.map((song, index) => (
-          <div key={index} style={{ textAlign: "center", width: "200px" }}>
-            <img
-              src={song.image}
-              alt={song.title}
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-            <h3>{song.title}</h3>
-            <p>{song.artist}</p>
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-4">Billboard Global 200</h1>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {songs.map((song, idx) => (
+          <div key={idx} className="border rounded-lg p-2 shadow-md bg-white">
+            <img src={song.image} alt={song.title} className="w-full h-48 object-cover rounded" />
+            <h2 className="font-semibold mt-2">{song.title}</h2>
+            <p className="text-gray-600">{song.artist}</p>
           </div>
         ))}
       </div>

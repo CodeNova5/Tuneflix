@@ -11,57 +11,6 @@ import * as cheerio from "cheerio";
 
 let artistTokenExpiresAt = 0;
 
-async function getBillboardTopSongs() {
-  const hot100Url = "https://www.billboard.com/charts/hot-100/";
-  try {
-    const { data } = await axios.get(hot100Url);
-    const $ = cheerio.load(data);
-    const songs = [];
-
-    $(".o-chart-results-list-row-container").each((i, el) => {
-      const title = $(el).find("h3#title-of-a-story").first().text().trim();
-      const artist = $(el).find("span.c-label.a-no-trucate").first().text().trim();
-      if (title && artist) {
-        songs.push({ title, artist });
-      }
-    });
-
-    return songs.slice(0, 20); // Get the top 20 songs
-  } catch (error) {
-    console.error("Failed to fetch Billboard Hot 100:", error.message);
-    return [];
-  }
-}
-
-async function getSpotifySongDetails(title, artist) {
-  try {
-    const accessToken = await getSpotifyAccessToken();
-    const query = `${title} ${artist}`;
-    const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
-
-    const response = await fetch(apiUrl, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch song details from Spotify");
-    }
-
-    const data = await response.json();
-    const track = data.tracks?.items?.[0];
-    if (!track) return null;
-
-    return {
-      title: track.name,
-      artist: track.artists.map((a) => a.name).join(", "),
-      image: track.album.images?.[0]?.url || "/placeholder.jpg",
-    };
-  } catch (error) {
-    console.error(`Failed to fetch Spotify details for ${title} - ${artist}:`, error.message);
-    return null;
-  }
-}
-
 async function getSpotifyAccessToken() {
   if (spotifyAccessToken && Date.now() < spotifyTokenExpiresAt) {
     return spotifyAccessToken;
@@ -536,13 +485,36 @@ export default async function handler(req, res) {
     }
     
    else if (type === "topSongs") {
-      const billboardSongs = await getBillboardTopSongs();
-      await Promise.all(
-        billboardSongs.map(async ({ title, artist }) => {
-          const details = await getSpotifySongDetails(title, artist);
-          return details || { title, artist, image: "/placeholder.jpg" };
-        })
-      );
+        
+    try {
+      const url = 'https://www.billboard.com/charts/billboard-global-200/';
+      const { data } = await axios.get(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0'
+        }
+      });
+    
+      const $ = cheerio.load(data);
+    
+      const chartItems = [];
+    
+      $('.o-chart-results-list-row-container').each((i, elem) => {
+        const title = $(elem).find('h3#title-of-a-story').first().text().trim();
+        const artist = $(elem).find('span.c-label').first().text().trim();
+        const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
+    
+        if (title && artist) {
+          chartItems.push({ title, artist, image });
+        }
+      });
+    
+      console.log(chartItems);
+      return res.status(200).json(chartItems);
+      
+    } catch (error) {
+      console.error('Error fetching chart data:', error.message);
+    }
+    
     }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
