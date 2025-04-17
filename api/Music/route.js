@@ -498,10 +498,14 @@ export default async function handler(req, res) {
         const chartItems = [];
 
         $('.o-chart-results-list-row-container').each((i, elem) => {
-          if (i >= 30) return false; // Limit to 30 songs
+      
           const title = $(elem).find('h3#title-of-a-story').first().text().trim();
-          const artist = $(elem).find('span.c-label.a-no-trucate.a-font-primary-s.lrv-u-font-size-14@mobile-max.u-line-height-normal@mobile-max.u-letter-spacing-0021.lrv-u-display-block.a-truncate-ellipsis-2line.u-max-width-330.u-max-width-230@tablet-only').first().text().trim();
-          const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
+          // More accurate selector for artist name
+          const artist = $(elem)
+            .find('span.c-label.a-no-trucate.a-font-primary-s')
+            .first()
+            .text()
+            .trim(); const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
 
           if (title && artist) {
             chartItems.push({ title, artist, image });
