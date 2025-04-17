@@ -498,17 +498,23 @@ export default async function handler(req, res) {
         const chartItems = [];
 
         $('.o-chart-results-list-row-container').each((i, elem) => {
-      
+
           const title = $(elem).find('h3#title-of-a-story').first().text().trim();
           // More accurate selector for artist name
-          const artist = $(elem)
+          const fullArtist = $(elem)
             .find('span.c-label.a-no-trucate.a-font-primary-s')
             .first()
             .text()
-            .trim(); const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
+            .trim();
 
-          if (title && artist) {
-            chartItems.push({ title, artist, image });
+          // Extract only the first artist by splitting on common separators
+          const firstArtist = fullArtist.split(/,|&|feat\.|featuring/i)[0].trim();
+          if (title && firstArtist) {
+            chartItems.push({ title, artist: firstArtist, image });
+          }
+          else {
+            console.error("Missing title or artist in chart item");
+            return res.status(500).json({ error: "Failed to fetch chart data" });
           }
         });
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
