@@ -29,8 +29,9 @@ export default function HomePage() {
     fetchTopSongs();
   }, []);
   const getFirstArtist = (artist: string): string => {
-    return artist.split(/[,&]|feat(?:uring)?|\sX\s/i)[0].trim();
+    return artist.split(/[,&]|feat(?:uring)?|\sX\s|\svs\.?\s/i)[0].trim();
   };
+  
   
   if (error) {
     return <h1>Error: {error}</h1>;
@@ -53,7 +54,7 @@ export default function HomePage() {
               />
               <h2 className="font-semibold mt-2">{song.title}</h2>
               <p className="text-gray-400">
-              {getFirstArtist(song.artist)}
+               {song.artist}
               </p>
             </div>
           </Link>
