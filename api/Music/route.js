@@ -67,7 +67,7 @@ export default async function handler(req, res) {
     // Decode before using
     const decodedArtistName = decodeURIComponent(artistName || "");
     const decodedSongName = decodeURIComponent(songName || "");
-   
+
     if (type === "songDetails") {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist or song" });
@@ -93,8 +93,8 @@ export default async function handler(req, res) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch song details" });
       }
-    } 
-   
+    }
+
     else if (type === "youtubeMusicVideo") {
       if (!YOUTUBE_API_KEY) {
         console.error("Missing YouTube API key.");
@@ -325,36 +325,36 @@ export default async function handler(req, res) {
     }
     else if (type === "relatedArtists") {
       const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd";
-    
+
       if (!LAST_FM_API_KEY) {
         console.error("Missing Last.fm API key.");
         return res.status(500).json({ error: "Internal server error" });
       }
-    
+
       if (!artistName) {
         return res.status(400).json({ error: "Missing artist name" });
       }
-    
+
       try {
         // Fetch related artists from Last.fm
         const lastFmApiUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
         )}&api_key=${LAST_FM_API_KEY}&format=json`;
-    
+
         const lastFmResponse = await fetch(lastFmApiUrl);
-    
+
         if (!lastFmResponse.ok) {
           throw new Error("Failed to fetch related artists from Last.fm");
         }
-    
+
         const lastFmData = await lastFmResponse.json();
-    
+
         if (!lastFmData.similarartists?.artist?.length) {
           return res.status(404).json({ error: "No related artists found" });
         }
-    
+
         const relatedArtistNames = lastFmData.similarartists.artist.map((artist) => artist.name);
-    
+
         // Fetch artist images from Spotify
         const accessToken = await getArtistAccessToken();
         const relatedArtists = await Promise.all(
@@ -363,18 +363,18 @@ export default async function handler(req, res) {
               const spotifyApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
                 name
               )}&type=artist&limit=1`;
-    
+
               const spotifyResponse = await fetch(spotifyApiUrl, {
                 headers: { Authorization: `Bearer ${accessToken}` },
               });
-    
+
               if (!spotifyResponse.ok) {
                 throw new Error(`Failed to fetch artist details for ${name}`);
               }
-    
+
               const spotifyData = await spotifyResponse.json();
               const artist = spotifyData.artists?.items?.[0];
-    
+
               return {
                 name: name,
                 image: artist?.images?.[0]?.url || "/placeholder.jpg",
@@ -390,7 +390,7 @@ export default async function handler(req, res) {
             }
           })
         );
-    
+
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(relatedArtists);
       } catch (err) {
@@ -402,7 +402,7 @@ export default async function handler(req, res) {
       if (!artistName) {
         return res.status(400).json({ error: "Missing artist name" });
       }
-    
+
       try {
         // Get Spotify access token
         const accessToken = await getArtistAccessToken();
@@ -447,23 +447,23 @@ export default async function handler(req, res) {
       if (!albumId) {
         return res.status(400).json({ error: "Missing Album Id" });
       }
-    
+
       try {
         // Get Spotify access token
         const accessToken = await getArtistAccessToken();
-      
+
         // Fetch album details
         const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
         const albumResponse = await fetch(albumApiUrl, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-    
+
         if (!albumResponse.ok) {
           throw new Error("Failed to fetch album details from Spotify");
         }
-    
+
         const albumData = await albumResponse.json();
-    
+
         // Format the album data
         const formattedAlbum = {
           name: albumData.name,
@@ -475,7 +475,7 @@ export default async function handler(req, res) {
             duration: track.duration_ms,
           })),
         };
-    
+
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(formattedAlbum);
       } catch (err) {
@@ -483,40 +483,40 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch album details" });
       }
     }
-      else if (type === "topSongs") {
-        
-        try {
+    else if (type === "topSongs") {
+
+      try {
         const url = 'https://www.billboard.com/charts/billboard-global-200/';
         const { data } = await axios.get(url, {
           headers: {
-          'User-Agent': 'Mozilla/5.0'
+            'User-Agent': 'Mozilla/5.0'
           }
         });
-        
+
         const $ = cheerio.load(data);
-        
+
         const chartItems = [];
-        
+
         $('.o-chart-results-list-row-container').each((i, elem) => {
           if (i >= 30) return false; // Limit to 30 songs
           const title = $(elem).find('h3#title-of-a-story').first().text().trim();
-          const artist = $(elem).find('span.c-label').first().text().trim();
+          const artist = $(elem).find('span.c-label.a-no-trucate.a-font-primary-s.lrv-u-font-size-14@mobile-max.u-line-height-normal@mobile-max.u-letter-spacing-0021.lrv-u-display-block.a-truncate-ellipsis-2line.u-max-width-330.u-max-width-230@tablet-only').first().text().trim();
           const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
-        
+
           if (title && artist) {
-          chartItems.push({ title, artist, image });
+            chartItems.push({ title, artist, image });
           }
         });
-        
+
         return res.status(200).json(chartItems);
-        
-        } catch (error) {
+
+      } catch (error) {
         console.error('Error fetching chart data:', error.message);
         return res.status(500).json({ error: 'Failed to fetch top songs' });
-        }
-        
       }
-      else {
+
+    }
+    else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
   } catch (error) {
