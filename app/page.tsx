@@ -40,7 +40,7 @@ export default function HomePage() {
         {songs.map((song, idx) => (
           <Link
             key={idx}
-            href={`/music/${song.artist}/song/${song.title}`}
+            href={`/music/${song.artist.split(/['"&]|feat(?:uring)?/i)[0].trim()}/song/${song.title}`}
           >
             <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer">
               <img
@@ -49,7 +49,9 @@ export default function HomePage() {
                 className="w-full h-48 object-cover rounded"
               />
               <h2 className="font-semibold mt-2">{song.title}</h2>
-              <p className="text-gray-400">{song.artist}</p>
+              <p className="text-gray-400">
+                {song.artist.split(/['"&]|feat(?:uring)?/i)[0].trim()}
+              </p>
             </div>
           </Link>
         ))}
