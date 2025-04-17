@@ -511,7 +511,7 @@ export default async function handler(req, res) {
             chartItems.push({ title, artist, image });
           }
         });
-
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(chartItems);
 
       } catch (error) {
