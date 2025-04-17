@@ -483,40 +483,40 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch album details" });
       }
     }
-    
-   else if (type === "topSongs") {
+      else if (type === "topSongs") {
         
-    try {
-      const url = 'https://www.billboard.com/charts/billboard-global-200/';
-      const { data } = await axios.get(url, {
-        headers: {
+        try {
+        const url = 'https://www.billboard.com/charts/billboard-global-200/';
+        const { data } = await axios.get(url, {
+          headers: {
           'User-Agent': 'Mozilla/5.0'
-        }
-      });
-    
-      const $ = cheerio.load(data);
-    
-      const chartItems = [];
-    
-      $('.o-chart-results-list-row-container').each((i, elem) => {
-        const title = $(elem).find('h3#title-of-a-story').first().text().trim();
-        const artist = $(elem).find('span.c-label').first().text().trim();
-        const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
-    
-        if (title && artist) {
+          }
+        });
+        
+        const $ = cheerio.load(data);
+        
+        const chartItems = [];
+        
+        $('.o-chart-results-list-row-container').each((i, elem) => {
+          if (i >= 30) return false; // Limit to 30 songs
+          const title = $(elem).find('h3#title-of-a-story').first().text().trim();
+          const artist = $(elem).find('span.c-label').first().text().trim();
+          const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
+        
+          if (title && artist) {
           chartItems.push({ title, artist, image });
+          }
+        });
+        
+        return res.status(200).json(chartItems);
+        
+        } catch (error) {
+        console.error('Error fetching chart data:', error.message);
+        return res.status(500).json({ error: 'Failed to fetch top songs' });
         }
-      });
-    
-      console.log(chartItems);
-      return res.status(200).json(chartItems);
-      
-    } catch (error) {
-      console.error('Error fetching chart data:', error.message);
-    }
-    
-    }
-    else {
+        
+      }
+      else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
   } catch (error) {
