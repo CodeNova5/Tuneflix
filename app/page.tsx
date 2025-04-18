@@ -39,27 +39,32 @@ export default function HomePage() {
 
   return (
     <div className="p-4 bg-gray-900 text-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">Billboard Global 200</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <h1 className="text-3xl font-bold mb-4">Billboard Global 200</h1>
+    
+    <div className="overflow-x-auto">
+      <div
+        className="grid grid-rows-5 auto-cols-[minmax(200px,1fr)] grid-flow-col gap-4"
+        style={{ maxHeight: 'calc(5 * 16rem)' }} // adjust row height here if needed
+      >
         {songs.map((song, idx) => (
           <Link
             key={idx}
             href={`/music/${getFirstArtist(song.artist)}/song/${song.title}`}
           >
-            <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer">
+            <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-48">
               <img
                 src={song.image}
                 alt={song.title}
                 className="w-full h-48 object-cover rounded"
               />
               <h2 className="font-semibold mt-2">{song.title}</h2>
-              <p className="text-gray-400">
-               {song.artist}
-              </p>
+              <p className="text-gray-400">{song.artist}</p>
             </div>
           </Link>
         ))}
       </div>
     </div>
+  </div>
+  
   );
 }
