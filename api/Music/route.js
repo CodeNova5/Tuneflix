@@ -518,7 +518,41 @@ export default async function handler(req, res) {
         console.error('Error fetching chart data:', error.message);
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
+    }
 
+    else if (type === "topArtists") {
+      const url = 'https://www.billboard.com/charts/artist-100/';
+
+      try {
+        const { data } = await axios.get(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0'
+          }
+        });
+      
+        const $ = cheerio.load(data);
+        const artists = [];
+      
+        $('.o-chart-results-list-row-container').each((i, elem) => {
+          const rank = i + 1;
+      
+          const artistName = $(elem)
+            .find('span.c-label.a-no-trucate.a-font-primary-s')
+            .first()
+            .text()
+            .trim();
+      
+          const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
+      
+          if (artistName) {
+            artists.push({ rank, artist: artistName, image });
+          }
+        });
+      
+        return res.status(200).json(artists);
+      } catch (error) {
+        console.error('Error fetching Artist 100 data:', error.message);
+      }
     }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
