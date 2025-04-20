@@ -527,7 +527,9 @@ export default async function handler(req, res) {
       console.log("playlistId", playlistId);
       const options = {
         method: 'GET',
-        url: 'https://deezerdevs-deezer.p.rapidapi.com/playlist/${playlistId}',
+        url: `https://deezerdevs-deezer.p.rapidapi.com/playlist/${encodeURIComponent(
+              playlistId
+            )}`,
         headers: {
           'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
           'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
