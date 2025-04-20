@@ -11,7 +11,7 @@ interface ChartItem {
 interface PopTrack {
   id: number;
   title: string;
-  artist: string;
+  artist: { name: string };
   album: { cover_medium: string };
 }
 
@@ -41,20 +41,20 @@ export default function HomePage() {
 
   useEffect(() => {
     async function fetchPopTracks() {
-      try {
-        const response = await fetch(`/api/Music/route?type=popSongs`);
-        if (!response.ok) throw new Error("Failed to fetch pop tracks");
-        const data = await response.json();
-        setPopTracks(data.tracks.data); // Ensure this matches the API response structure
-        console.log(data.tracks.data); // Log the data to check its structure
-      } catch (err: any) {
-        console.error(err.message);
-        setError(err.message);
-      }
+        try {
+            const response = await fetch(`/api/Music/route?type=popSongs`);
+            if (!response.ok) throw new Error("Failed to fetch pop tracks");
+            const data = await response.json();
+            setPopTracks(data.tracks.data); // Ensure this matches the API response structure
+            console.log(data.tracks.data); // Log the data to check its structure
+          } catch (err: any) {
+            console.error(err.message);
+            setError(err.message);
+        }
     }
 
     fetchPopTracks();
-  }, []);
+}, []);
 
 
   if (error) {
@@ -86,10 +86,10 @@ export default function HomePage() {
       </div>
       <h1 className="text-3xl font-bold mb-4">Pop Tracks</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {Array.isArray(popTracks) && popTracks.map((track) => (
+        {popTracks.map((track) => (
           <Link
             key={track.id}
-            href={`/music/${encodeURIComponent(track.artist)}/song/${encodeURIComponent(track.title)}`}
+            href={`/music/${encodeURIComponent(track.artist.name)}/song/${encodeURIComponent(track.title)}`}
           >
             <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer">
               <img
@@ -98,7 +98,7 @@ export default function HomePage() {
                 className="w-full h-48 object-cover rounded"
               />
               <h2 className="font-semibold mt-2">{track.title}</h2>
-              <p className="text-gray-400">{track.artist}</p>
+              <p className="text-gray-400">{track.artist.name}</p>
             </div>
           </Link>
         ))}
