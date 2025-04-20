@@ -8,12 +8,7 @@ interface ChartItem {
   artist: string;
   image: string;
 }
-interface PopTrack {
-  id: number;
-  title: string;
-  artist: { name: string };
-  album: { cover_medium: string };
-}
+
 
 const items = [
   {
@@ -43,7 +38,7 @@ const items = [
 export default function HomePage() {
   const [songs, setSongs] = useState<ChartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [popTracks, setPopTracks] = useState<PopTrack[]>([]);
+
 
   useEffect(() => {
     async function fetchTopSongs() {
@@ -64,23 +59,7 @@ export default function HomePage() {
     return artist.split(/[,&]|feat(?:uring)?|\sX\s|\svs\.?\s/i)[0].trim();
   };
 
-  useEffect(() => {
-    async function fetchPopTracks() {
-        try {
-            const response = await fetch(`/api/Music/route?type=popSongs`);
-            if (!response.ok) throw new Error("Failed to fetch pop tracks");
-            const data = await response.json();
-            setPopTracks(data.tracks.data); // Ensure this matches the API response structure
-            console.log(data.tracks.data); // Log the data to check its structure
-          } catch (err: any) {
-            console.error(err.message);
-            setError(err.message);
-        }
-    }
-
-    fetchPopTracks();
-}, []);
-
+  
 
   if (error) {
     return <h1>Error: {error}</h1>;
@@ -109,25 +88,7 @@ export default function HomePage() {
           ))}
         </div>
       </div>
-      <h1 className="text-3xl font-bold mb-4">Pop Tracks</h1>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {popTracks.map((track) => (
-          <Link
-            key={track.id}
-            href={`/music/${encodeURIComponent(track.artist.name)}/song/${encodeURIComponent(track.title)}`}
-          >
-            <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer">
-              <img
-                src={track.album.cover_medium}
-                alt={track.title}
-                className="w-full h-48 object-cover rounded"
-              />
-              <h2 className="font-semibold mt-2">{track.title}</h2>
-              <p className="text-gray-400">{track.artist.name}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
+     
       
 
     <div className="overflow-x-auto">
