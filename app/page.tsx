@@ -13,10 +13,10 @@ interface ChartItem {
 const items = [
   {
     id: 1,
-    link: "#",
-    image: "https://via.placeholder.com/150",
-    title: "Item One",
-    text: "This is the description of item one.",
+    link: "/music/playlists/2228601362",
+    image: "pop.jpg",
+    title: "Fresh Pop",
+    text: "Discover the best releases with our fresh pop selection.",
   },
   {
     id: 2,
@@ -94,19 +94,17 @@ export default function HomePage() {
     <div className="overflow-x-auto">
       <div className="flex space-x-4 p-4">
         {items.map((item) => (
-          <a
-            key={item.id}
-            href={item.link}
-            className="min-w-[200px] bg-white rounded-2xl shadow hover:shadow-lg transition p-4 flex-shrink-0"
-          >
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full h-32 object-cover rounded-lg"
-            />
-            <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
-            <p className="text-sm text-gray-600">{item.text}</p>
-          </a>
+          <Link key={item.id} href={item.link}>
+            <div className="min-w-[200px] bg-white rounded-2xl shadow hover:shadow-lg transition p-4 flex-shrink-0 cursor-pointer">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-32 object-cover rounded-lg"
+              />
+              <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
+              <p className="text-sm text-gray-600">{item.text}</p>
+            </div>
+          </Link>
         ))}
       </div>
     </div>
