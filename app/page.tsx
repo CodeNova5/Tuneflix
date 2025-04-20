@@ -99,7 +99,7 @@ export default function HomePage() {
               <img
                 src={item.image}
                 alt={item.title}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-48 object-cover rounded"
               />
               <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
               <p className="text-sm text-gray-600">{item.text}</p>
