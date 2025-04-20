@@ -531,8 +531,13 @@ export default async function handler(req, res) {
       };
       try {
         const response = await axios.request(options);
-        console.log(response.data);
+        const tracks = response.data.tracks.data;
 
+        // Log only the track titles
+        tracks.forEach(track => {
+          console.log(`Track: ${track.title}, Artist: ${track.artist.name}`);
+        });
+        console.log(response.tracks);
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(response.data);
       } catch (error) {
