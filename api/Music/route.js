@@ -524,9 +524,10 @@ export default async function handler(req, res) {
       if (!playlistId) {
         return res.status(400).json({ error: "Missing playlist ID" });
       }
+      console.log("playlistId", playlistId);
       const options = {
         method: 'GET',
-        url: 'https://deezerdevs-deezer.p.rapidapi.com/playlist/2228601362',
+        url: 'https://deezerdevs-deezer.p.rapidapi.com/playlist/${playlistId}',
         headers: {
           'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
           'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
