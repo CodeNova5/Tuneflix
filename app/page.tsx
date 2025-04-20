@@ -15,6 +15,31 @@ interface PopTrack {
   album: { cover_medium: string };
 }
 
+const items = [
+  {
+    id: 1,
+    link: "#",
+    image: "https://via.placeholder.com/150",
+    title: "Item One",
+    text: "This is the description of item one.",
+  },
+  {
+    id: 2,
+    link: "#",
+    image: "https://via.placeholder.com/150",
+    title: "Item Two",
+    text: "This is the description of item two.",
+  },
+  {
+    id: 3,
+    link: "#",
+    image: "https://via.placeholder.com/150",
+    title: "Item Three",
+    text: "This is the description of item three.",
+  },
+];
+
+
 export default function HomePage() {
   const [songs, setSongs] = useState<ChartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +128,28 @@ export default function HomePage() {
           </Link>
         ))}
       </div>
+      
+
+    <div className="overflow-x-auto">
+      <div className="flex space-x-4 p-4">
+        {items.map((item) => (
+          <a
+            key={item.id}
+            href={item.link}
+            className="min-w-[200px] bg-white rounded-2xl shadow hover:shadow-lg transition p-4 flex-shrink-0"
+          >
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
+            <p className="text-sm text-gray-600">{item.text}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+
     </div>
 
   );
