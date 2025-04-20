@@ -520,40 +520,26 @@ export default async function handler(req, res) {
       }
     }
 
-    else if (type === "topArtists") {
-      const url = 'https://www.billboard.com/charts/artist-100/';
-
-      try {
-        const { data } = await axios.get(url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0'
-          }
-        });
-      
-        const $ = cheerio.load(data);
-        const artists = [];
-      
-        $('.o-chart-results-list-row-container').each((i, elem) => {
-          const rank = i + 1;
-      
-          const artistName = $(elem)
-            .find('span.c-label.a-no-trucate.a-font-primary-s')
-            .first()
-            .text()
-            .trim();
-      
-          const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
-      
-          if (artistName) {
-            artists.push({ rank, artist: artistName, image });
-          }
-        });
-      
-        return res.status(200).json(artists);
-      } catch (error) {
-        console.error('Error fetching Artist 100 data:', error.message);
+   else if (type === "popSongs") {
+    const options = {
+      method: 'GET',
+      url: 'https://deezerdevs-deezer.p.rapidapi.com/playlist/2228601362',
+      headers: {
+        'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
+        'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
       }
-    }
+    };
+    
+      try {
+        const response = await axios.request(options);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    
+    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+    return res.status(200).json(response.data);
+  }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
