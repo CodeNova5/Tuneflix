@@ -10,12 +10,17 @@ const options = {
 };
 
 async function fetchData() {
-	try {
-		const response = await axios.request(options);
-		console.log(response.data);
-	} catch (error) {
-		console.error(error);
-	}
+  try {
+    const response = await axios.request(options);
+    const tracks = response.data.tracks.data;
+
+    // Log only the track titles
+    tracks.forEach(track => {
+      console.log(`Track: ${track.title}, Artist: ${track.artist.name}`);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 fetchData();

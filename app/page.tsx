@@ -45,7 +45,7 @@ export default function HomePage() {
         const response = await fetch(`/api/Music/route?type=popSongs`);
         if (!response.ok) throw new Error("Failed to fetch pop tracks");
         const data = await response.json();
-        setPopTracks(data.tracks.data); // Adjust based on the API response structure
+        setPopTracks(data); // Adjust based on the API response structure
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);

@@ -498,7 +498,7 @@ export default async function handler(req, res) {
         const chartItems = [];
 
         $('.o-chart-results-list-row-container').each((i, elem) => {
-      
+
           const title = $(elem).find('h3#title-of-a-story').first().text().trim();
           // More accurate selector for artist name
           const artist = $(elem)
@@ -520,26 +520,26 @@ export default async function handler(req, res) {
       }
     }
 
-   else if (type === "popSongs") {
-    const options = {
-      method: 'GET',
-      url: 'https://deezerdevs-deezer.p.rapidapi.com/playlist/2228601362',
-      headers: {
-        'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
-        'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
-      }
-    };
-    
+    else if (type === "popSongs") {
+      const options = {
+        method: 'GET',
+        url: 'https://deezerdevs-deezer.p.rapidapi.com/playlist/2228601362',
+        headers: {
+          'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
+          'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
+        }
+      };
       try {
         const response = await axios.request(options);
         console.log(response.data);
+
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(response.data);
       } catch (error) {
         console.error(error);
+        return res.status(500).json({ error: 'Failed to fetch pop songs' });
       }
-    
-    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-    return res.status(200).json(response.data);
-  }
+    }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
