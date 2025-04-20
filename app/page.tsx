@@ -95,7 +95,7 @@ export default function HomePage() {
       <div className="flex space-x-4 p-4">
         {items.map((item) => (
           <Link key={item.id} href={item.link}>
-            <div className="min-w-[200px] bg-white rounded-2xl shadow hover:shadow-lg transition p-4 flex-shrink-0 cursor-pointer">
+            <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
               <img
                 src={item.image}
                 alt={item.title}
