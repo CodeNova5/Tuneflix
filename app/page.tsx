@@ -45,7 +45,8 @@ export default function HomePage() {
         const response = await fetch(`/api/Music/route?type=popSongs`);
         if (!response.ok) throw new Error("Failed to fetch pop tracks");
         const data = await response.json();
-        setPopTracks(data); // Adjust based on the API response structure
+        setPopTracks(data.tracks.data); // Ensure this matches the API response structure
+        console.log(data.tracks.data); // Log the data to check its structure
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
@@ -54,6 +55,7 @@ export default function HomePage() {
 
     fetchPopTracks();
   }, []);
+
 
   if (error) {
     return <h1>Error: {error}</h1>;
@@ -84,7 +86,7 @@ export default function HomePage() {
       </div>
       <h1 className="text-3xl font-bold mb-4">Pop Tracks</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {popTracks.map((track) => (
+        {Array.isArray(popTracks) && popTracks.map((track) => (
           <Link
             key={track.id}
             href={`/music/${encodeURIComponent(track.artist)}/song/${encodeURIComponent(track.title)}`}
