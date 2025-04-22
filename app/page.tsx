@@ -13,17 +13,38 @@ interface ChartItem {
 const items = [
   {
     id: 1,
-    link: "/music/playlists/2228601362",
+    link: "/music/playlist/2228601362",
     image: "pop.jpg",
     title: "Fresh Pop",
     text: "Discover the best releases with our fresh pop selection.",
   },
   {
     id: 2,
+    link: "/music/playlist/706093725",
+    image: "edm.jpg",
+    title: "Dance & EDM",
+    text: "Feel the beat with our dance and EDM playlist.",
+  },
+  {
+    id: 3,
     link: "#",
     image: "https://via.placeholder.com/150",
-    title: "Item Two",
-    text: "This is the description of item two.",
+    title: "Item Three",
+    text: "This is the description of item three.",
+  },
+  {
+    id: 3,
+    link: "#",
+    image: "https://via.placeholder.com/150",
+    title: "Item Three",
+    text: "This is the description of item three.",
+  },
+  {
+    id: 3,
+    link: "#",
+    image: "https://via.placeholder.com/150",
+    title: "Item Three",
+    text: "This is the description of item three.",
   },
   {
     id: 3,
@@ -103,7 +124,7 @@ export default function HomePage() {
                 />
 
                 <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
-                <p className="text-sm text-gray-600">{item.text}</p>
+                <p className="text-sm text-gray-200">{item.text}</p>
               </div>
             </Link>
           ))}
