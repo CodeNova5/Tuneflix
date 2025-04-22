@@ -368,7 +368,7 @@ export default function Page() {
       <a
         download={
           downloadUrl
-            ? `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`
+            ? `${track?.artists[0]?.name.replace(/ /g, "-")}_-_${track?.name.replace(/ /g, "-")}.mp3`
             : undefined
         }
         onClick={async (e) => {
@@ -409,7 +409,7 @@ export default function Page() {
             // Auto-trigger the download
             const link = document.createElement("a");
             link.href = downloadUrl;
-            link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_${track?.name.replace(/ /g, "-")}.mp3`;
+            link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_-_${track?.name.replace(/ /g, "-")}.mp3`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

@@ -59,7 +59,7 @@ export default function HomePage() {
     return artist.split(/[,&]|feat(?:uring)?|\sX\s|\svs\.?\s/i)[0].trim();
   };
 
-  
+
 
   if (error) {
     return <h1>Error: {error}</h1>;
@@ -88,26 +88,27 @@ export default function HomePage() {
           ))}
         </div>
       </div>
-     
-      
 
-    <div className="overflow-x-auto">
-      <div className="flex space-x-4 p-4">
-        {items.map((item) => (
-          <Link key={item.id} href={item.link}>
-            <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-48 object-cover rounded"
-              />
-              <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
-              <p className="text-sm text-gray-600">{item.text}</p>
-            </div>
-          </Link>
-        ))}
+
+
+      <div className="overflow-x-auto">
+        <div className="flex space-x-4 p-4">
+          {items.map((item) => (
+            <Link key={item.id} href={item.link}>
+              <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-48 object-contain rounded bg-black"
+                />
+
+                <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
+                <p className="text-sm text-gray-600">{item.text}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
 
     </div>
 
