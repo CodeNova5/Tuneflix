@@ -58,7 +58,7 @@ async function getArtistAccessToken() {
 }
 export default async function handler(req, res) {
   try {
-    const { type, artistName, songName, artistId, albumId, playlistId } = req.query;
+    const { type, artistName, songName, artistId, albumId, playlistId, playlistType } = req.query;
 
     if (!type) {
       return res.status(400).json({ error: "Missing type parameter (spotify or youtube)" });
@@ -524,32 +524,62 @@ export default async function handler(req, res) {
       if (!playlistId) {
         return res.status(400).json({ error: "Missing playlist ID" });
       }
-      console.log("playlistId", playlistId);
-      const options = {
-        method: 'GET',
-        url: `https://deezerdevs-deezer.p.rapidapi.com/playlist/${encodeURIComponent(
-              playlistId
-            )}`,
-        headers: {
-          'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
-          'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
-        }
-      };
-      try {
-        const response = await axios.request(options);
-        const tracks = response.data.tracks.data;
-
-        // Log only the track titles
-        tracks.forEach(track => {
-          console.log(`Track: ${track.title}, Artist: ${track.artist.name}`);
-        });
-        console.log(response.tracks);
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(response.data);
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Failed to fetch pop songs' });
+      if (!playlistType) {
+        return res.status(400).json({ error: "Missing playlist type" });
       }
+      if (playlistType !== "spotify" && playlistType !== "deezer") {
+        return res.status(400).json({ error: "Invalid playlist type" });
+      }
+      if (playlistType === "spotify") {
+       
+        const accessToken = await getSpotifyAccessToken();
+        const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch Spotify playlist tracks");
+        }
+
+        const data = await response.json();
+        if (!data.items?.length) {
+          return res.status(404).json({ error: "No tracks found in this playlist" });
+        }
+        console.log(data);
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(data.items);
+      }
+      
+      console.log("playlistId", playlistId || "playlistType", playlistType);
+      if (type === "deezer") {
+        const options = {
+          method: 'GET',
+          url: `https://deezerdevs-deezer.p.rapidapi.com/playlist/${encodeURIComponent(
+                playlistId
+              )}`,
+          headers: {
+            'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
+            'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
+          }
+        };
+        try {
+          const response = await axios.request(options);
+          const tracks = response.data.tracks.data;
+  
+          // Log only the track titles
+          tracks.forEach(track => {
+            console.log(`Track: ${track.title}, Artist: ${track.artist.name}`);
+          });
+          console.log(response.tracks);
+          res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+          return res.status(200).json(response.data);
+        } catch (error) {
+          console.error(error);
+          return res.status(500).json({ error: 'Failed to fetch pop songs' });
+        }
+      }
+     
     }
     else {
       return res.status(400).json({ error: "Invalid type parameter" });

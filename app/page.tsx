@@ -140,7 +140,154 @@ const genre = [
   }
 ];
 
+const mood = [
+  {
+    id: 1,
+    link: "/music/playlist/1479458365",
+    image: "happy.jpg",
+    title: "Happy",
+    text: "Feel the joy with our happy playlist.",
+  },
+  {
+    id: 2,
+    link: "/music/playlist/1910358422",
+    image: "sad.jpg",
+    title: "Sad",
+    text: "Embrace the emotions with our sad playlist.",
+  },
+  {
+    id: 3,
+    link: "/music/playlist/1976454162",
+    image: "chill.jpg",
+    title: "Chill",
+    text: "Relax and unwind with our chill playlist.",
+  },
+  {
+    id: 4,
+    link: "/music/playlist/11081408402",
+    image: "self-love.jpg",
+    title: "Self-love",
+    text: "Embrace yourself with our badass self-love playlist (IDGAF).",
 
+  },
+  {
+    id: 5,
+    link: "/music/playlist/5163340024",
+    image: "romantic.jpg",
+    title: "Romantic",
+    text: "Set the mood with our romantic playlist.",
+  },
+  {
+    id: 6,
+    link: "/music/playlist/2097558104",
+    image: "party.jpg",
+    title: "Party",
+    text: "Get the party started with our upbeat playlist.",
+  },
+  {
+    id: 7,
+    link: "/music/playlist/2153050122",
+    image: "workout.jpg",
+    title: "Workout",
+    text: "Stay motivated with our workout playlist.",
+  },
+  {
+    id: 8,
+    link: "/music/playlist/1306085715",
+    image: "focus.jpg",
+    title: "Focus",
+    text: "Concentrate better with our focus playlist.",
+  },
+  {
+    id: 9,
+    link: "/music/playlist/733113466",
+    image: "sleep.jpg",
+    title: "Sleep",
+    text: "Drift off to sleep with our calming playlist.",
+  },
+  {
+    id: 10,
+    link: "/music/playlist/10746894082",
+    image: "gaming.jpg",
+    title: "Gaming",
+    text: "Get in the zone with our Phonk gaming playlist.",
+     }
+
+
+];
+
+const animeVerse = [
+   {
+    id: 1,
+    link: "/music/playlist/10165025962",
+    image: "aot.jpg",
+    title: "Attack on Titan",
+    text: "Experience the epic soundtrack of Attack on Titan.",
+  },
+  {
+    id: 2,
+    link: "/music/playlist/6595233144",
+    image: "studio-ghilbli.jpg",
+    title: "Studio Ghibli",
+    text: "Immerse yourself in the magical world of Studio Ghibli.",
+  },
+  {
+    id: 3,
+    link: "/music/playlist/10161850462",
+    image: "naruto.jpg",
+    title: "Naruto",
+    text: "Feel the nostalgia with Naruto's iconic soundtrack.",
+  },
+  {
+    id: 4,
+    link: "/music/playlist/8582178942",
+    image: "demon-slayer.jpg",
+    title: "Demon Slayer",
+    text: "Dive into the world of Demon Slayer with its stunning soundtrack.",
+
+
+  },
+  {
+    id: 5,
+    link: "/music/playlist/12640810163",
+    image: "one-piece.jpg",
+    title: "One Piece",
+    text: "Set sail with the adventurous soundtrack of One Piece.",
+
+  },
+  {
+    id: 6,
+    link: "/music/playlist/10707145982",
+    image: "bleach.jpg",
+    title: "Bleach",
+    text: "Experience the intense battles with Bleach's soundtrack.",
+
+  },
+  {
+    id: 7,
+    link: "/music/playlist/2153050122",
+    image: "workout.jpg",
+    title: "Workout",
+    text: "Stay motivated with our workout playlist.",
+  },
+  {
+    id: 8,
+    link: "/music/playlist/1306085715",
+    image: "focus.jpg",
+    title: "Focus",
+    text: "Concentrate better with our focus playlist.",
+  },
+  {
+    id: 9,
+    link: "/music/playlist/733113466",
+    image: "sleep.jpg",
+    title: "Sleep",
+    text: "Drift off to sleep with our calming playlist.",
+  },
+
+
+
+];
 export default function HomePage() {
   const [songs, setSongs] = useState<ChartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
