@@ -24,35 +24,60 @@ export default function HomePage() {
   const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetails | null>(null);
 
   useEffect(() => {
-    async function fetchPlaylistData() {
+    async function fetchPlaylistDetails() {
+      try {
+        const response = await fetch(
+          `/api/Music/route?type=playlistDetails&playlistId=${playlistId}&playlistType=${playlistType}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch playlist details");
+        const data = await response.json();
+        setPlaylistDetails({
+          name: data.name,
+          image: data.image,
+        });
+      } catch (err: any) {
+        console.error(err.message);
+        setError(err.message);
+      }
+    }
+
+    async function fetchDeezerTracks() {
       try {
         const response = await fetch(
           `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=${playlistType}`
         );
-        if (!response.ok) throw new Error("Failed to fetch playlist data");
+        if (!response.ok) throw new Error("Failed to fetch Deezer tracks");
         const data = await response.json();
+        setTracks(data.tracks.data); // Adjust based on Deezer API response structure
+        setPlaylistDetails({
+          name: data.playlistDetails.name,
+          image: data.playlistDetails.image,
+        });
+      } catch (err: any) {
+        console.error(err.message);
+        setError(err.message);
+      }
+    }
 
-        // Extract playlist details and tracks from the response
-        if (playlistType === "deezer") {
-          setPlaylistDetails({
-            name: data.title, // Adjust based on Deezer API response structure
-            image: data.picture_medium, // Adjust based on Deezer API response structure
-          });
-          setTracks(data.tracks.data); // Adjust based on Deezer API response structure
-        } else if (playlistType === "spotify") {
-          setPlaylistDetails({
-            name: data.name, // Adjust based on Spotify API response structure
-            image: data.images[0]?.url || "/placeholder.jpg", // Adjust based on Spotify API response structure
-          });
-          setTracks(
-            data.tracks.items.map((item: any) => ({
-              id: item.track.id,
-              title: item.track.name,
-              artist: { name: item.track.artists[0]?.name || "Unknown Artist" },
-              album: { cover_medium: item.track.album.images[0]?.url || "/placeholder.jpg" },
-            }))
-          ); // Normalize Spotify API response
-        }
+    async function fetchSpotifyTracks() {
+      try {
+        const response = await fetch(
+          `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=${playlistType}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch Spotify tracks");
+        const data = await response.json();
+        setTracks(
+          data.map((item: any) => ({
+            id: item.track.id,
+            title: item.track.name,
+            artist: { name: item.track.artists[0]?.name || "Unknown Artist" },
+            album: { cover_medium: item.track.album.images[0]?.url || "/placeholder.jpg" },
+          }))
+        ); // Normalize Spotify API response
+        setPlaylistDetails({
+          name: data.playlistDetails.name,
+          image: data.playlistDetails.image,
+        });
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
@@ -60,7 +85,14 @@ export default function HomePage() {
     }
 
     if (playlistId && playlistType) {
-      fetchPlaylistData();
+      fetchPlaylistDetails();
+      if (playlistType === "deezer") {
+        fetchDeezerTracks();
+      } else if (playlistType === "spotify") {
+        fetchSpotifyTracks();
+      } else {
+        setError("Invalid playlist type");
+      }
     } else {
       setError("Missing playlist ID or type");
     }

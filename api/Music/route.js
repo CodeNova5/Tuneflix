@@ -519,7 +519,6 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
     }
-
     else if (type === "playlist") {
       if (!playlistId) {
         return res.status(400).json({ error: "Missing playlist ID" });
@@ -530,57 +529,76 @@ export default async function handler(req, res) {
       if (playlistType !== "spotify" && playlistType !== "deezer") {
         return res.status(400).json({ error: "Invalid playlist type" });
       }
+    
       if (playlistType === "spotify") {
-       
         const accessToken = await getSpotifyAccessToken();
-        const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+        const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
         const response = await fetch(apiUrl, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-
+    
         if (!response.ok) {
-          throw new Error("Failed to fetch Spotify playlist tracks");
+          throw new Error("Failed to fetch Spotify playlist details");
         }
-
+    
         const data = await response.json();
-        if (!data.items?.length) {
+        if (!data.tracks?.items?.length) {
           return res.status(404).json({ error: "No tracks found in this playlist" });
         }
-        console.log(data);
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(data.items);
-      }
-      
-      console.log("playlistId", playlistId || "playlistType", playlistType);
-      if (type === "deezer") {
-        const options = {
-          method: 'GET',
-          url: `https://deezerdevs-deezer.p.rapidapi.com/playlist/${encodeURIComponent(
-                playlistId
-              )}`,
-          headers: {
-            'x-rapidapi-key': '67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302',
-            'x-rapidapi-host': 'deezerdevs-deezer.p.rapidapi.com'
-          }
+    
+        const playlistDetails = {
+          name: data.name,
+          image: data.images[0]?.url || "/placeholder.jpg",
         };
+    
+        const tracks = data.tracks.items.map((item) => ({
+          id: item.track.id,
+          title: item.track.name,
+          artist: { name: item.track.artists[0]?.name || "Unknown Artist" },
+          album: { cover_medium: item.track.album.images[0]?.url || "/placeholder.jpg" },
+        }));
+    
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json({ playlistDetails, tracks });
+      }
+    
+      if (playlistType === "deezer") {
+        const options = {
+          method: "GET",
+          url: `https://deezerdevs-deezer.p.rapidapi.com/playlist/${encodeURIComponent(
+            playlistId
+          )}`,
+          headers: {
+            "x-rapidapi-key": "67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302",
+            "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
+          },
+        };
+    
         try {
           const response = await axios.request(options);
-          const tracks = response.data.tracks.data;
-  
-          // Log only the track titles
-          tracks.forEach(track => {
-            console.log(`Track: ${track.title}, Artist: ${track.artist.name}`);
-          });
-          console.log(response.tracks);
+          const data = response.data;
+    
+          const playlistDetails = {
+            name: data.title,
+            image: data.picture_medium,
+          };
+    
+          const tracks = data.tracks.data.map((track) => ({
+            id: track.id,
+            title: track.title,
+            artist: { name: track.artist.name },
+            album: { cover_medium: track.album.cover_medium },
+          }));
+    
           res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-          return res.status(200).json(response.data);
+          return res.status(200).json({ playlistDetails, tracks });
         } catch (error) {
           console.error(error);
-          return res.status(500).json({ error: 'Failed to fetch pop songs' });
+          return res.status(500).json({ error: "Failed to fetch Deezer playlist details" });
         }
       }
-     
     }
+  
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
