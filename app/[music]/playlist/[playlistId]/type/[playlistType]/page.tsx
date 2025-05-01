@@ -72,9 +72,9 @@ export default function HomePage() {
     }
 
     if (playlistId && playlistType) {
-      if (playlistType === "deezer") {
+      if (playlistType === "dz") {
         fetchDeezerTracks();
-      } else if (playlistType === "spotify") {
+      } else if (playlistType === "sp") {
         fetchSpotifyTracks();
       } else {
         setError("Invalid playlist type");

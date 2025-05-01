@@ -526,11 +526,11 @@ export default async function handler(req, res) {
       if (!playlistType) {
         return res.status(400).json({ error: "Missing playlist type" });
       }
-      if (playlistType !== "spotify" && playlistType !== "deezer") {
+      if (playlistType !== "sp" && playlistType !== "dz") {
         return res.status(400).json({ error: "Invalid playlist type" });
       }
     
-      if (playlistType === "spotify") {
+      if (playlistType === "sp") {
         const accessToken = await getSpotifyAccessToken();
         const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
         const response = await fetch(apiUrl, {
@@ -562,7 +562,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ playlistDetails, tracks });
       }
     
-      if (playlistType === "deezer") {
+      if (playlistType === "dz") {
         const options = {
           method: "GET",
           url: `https://deezerdevs-deezer.p.rapidapi.com/playlist/${encodeURIComponent(
