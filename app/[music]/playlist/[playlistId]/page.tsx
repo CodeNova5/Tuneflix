@@ -21,7 +21,7 @@ export default function HomePage() {
     async function fetchDeezerTracks() {
       try {
         const response = await fetch(
-          `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=deezer`
+          `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=${playlistType}`
         );
         if (!response.ok) throw new Error("Failed to fetch Deezer tracks");
         const data = await response.json();
@@ -35,7 +35,7 @@ export default function HomePage() {
     async function fetchSpotifyTracks() {
       try {
         const response = await fetch(
-          `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=spotify`
+          `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=${playlistType}`
         );
         if (!response.ok) throw new Error("Failed to fetch Spotify tracks");
         const data = await response.json();
