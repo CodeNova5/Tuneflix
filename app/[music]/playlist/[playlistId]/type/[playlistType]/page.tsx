@@ -24,22 +24,6 @@ export default function HomePage() {
   const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetails | null>(null);
 
   useEffect(() => {
-    async function fetchPlaylistDetails() {
-      try {
-        const response = await fetch(
-          `/api/Music/route?type=playlistDetails&playlistId=${playlistId}&playlistType=${playlistType}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch playlist details");
-        const data = await response.json();
-        setPlaylistDetails({
-          name: data.name,
-          image: data.image,
-        });
-      } catch (err: any) {
-        console.error(err.message);
-        setError(err.message);
-      }
-    }
 
     async function fetchDeezerTracks() {
       try {
@@ -85,7 +69,6 @@ export default function HomePage() {
     }
 
     if (playlistId && playlistType) {
-      fetchPlaylistDetails();
       if (playlistType === "deezer") {
         fetchDeezerTracks();
       } else if (playlistType === "spotify") {
