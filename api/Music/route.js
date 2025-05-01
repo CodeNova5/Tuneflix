@@ -538,7 +538,7 @@ export default async function handler(req, res) {
         });
     
         if (!response.ok) {
-          throw new Error("Failed to fetch Spotify playlist details");
+          return res.status(500).json({ error: "Failed to fetch Spotify playlist details" });
         }
     
         const data = await response.json();

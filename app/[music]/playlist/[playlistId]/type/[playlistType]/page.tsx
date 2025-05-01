@@ -50,14 +50,17 @@ export default function HomePage() {
         );
         if (!response.ok) throw new Error("Failed to fetch Spotify tracks");
         const data = await response.json();
+    
+        // Ensure tracks are mapped from data.tracks
         setTracks(
-          data.map((item: any) => ({
-            id: item.track.id,
-            title: item.track.name,
-            artist: { name: item.track.artists[0]?.name || "Unknown Artist" },
-            album: { cover_medium: item.track.album.images[0]?.url || "/placeholder.jpg" },
+          data.tracks.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            artist: { name: item.artist.name },
+            album: { cover_medium: item.album.cover_medium },
           }))
-        ); // Normalize Spotify API response
+        );
+    
         setPlaylistDetails({
           name: data.playlistDetails.name,
           image: data.playlistDetails.image,
