@@ -33,10 +33,11 @@ export default function HomePage() {
         if (!response.ok) throw new Error("Failed to fetch Deezer tracks");
         const data = await response.json();
         console.log("Deezer API Response:", data);
-        // Check if tracks data exists before mapping
-        if (data.tracks && data.tracks.data) {
+    
+        // Map over the tracks array directly
+        if (data.tracks && Array.isArray(data.tracks)) {
           setTracks(
-            data.tracks.data.map((track: any) => ({
+            data.tracks.map((track: any) => ({
               id: track.id,
               title: track.title,
               artist: { name: track.artist.name },
@@ -46,12 +47,11 @@ export default function HomePage() {
         } else {
           setTracks([]); // Set an empty array if no tracks are found
         }
-      
+    
         setPlaylistDetails({
           name: data.playlistDetails.name,
           image: data.playlistDetails.image,
         });
-
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
