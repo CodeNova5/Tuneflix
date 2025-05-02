@@ -32,11 +32,26 @@ export default function HomePage() {
         );
         if (!response.ok) throw new Error("Failed to fetch Deezer tracks");
         const data = await response.json();
-        setTracks(data.tracks.data); // Adjust based on Deezer API response structure
+        console.log("Deezer API Response:", data);
+        // Check if tracks data exists before mapping
+        if (data.tracks && data.tracks.data) {
+          setTracks(
+            data.tracks.data.map((track: any) => ({
+              id: track.id,
+              title: track.title,
+              artist: { name: track.artist.name },
+              album: { cover_medium: track.album.cover_medium },
+            }))
+          );
+        } else {
+          setTracks([]); // Set an empty array if no tracks are found
+        }
+      
         setPlaylistDetails({
           name: data.playlistDetails.name,
           image: data.playlistDetails.image,
         });
+
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
