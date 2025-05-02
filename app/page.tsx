@@ -9,6 +9,10 @@ interface ChartItem {
   image: string;
 }
 
+interface Artist {
+  name: string;
+}
+
 const countrySongs = [
   {
     id: 1,
@@ -400,6 +404,7 @@ const animeVerse = [
 export default function HomePage() {
   const [songs, setSongs] = useState<ChartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [artists, setArtists] = useState<Artist[]>([]);
 
 
   useEffect(() => {
@@ -414,7 +419,19 @@ export default function HomePage() {
         setError(err.message);
       }
     }
+    async function fetchTopArtists() {
+      try {
+        const response = await fetch(`/api/Music/route?type=trendingArtists`);
+        if (!response.ok) throw new Error("Failed to fetch top artists");
+        const data = await response.json();
+        setArtists(data);
+      } catch (err: any) {
+        console.error(err.message);
+        setError(err.message);
+      }
+    }
 
+    fetchTopArtists();
     fetchTopSongs();
   }, []);
   const getFirstArtist = (artist: string): string => {
@@ -451,7 +468,16 @@ export default function HomePage() {
         </div>
       </div>
 
-
+      <h1 className="text-3xl font-bold mb-4">Top Artists</h1>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {artists.map((artist, idx) => (
+          <Link key={idx} href={`/music/${encodeURIComponent(artist.name)}`}>
+            <div className="border rounded-lg p-4 shadow-md bg-gray-800 cursor-pointer">
+              <h2 className="font-semibold text-lg">{artist.name}</h2>
+            </div>
+          </Link>
+        ))}
+      </div>
 
       <div className="overflow-x-auto">
         <h2 className="text-2xl font-bold mb-4">Genre</h2>

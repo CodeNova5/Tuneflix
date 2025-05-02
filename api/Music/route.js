@@ -519,6 +519,36 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
     }
+
+    else if (type === "trendingArtists") {
+      const url = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
+      try {
+        const { data } = await axios.get(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0'
+          }
+        });
+
+        const $ = cheerio.load(data);
+        const artists = [];
+
+        $('.o-chart-results-list__item .c-title').each((i, el) => {
+          const artist = $(el).text().trim();
+          if (artist && !artists.includes(artist)) {
+            artists.push(artist);
+          }
+          if (artists.length >= 20) return false; // break loop
+        });
+
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json(artists);
+
+      } catch (error) {
+        console.error('Error fetching artists:', error.message);
+        return res.status(500).json({ error: 'Failed to fetch trending artists' });
+      }
+    }
+
     else if (type === "playlist") {
       if (!playlistId) {
         return res.status(400).json({ error: "Missing playlist ID" });
