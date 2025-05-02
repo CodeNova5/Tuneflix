@@ -11,6 +11,7 @@ interface ChartItem {
 
 interface Artist {
   name: string;
+  image: string;
 }
 
 const countrySongs = [
@@ -425,7 +426,7 @@ export default function HomePage() {
         if (!response.ok) throw new Error("Failed to fetch top artists");
         const data = await response.json();
         console.log(data);
-        setArtists(data.map((artist: string) => ({ name: artist })));
+        setArtists(data.map((artist: { name: string; image: string }) => ({ name: artist.name, image: artist.image })));
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
@@ -469,15 +470,23 @@ export default function HomePage() {
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold mb-4">Top Artists</h1>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {artists.map((artist, idx) => (
-          <Link key={idx} href={`/music/${encodeURIComponent(artist.name)}`}>
-            <div className="border rounded-lg p-4 shadow-md bg-gray-800 cursor-pointer">
-              <h2 className="font-semibold text-lg">{artist.name}</h2>
-            </div>
-          </Link>
-        ))}
+
+      <div className="overflow-x-auto">
+        <h1 className="text-3xl font-bold mb-4">Top Artists</h1>
+        <div className="flex space-x-4 p-4">
+          {artists.map((artist, idx) => (
+            <Link key={idx} href={`/music/${encodeURIComponent(artist.name)}`}>
+              <div className="border w-24 h-24 rounded-full p-4 shadow-md bg-gray-800 cursor-pointer">
+                <img
+                  src={artist.image}
+                  alt={artist.name}
+                  className="w-full h-32 object-cover rounded mb-2"
+                />
+                <h2 className="font-semibold text-lg">{artist.name}</h2>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="overflow-x-auto">

@@ -519,23 +519,27 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
     }
-
-    else if (type === "trendingArtists") {
-      const url = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
-      try {
+      else if (type === "trendingArtists") {
+        const url = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
+        try {
         const { data } = await axios.get(url, {
           headers: {
-            'User-Agent': 'Mozilla/5.0'
+          'User-Agent': 'Mozilla/5.0'
           }
         });
 
         const $ = cheerio.load(data);
         const artists = [];
 
-        $('.o-chart-results-list__item .c-title').each((i, el) => {
-          const artist = $(el).text().trim();
-          if (artist && !artists.includes(artist)) {
-            artists.push(artist);
+        $('.o-chart-results-list__item').each((i, el) => {
+          const artistName = $(el).find('.c-title').text().trim();
+          const artistImage = $(el).find('img').attr('data-lazy-src') || $(el).find('img').attr('src');
+
+          if (artistName && !artists.some(artist => artist.name === artistName)) {
+          artists.push({
+            name: artistName,
+            image: artistImage || "/placeholder.jpg", // Fallback to placeholder if no image
+          });
           }
           if (artists.length >= 20) return false; // break loop
         });
@@ -543,13 +547,13 @@ export default async function handler(req, res) {
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(artists);
 
-      } catch (error) {
+        } catch (error) {
         console.error('Error fetching artists:', error.message);
         return res.status(500).json({ error: 'Failed to fetch trending artists' });
+        }
       }
-    }
 
-    else if (type === "playlist") {
+      else if (type === "playlist") {
       if (!playlistId) {
         return res.status(400).json({ error: "Missing playlist ID" });
       }
