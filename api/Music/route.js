@@ -521,7 +521,7 @@ export default async function handler(req, res) {
     }
 
     else if (type === "trendingArtists") {
-      const url = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
+      const URL = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
       try {
         const { data } = await axios.get(URL);
         const $ = cheerio.load(data);
