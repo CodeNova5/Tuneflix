@@ -11,7 +11,7 @@ interface ChartItem {
 
 interface Artist {
   name: string;
-  image: string;
+  img: string;
 }
 
 const countrySongs = [
@@ -426,7 +426,7 @@ export default function HomePage() {
         if (!response.ok) throw new Error("Failed to fetch top artists");
         const data = await response.json();
         console.log(data);
-        setArtists(data.map((artist: { name: string; image: string }) => ({ name: artist.name, image: artist.image })));
+        setArtists(data.map((artist: { name: string; img: string }) => ({ name: artist.name, img: artist.img })));
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
@@ -460,7 +460,7 @@ export default function HomePage() {
                 <img
                   src={song.image}
                   alt={song.title}
-                  className="w-full h-28 object-cover rounded"
+                  className="w-30 h-30 object-cover rounded"
                 />
                 <h2 className="font-semibold mt-2">{song.title}</h2>
                 <p className="text-gray-400">{song.artist}</p>
@@ -478,7 +478,7 @@ export default function HomePage() {
             <Link key={idx} href={`/music/${encodeURIComponent(artist.name)}`}>
               <div className="border w-24 h-24 rounded-full p-4 shadow-md bg-gray-800 cursor-pointer">
                 <img
-                  src={artist.image}
+                  src={artist.img}
                   alt={artist.name}
                   className="w-full h-32 object-cover rounded mb-2"
                 />

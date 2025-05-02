@@ -1,7 +1,7 @@
 import axios from 'axios';
-import * as cheerio from "cheerio";
+import * as cheerio from 'cheerio';
 
-const URL = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
+const URL = 'https://www.billboard.com/charts/artist-100/';
 
 async function fetchTrendingArtists() {
   try {
@@ -10,17 +10,27 @@ async function fetchTrendingArtists() {
 
     const artists = [];
 
+    // Step 1: Extract names first (in order)
     $('.o-chart-results-list__item .c-title').each((i, el) => {
-      const artist = $(el).text().trim();
-      if (artist && !artists.includes(artist)) {
-        artists.push(artist);
+      const name = $(el).text().trim();
+      if (name && artists.length < 20 && !artists.find(a => a.name === name)) {
+        artists.push({ name }); // placeholder for img
       }
-      if (artists.length >= 20) return false; // break loop
     });
 
-    console.log('🎤 Top 20 Trending Artists on Billboard:');
+    // Step 2: Extract images in same order and attach by index
+    $('li.o-chart-results-list__item img.c-lazy-image__img').each((i, el) => {
+      const src = $(el).attr('src');
+      if (src && i < artists.length) {
+        artists[i].img = src;
+      }
+    });
+
+    // Output
+    console.log('🎤 Top 20 Trending Artists on Billboard:\n');
     artists.forEach((artist, i) => {
-      console.log(`${i + 1}. ${artist}`);
+      console.log(`${i + 1}. ${artist.name}`);
+      console.log(`   🖼️ ${artist.img || 'No image found'}\n`);
     });
 
   } catch (error) {

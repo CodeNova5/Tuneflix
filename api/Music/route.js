@@ -519,41 +519,41 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
     }
-      else if (type === "trendingArtists") {
-        const url = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
-        try {
-        const { data } = await axios.get(url, {
-          headers: {
-          'User-Agent': 'Mozilla/5.0'
+
+    else if (type === "trendingArtists") {
+      const url = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
+      try {
+        const { data } = await axios.get(URL);
+        const $ = cheerio.load(data);
+
+        const artists = [];
+
+        // Step 1: Extract names first (in order)
+        $('.o-chart-results-list__item .c-title').each((i, el) => {
+          const name = $(el).text().trim();
+          if (name && artists.length < 20 && !artists.find(a => a.name === name)) {
+            artists.push({ name }); // placeholder for img
           }
         });
 
-        const $ = cheerio.load(data);
-        const artists = [];
-
-        $('.o-chart-results-list__item').each((i, el) => {
-          const artistName = $(el).find('.c-title').text().trim();
-          const artistImage = $(el).find('img').attr('data-lazy-src') || $(el).find('img').attr('src');
-
-          if (artistName && !artists.some(artist => artist.name === artistName)) {
-          artists.push({
-            name: artistName,
-            image: artistImage || "/placeholder.jpg", // Fallback to placeholder if no image
-          });
+        // Step 2: Extract images in same order and attach by index
+        $('li.o-chart-results-list__item img.c-lazy-image__img').each((i, el) => {
+          const src = $(el).attr('src');
+          if (src && i < artists.length) {
+            artists[i].img = src;
           }
-          if (artists.length >= 20) return false; // break loop
         });
 
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(artists);
 
-        } catch (error) {
+      } catch (error) {
         console.error('Error fetching artists:', error.message);
         return res.status(500).json({ error: 'Failed to fetch trending artists' });
-        }
       }
+    }
 
-      else if (type === "playlist") {
+    else if (type === "playlist") {
       if (!playlistId) {
         return res.status(400).json({ error: "Missing playlist ID" });
       }
@@ -563,39 +563,39 @@ export default async function handler(req, res) {
       if (playlistType !== "sp" && playlistType !== "dz") {
         return res.status(400).json({ error: "Invalid playlist type" });
       }
-    
+
       if (playlistType === "sp") {
         const accessToken = await getSpotifyAccessToken();
         const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
         const response = await fetch(apiUrl, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-    
+
         if (!response.ok) {
           return res.status(500).json({ error: "Failed to fetch Spotify playlist details" });
         }
-    
+
         const data = await response.json();
         if (!data.tracks?.items?.length) {
           return res.status(404).json({ error: "No tracks found in this playlist" });
         }
-    
+
         const playlistDetails = {
           name: data.name,
           image: data.images[0]?.url || "/placeholder.jpg",
         };
-    
+
         const tracks = data.tracks.items.map((item) => ({
           id: item.track.id,
           title: item.track.name,
           artist: { name: item.track.artists[0]?.name || "Unknown Artist" },
           album: { cover_medium: item.track.album.images[0]?.url || "/placeholder.jpg" },
         }));
-    
+
         res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json({ playlistDetails, tracks });
       }
-    
+
       if (playlistType === "dz") {
         const options = {
           method: "GET",
@@ -607,23 +607,23 @@ export default async function handler(req, res) {
             "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
           },
         };
-    
+
         try {
           const response = await axios.request(options);
           const data = response.data;
-    
+
           const playlistDetails = {
             name: data.title,
             image: data.picture_medium,
           };
-    
+
           const tracks = data.tracks.data.map((track) => ({
             id: track.id,
             title: track.title,
             artist: { name: track.artist.name },
             album: { cover_medium: track.album.cover_medium },
           }));
-    
+
           res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
           return res.status(200).json({ playlistDetails, tracks });
         } catch (error) {
@@ -632,7 +632,7 @@ export default async function handler(req, res) {
         }
       }
     }
-  
+
     else {
       return res.status(400).json({ error: "Invalid type parameter" });
     }
