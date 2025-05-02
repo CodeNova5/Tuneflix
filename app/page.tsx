@@ -218,20 +218,20 @@ const mood = [
     image: "gaming.jpg",
     title: "Gaming",
     text: "Get in the zone with our Phonk gaming playlist.",
-     }
+  }
 
 
 ];
 
 const animeVerse = [
-   {
+  {
     id: 1,
     link: "/music/playlist/77fmI8qO4Y0ZXvVyeSr6VY/type/sp",
     image: "aot.jpg",
     title: "Attack on Titan",
     text: "Experience the epic soundtrack of Attack on Titan.",
   },
- 
+
   {
     id: 3,
     link: "/music/playlist/2Rskw6jbWzyTd4xbtlyJTO/type/sp",
@@ -281,7 +281,7 @@ const animeVerse = [
     image: "kaiju.jpg",
     title: "Kaiju No. 8",
     text: "Immerse yourself in the world of Kaiju No. 8 with its thrilling soundtrack.",
-     },
+  },
   {
     id: 7,
     link: "/music/playlist/0E6nx38s2K13qDL8YkbQ3F/type/sp",
@@ -326,7 +326,7 @@ const animeVerse = [
     image: "jjk.jpg",
     title: "Jujutsu Kaisen",
     text: "Feel the thrill with Jujutsu Kaisen's electrifying soundtrack.",
-    },
+  },
   {
     id: 9,
     link: "/music/playlist/28iePdgP3BmHzmGhjZlvrv/type/sp",
@@ -378,7 +378,7 @@ const animeVerse = [
     title: "Fullmetal Alchemist",
     text: "Feel the depth of Fullmetal Alchemist's soundtrack.",
   },
- 
+
   {
     id: 17,
     link: "/music/playlist/3eap0jJLCmA9biDsXnloeV/type/sp",
@@ -429,7 +429,7 @@ export default function HomePage() {
 
   return (
     <div className="p-4 bg-gray-900 text-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">Billboard Global 200</h1>
+      <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
       <div className="overflow-x-auto">
         <div className="grid grid-flow-col grid-rows-4 auto-cols-max gap-4 w-max">
           {songs.map((song, idx) => (
@@ -441,7 +441,7 @@ export default function HomePage() {
                 <img
                   src={song.image}
                   alt={song.title}
-                  className="w-full h-48 object-cover rounded"
+                  className="w-full h-28 object-cover rounded"
                 />
                 <h2 className="font-semibold mt-2">{song.title}</h2>
                 <p className="text-gray-400">{song.artist}</p>
@@ -454,6 +454,7 @@ export default function HomePage() {
 
 
       <div className="overflow-x-auto">
+        <h2 className="text-2xl font-bold mb-4">Genre</h2>
         <div className="flex space-x-4 p-4">
           {genre.map((item) => (
             <Link key={item.id} href={item.link}>
@@ -463,7 +464,6 @@ export default function HomePage() {
                   alt={item.title}
                   className="w-full h-48 object-contain rounded bg-black"
                 />
-
                 <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
                 <p className="text-sm text-gray-200">{item.text}</p>
               </div>
@@ -473,6 +473,8 @@ export default function HomePage() {
       </div>
 
       <div className="overflow-x-auto">
+
+        <h2 className="text-2xl font-bold mb-4">Mood</h2>
         <div className="flex space-x-4 p-4">
           {mood.map((item) => (
             <Link key={item.id} href={item.link}>
@@ -482,7 +484,6 @@ export default function HomePage() {
                   alt={item.title}
                   className="w-full h-48 object-contain rounded bg-black"
                 />
-
                 <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
                 <p className="text-sm text-gray-200">{item.text}</p>
               </div>
@@ -492,6 +493,7 @@ export default function HomePage() {
       </div>
 
       <div className="overflow-x-auto">
+        <h2 className="text-2xl font-bold mb-4">AnimeVerse</h2>
         <div className="flex space-x-4 p-4">
           {animeVerse.map((item) => (
             <Link key={item.id} href={item.link}>
@@ -501,7 +503,6 @@ export default function HomePage() {
                   alt={item.title}
                   className="w-full h-48 object-contain rounded bg-black"
                 />
-
                 <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
                 <p className="text-sm text-gray-200">{item.text}</p>
               </div>
@@ -511,6 +512,7 @@ export default function HomePage() {
       </div>
 
       <div className="overflow-x-auto">
+        <h2 className="text-2xl font-bold mb-4">Country Songs</h2>
         <div className="flex space-x-4 p-4">
           {countrySongs.map((item) => (
             <Link key={item.id} href={item.link}>
@@ -520,7 +522,6 @@ export default function HomePage() {
                   alt={item.title}
                   className="w-full h-48 object-contain rounded bg-black"
                 />
-
                 <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
                 <p className="text-sm text-gray-200">{item.text}</p>
               </div>
