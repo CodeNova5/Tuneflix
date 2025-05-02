@@ -71,6 +71,13 @@ const genre = [
   },
   {
     id: 3,
+    link: "/music/playlist/02okEcUQXHe2sS5ajE9XG0/type/sp",
+    image: "hip-hop.jpg",
+    title: "Hip-Hop",
+    text: "Explore the latest and greatest in hip-hop.",
+  },
+  {
+    id: 3,
     link: "/music/playlist/1999466402/type/dz",
     image: "rnb.jpg",
     title: "R&B",
@@ -78,7 +85,7 @@ const genre = [
   },
   {
     id: 3,
-    link: "/music/playlist/1996494362/type/dz",
+    link: "/music/playlist/13754510761/type/dz",
     image: "rap.jpg",
     title: "Rap",
     text: "Dive into the world of rap with our curated playlist.",
@@ -449,6 +456,25 @@ export default function HomePage() {
       <div className="overflow-x-auto">
         <div className="flex space-x-4 p-4">
           {genre.map((item) => (
+            <Link key={item.id} href={item.link}>
+              <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-48 object-contain rounded bg-black"
+                />
+
+                <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
+                <p className="text-sm text-gray-200">{item.text}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <div className="flex space-x-4 p-4">
+          {mood.map((item) => (
             <Link key={item.id} href={item.link}>
               <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
                 <img
