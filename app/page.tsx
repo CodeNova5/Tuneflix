@@ -460,7 +460,7 @@ export default function HomePage() {
                 <img
                   src={song.image}
                   alt={song.title}
-                  className="w-30 h-30 object-cover rounded"
+                  className="w-full h-30 object-cover rounded"
                 />
                 <h2 className="font-semibold mt-2">{song.title}</h2>
                 <p className="text-gray-400">{song.artist}</p>
@@ -472,15 +472,15 @@ export default function HomePage() {
 
 
       <div className="overflow-x-auto">
-        <h1 className="text-3xl font-bold mb-4">Top Artists</h1>
+        <h1 className="text-2xl font-bold mb-4">Top Artists</h1>
         <div className="flex space-x-4 p-4">
           {artists.map((artist, idx) => (
             <Link key={idx} href={`/music/${encodeURIComponent(artist.name)}`}>
-              <div className="border w-24 h-24 rounded-full p-4 shadow-md bg-gray-800 cursor-pointer">
+              <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
                 <img
                   src={artist.img}
                   alt={artist.name}
-                  className="w-full h-32 object-cover rounded mb-2"
+                  className="w-30 h-30 object-cover rounded-full mb-2"
                 />
                 <h2 className="font-semibold text-lg">{artist.name}</h2>
               </div>
