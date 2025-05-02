@@ -424,7 +424,8 @@ export default function HomePage() {
         const response = await fetch(`/api/Music/route?type=trendingArtists`);
         if (!response.ok) throw new Error("Failed to fetch top artists");
         const data = await response.json();
-        setArtists(data);
+        console.log(data);
+        setArtists(data.map((artist: string) => ({ name: artist })));
       } catch (err: any) {
         console.error(err.message);
         setError(err.message);
