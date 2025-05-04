@@ -74,7 +74,7 @@ export default function ArtistPage() {
   async function fetchArtistAlbums() {
     // Fetch artist albums
     const albumsResponse = await fetch(
-      `/api/Music/route?type=artistAlbums&artistName=${encodeURIComponent(artist)}`
+      `/api/Music/route?type=artistAlbums&artistId=${encodeURIComponent(artistDetails.id)}`
     );
     if (!albumsResponse.ok) {
       const errorData = await albumsResponse.json();
@@ -87,9 +87,6 @@ export default function ArtistPage() {
   // Call the function to fetch albums when artistDetails is available
   if (artistDetails) {
     fetchArtistAlbums();
-  }
-  if (error) {
-    return <h1>{error}</h1>;
   }
 
   if (!artistDetails) {

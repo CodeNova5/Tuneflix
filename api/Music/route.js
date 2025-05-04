@@ -87,8 +87,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "Song not found" });
         }
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(searchData.tracks.items[0]);
+        res.setHeader('Cache-Control', 'max-age=31536000, immutable'); return res.status(200).json(searchData.tracks.items[0]);
       } catch (err) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch song details" });
@@ -118,7 +117,7 @@ export default async function handler(req, res) {
         }
 
         const videoId = data.items[0].id.videoId;
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader('Cache-Control', 'max-age=31536000, immutable');
         return res.status(200).json({ videoId });
       } catch (err) {
         console.error("YouTube API Error:", err);
@@ -149,7 +148,7 @@ export default async function handler(req, res) {
         }
 
         const videoId = data.items[0].id.videoId;
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader('Cache-Control', 'max-age=31536000, immutable');
         return res.status(200).json({ videoId });
       } catch (err) {
         console.error("YouTube API Error:", err);
@@ -175,7 +174,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "Lyrics not found" });
         }
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader('Cache-Control', 'max-age=31536000, immutable');
         return res.status(200).json({ lyrics: data.lyrics });
       } catch (err) {
         console.error("Lyrics API Error:", err);
@@ -207,7 +206,7 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "No songs found for this artist" });
         }
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate");
         return res.status(200).json(data.tracks.items);
       } catch (err) {
         console.error("Spotify API Error:", err);
@@ -230,7 +229,7 @@ export default async function handler(req, res) {
       try {
         const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}&track=${encodeURIComponent(decodedSongName)}&api_key=${LAST_FM_API_KEY}&format=json`;
+        )}&track=${encodeURIComponent(decodedSongName)}&api_key=${LAST_FM_API_KEY}&format=json&limit=20`;
 
         const response = await fetch(apiUrl);
 
@@ -276,7 +275,7 @@ export default async function handler(req, res) {
           })
         );
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=2419200, stale-while-revalidate");
         return res.status(200).json(relatedTracks);
       } catch (err) {
         console.error("Last.fm API Error:", err);
@@ -339,7 +338,7 @@ export default async function handler(req, res) {
         // Fetch related artists from Last.fm
         const lastFmApiUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}&api_key=${LAST_FM_API_KEY}&format=json`;
+        )}&api_key=${LAST_FM_API_KEY}&format=json&limit=20`;
 
         const lastFmResponse = await fetch(lastFmApiUrl);
 
@@ -391,7 +390,7 @@ export default async function handler(req, res) {
           })
         );
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=2419200, stale-while-revalidate");
         return res.status(200).json(relatedArtists);
       } catch (err) {
         console.error("API Error:", err);
@@ -399,45 +398,35 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "artistAlbums") {
-      if (!artistName) {
-        return res.status(400).json({ error: "Missing artist name" });
+      if (!artistId) {
+        return res.status(400).json({ error: "Missing artist Id" });
       }
 
       try {
         // Get Spotify access token
         const accessToken = await getArtistAccessToken();
 
-        // Search for the artist's albums
-        const searchApiUrl = `https://api.spotify.com/v1/search?q=artist:${encodeURIComponent(
-          decodedArtistName
-        )}&type=album&limit=10`;
-
-        const searchResponse = await fetch(searchApiUrl, {
+        // Fetch artist albums
+        const albumsApiUrl = `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album,single,appears_on&market=US&limit=15`;
+        const albumsResponse = await fetch(albumsApiUrl, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-
-        if (!searchResponse.ok) {
+        if (!albumsResponse.ok) {
           throw new Error("Failed to fetch artist albums from Spotify");
         }
-
-        const searchData = await searchResponse.json();
-
-        if (!searchData.albums?.items?.length) {
+        const albumsData = await albumsResponse.json();
+        if (!albumsData.items?.length) {
           return res.status(404).json({ error: "No albums found for this artist" });
         }
 
-        // Format the album data
-        const albums = searchData.albums.items.map((album) => ({
+        res.setHeader("Cache-Control", "s-maxage=43200, stale-while-revalidate");
+        return res.status(200).json(albumsData.items.map((album) => ({
           name: album.name,
-          id: album.id,
           releaseDate: album.release_date,
           totalTracks: album.total_tracks,
           image: album.images?.[0]?.url || "/placeholder.jpg",
-          url: album.external_urls.spotify,
-        }));
-
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(albums);
+          id: album.id,
+        })));
       } catch (err) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch artist albums" });
@@ -476,7 +465,7 @@ export default async function handler(req, res) {
           })),
         };
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader('Cache-Control', 'max-age=31536000, immutable');
         return res.status(200).json(formattedAlbum);
       } catch (err) {
         console.error("Spotify API Error:", err);
@@ -484,40 +473,36 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "topSongs") {
-
       try {
-        const url = 'https://www.billboard.com/charts/billboard-global-200/';
+        const url = 'https://deezerdevs-deezer.p.rapidapi.com/chart/top';  // Deezer API endpoint for top songs
         const { data } = await axios.get(url, {
           headers: {
-            'User-Agent': 'Mozilla/5.0'
+            "x-rapidapi-key": "67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302",  // Your RapidAPI key
+            "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com"
           }
         });
 
-        const $ = cheerio.load(data);
-
         const chartItems = [];
 
-        $('.o-chart-results-list-row-container').each((i, elem) => {
-
-          const title = $(elem).find('h3#title-of-a-story').first().text().trim();
-          // More accurate selector for artist name
-          const artist = $(elem)
-            .find('span.c-label.a-no-trucate.a-font-primary-s')
-            .first()
-            .text()
-            .trim(); const image = $(elem).find('img').attr('data-lazy-src') || $(elem).find('img').attr('src');
+        // Deezer API response structure for top tracks
+        data.tracks.data.forEach((track) => {
+          const title = track.title;
+          const artist = track.artist.name;
+          const image = track.album.cover_medium;  // Medium size album cover image
 
           if (title && artist) {
             chartItems.push({ title, artist, image });
           }
         });
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+
+        res.setHeader("Cache-Control", "s-maxage=432000, stale-while-revalidate");
         return res.status(200).json(chartItems);
 
       } catch (error) {
         console.error('Error fetching chart data:', error.message);
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
+
     }
 
     else if (type === "trendingArtists") {
