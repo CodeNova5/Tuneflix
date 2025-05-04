@@ -470,6 +470,7 @@ export default async function handler(req, res) {
       } catch (err) {
         console.error("Spotify API Error:", err);
         return res.status(500).json({ error: "Failed to fetch album details" });
+
       }
     }
     else if (type === "topSongs") {
@@ -479,13 +480,37 @@ export default async function handler(req, res) {
 
         const { data } = await axios.get(url);
 
-        const chartItems = data.tracks.track.map(track => {
-          const title = track.name;
-          const artist = track.artist.name;
-          const image = track.image.find(img => img.size === 'large')['#text'];
+        const accessToken = await getArtistAccessToken();
 
-          return { title, artist, image };
-        });
+        const chartItems = await Promise.all(
+          data.tracks.track.map(async (track) => {
+            const title = track.name;
+            const artist = track.artist.name;
+
+            try {
+              const spotifyApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+                `${artist} ${title}`
+              )}&type=track&limit=1`;
+
+              const spotifyResponse = await fetch(spotifyApiUrl, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              });
+
+              if (!spotifyResponse.ok) {
+                throw new Error(`Failed to fetch Spotify data for ${title} by ${artist}`);
+              }
+
+              const spotifyData = await spotifyResponse.json();
+              const image =
+                spotifyData.tracks?.items?.[0]?.album?.images?.[0]?.url || "/placeholder.jpg";
+
+              return { title, artist, image };
+            } catch (err) {
+              console.error(`Spotify API Error for track ${title} by ${artist}:`, err);
+              return { title, artist, image: "/placeholder.jpg" };
+            }
+          })
+        );
 
         res.setHeader("Cache-Control", "s-maxage=432000, stale-while-revalidate");
         return res.status(200).json(chartItems);
