@@ -519,41 +519,77 @@ export default async function handler(req, res) {
         console.error('Error fetching chart data:', error.message);
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
+
     }
-
-
     else if (type === "trendingArtists") {
-      const URL = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
+      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd"; // Replace with your Last.fm API key
+
+      if (!LAST_FM_API_KEY) {
+        console.error("Missing Last.fm API key.");
+        return res.status(500).json({ error: "Internal server error" });
+      }
+
       try {
-        const { data } = await axios.get(URL);
-        const $ = cheerio.load(data);
+        // Fetch trending artists from Last.fm
+        const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=${LAST_FM_API_KEY}&format=json&limit=20`;
 
-        const artists = [];
+        const response = await fetch(apiUrl);
 
-        // Step 1: Extract names first (in order)
-        $('.o-chart-results-list__item .c-title').each((i, el) => {
-          const name = $(el).text().trim();
-          if (name && artists.length < 20 && !artists.find(a => a.name === name)) {
-            artists.push({ name }); // placeholder for img
-          }
-        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch trending artists from Last.fm");
+        }
 
-        // Step 2: Extract images in same order and attach by index
-        $('li.o-chart-results-list__item img.c-lazy-image__img').each((i, el) => {
-          const src = $(el).attr('src');
-          if (src && i < artists.length) {
-            artists[i].img = src;
-          }
-        });
+        const data = await response.json();
 
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
-        return res.status(200).json(artists);
+        if (!data.artists?.artist?.length) {
+          return res.status(404).json({ error: "No trending artists found" });
+        }
 
-      } catch (error) {
-        console.error('Error fetching artists:', error.message);
-        return res.status(500).json({ error: 'Failed to fetch trending artists' });
+        // Fetch artist images from Spotify
+        const accessToken = await getArtistAccessToken();
+        const trendingArtists = await Promise.all(
+          data.artists.artist.map(async (artist) => {
+            try {
+              const spotifyApiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+                artist.name
+              )}&type=artist&limit=1`;
+
+              const spotifyResponse = await fetch(spotifyApiUrl, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              });
+
+              if (!spotifyResponse.ok) {
+                throw new Error(`Failed to fetch Spotify data for artist ${artist.name}`);
+              }
+
+              const spotifyData = await spotifyResponse.json();
+              const spotifyArtist = spotifyData.artists?.items?.[0];
+
+              return {
+                name: artist.name,
+                url: artist.url,
+                image: spotifyArtist?.images?.[0]?.url || "/placeholder.jpg",
+              };
+            } catch (err) {
+              console.error(`Spotify API Error for artist ${artist.name}:`, err);
+              return {
+                name: artist.name,
+                url: artist.url,
+                image: "/placeholder.jpg",
+              };
+            }
+          })
+        );
+
+        res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate");
+        return res.status(200).json(trendingArtists);
+      } catch (err) {
+        console.error("Last.fm API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch trending artists" });
       }
     }
+
+
 
     else if (type === "playlist") {
       if (!playlistId) {
