@@ -575,7 +575,7 @@ export default async function handler(req, res) {
               return {
                 name: artist.name,
                 url: artist.url,
-                image: "/placeholder.jpg",
+                img: "/placeholder.jpg",
               };
             }
           })
