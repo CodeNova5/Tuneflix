@@ -373,4 +373,71 @@ export const countrySongs = [
       text: "Experience the humor and action of One Punch",
     }
   ];
-  
+
+  export const kids = [
+    {
+      id: 1,
+      link: "/music/playlist/3vHjFKeNa7SYCsuIEJRjjb/type/sp",
+      image: "/images/disney.jpg",
+      title: "Disney",
+      text: "Explore the magical world of Disney with our curated playlist.",
+    },
+    {
+      id: 2,
+      link: "/music/playlist/1CKZs4Atk5gBaL40EUVZRg/type/sp",
+      image: "/images/nursery.jpg",
+      title: "Nursery Rhymes",
+      text: "Enjoy the classic nursery rhymes that kids love.",
+    },
+    {
+      id: 3,
+      link: "/music/playlist/11958811001/type/dz",
+      image: "/images/nick.jpg",
+      title: "Nickelodeon sing along songs",
+      text: "Sing along to your favorite Nickelodeon songs.",
+  },
+  {
+      id: 6,
+      link: "/music/playlist/6XMhvUe2OfARE6iEjhx96k/type/sp",
+      image: "/images/lullabies.jpg",
+      title: "Lullabies",
+      text: "Relax and unwind with soothing lullabies for kids.",
+    },
+    {
+      id: 4,
+      link: "/music/playlist/12K4ZEoGgvnefBV0BZzu5N/type/sp",
+      image: "/images/cn.jpg",
+      title: "Cartoon Network",
+      text: "Enjoy the catchy tunes from your favorite Cartoon Network shows.",
+    },
+    {
+      id: 5,
+      link: "/music/playlist/9415478102/type/dz",
+      image: "/images/cocomelon.jpg",
+      title: "Cocomelon",
+      text: "Explore the fun and educational songs from Cocomelon.",
+    },
+    
+    {
+      id: 7,
+      link: "/music/playlist/47kWkNwyIfBL20r7CMVuZS/type/sp",
+      image: "/images/phonics.jpg",
+      title: "Phonics",
+      text: "Learn phonics with fun and engaging songs.",
+    },
+    {
+      id: 8,
+      link: "/music/playlist/47M7pLabZgxIPiVY6Bgmhi/type/sp",
+      image: "/images/maths.jpg",
+      title: "Maths Songs",
+      text: "Explore the fun and educational songs about numbers.",
+      },
+    {
+      id: 9,
+      link: "/music/playlist/18CK2IfmSalVMFvOM9Ruu9/type/sp",
+      image: "/images/science.jpg",
+      title: "Science for kids",
+      text: "Explore the fun and educational songs about science.",
+    },
+    
+  ];

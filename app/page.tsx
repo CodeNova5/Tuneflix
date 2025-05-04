@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link"; // Import Link from next/link
-import { genre, mood, animeVerse, countrySongs } from "../components/arrays"; // Import genre, mood, animeVerse, and countrySongs from arrays.js
+import { genre, mood, animeVerse, countrySongs, kids } from "../components/arrays"; // Import genre, mood, animeVerse, and countrySongs from arrays.js
 interface ChartItem {
   title: string;
   artist: string;
@@ -179,7 +179,25 @@ export default function HomePage() {
         </div>
       </div>
 
+      <div className="overflow-x-auto">
+        <h2 className="text-2xl font-bold mb-4">Kids Songs</h2>
+        <div className="flex space-x-4 p-4">
+          {kids.map((item) => (
+            <Link key={item.id} href={item.link}>
+              <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-48 object-contain rounded bg-black"
+                />
+                <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
+                <p className="text-sm text-gray-200">{item.text}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+      
     </div>
-
   );
 }
