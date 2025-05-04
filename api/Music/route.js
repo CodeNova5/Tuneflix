@@ -546,7 +546,7 @@ export default async function handler(req, res) {
         }
 
         // Fetch artist images from Spotify
-        const accessToken = await getArtistAccessToken();
+        const accessToken = await getSpotifyAccessToken();
         const trendingArtists = await Promise.all(
           data.artists.artist.map(async (artist) => {
             try {
@@ -568,7 +568,7 @@ export default async function handler(req, res) {
               return {
                 name: artist.name,
                 url: artist.url,
-                image: spotifyArtist?.images?.[0]?.url || "/placeholder.jpg",
+                img: spotifyArtist?.images?.[0]?.url || "/placeholder.jpg",
               };
             } catch (err) {
               console.error(`Spotify API Error for artist ${artist.name}:`, err);
