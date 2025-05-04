@@ -474,25 +474,17 @@ export default async function handler(req, res) {
     }
     else if (type === "topSongs") {
       try {
-        const url = 'https://deezerdevs-deezer.p.rapidapi.com/chart/top';  // Deezer API endpoint for top songs
-        const { data } = await axios.get(url, {
-          headers: {
-            "x-rapidapi-key": "67685ec1f0msh5feaa6bf64dbeadp16ffa5jsnd72b2a894302",  // Your RapidAPI key
-            "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com"
-          }
-        });
+        const apiKey = 'c98799d0a98242258436e85147bc27fd'; // Replace with your actual Last.fm API key
+        const url = `https://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apiKey}&format=json`;
 
-        const chartItems = [];
+        const { data } = await axios.get(url);
 
-        // Deezer API response structure for top tracks
-        data.tracks.data.forEach((track) => {
-          const title = track.title;
+        const chartItems = data.tracks.track.map(track => {
+          const title = track.name;
           const artist = track.artist.name;
-          const image = track.album.cover_medium;  // Medium size album cover image
+          const image = track.image.find(img => img.size === 'large')['#text'];
 
-          if (title && artist) {
-            chartItems.push({ title, artist, image });
-          }
+          return { title, artist, image };
         });
 
         res.setHeader("Cache-Control", "s-maxage=432000, stale-while-revalidate");
@@ -502,8 +494,8 @@ export default async function handler(req, res) {
         console.error('Error fetching chart data:', error.message);
         return res.status(500).json({ error: 'Failed to fetch top songs' });
       }
-
     }
+
 
     else if (type === "trendingArtists") {
       const URL = 'https://www.billboard.com/charts/artist-100/'; // or try 'hot-100'
