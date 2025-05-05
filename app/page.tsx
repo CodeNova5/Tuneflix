@@ -13,6 +13,29 @@ interface Artist {
   img: string;
 }
 
+export async function generateMetadata() {
+  return {
+    title: 'Tuneflix - Top Songs and Artists',
+    description: 'Discover top songs, trending artists, and music genres, Playlists, Albums and many more on Tuneflix. Your ultimate music discovery platform.',
+    keywords: ['music', 'top songs', 'trending artists', 'genres', 'moods', 'anime songs', 'country songs', 'kids songs', 'Tuneflix', 'Playlists'],
+    authors: [{ name: 'Code Nova' }],
+    openGraph: {
+      title: 'Tuneflix',
+      description: 'Get access to millions of songs on Tuneflix. Stream and discover the latest hits from your favorite artists.',
+      url: 'https://tuneflix.com',
+      type: 'website',
+      siteName: 'Tuneflix',
+      images: [
+        {
+          url: 'https://tuneflix.com/images/og-image.jpg',
+          alt: 'Tuneflix logo',
+        },
+      ],
+      locale: 'en_US',
+    },
+    // Schema.org JSON-LD needs to be rendered manually via <script> below
+  };
+}
 
 export default function HomePage() {
   const [songs, setSongs] = useState<ChartItem[]>([]);
@@ -60,6 +83,26 @@ export default function HomePage() {
 
   return (
     <div className="p-4 bg-gray-900 text-white min-h-screen">
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Tuneflix",
+      description: "Discover top songs, trending artists, and music genres on Tuneflix.",
+      url: "https://tuneflix.com",
+      publisher: {
+        "@type": "Organization",
+        name: "Tuneflix",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://tuneflix.com/logo.png",
+        },
+      },
+    }),
+  }}
+/>
       <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
       <main>
       <section aria-labelledby="top-songs">
