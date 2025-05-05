@@ -74,7 +74,7 @@ export default function HomePage() {
       __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "WebPage",
-        name: "Tuneflix - Top Songs and Artists",
+        name: "Tuneflix",
         description: "Discover top songs, trending artists, and music genres on Tuneflix. Your ultimate music discovery platform.",
         url: "https://tuneflix.com", // Replace with your actual URL
         publisher: {
