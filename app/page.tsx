@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import HomePage from "./HomePage"; // client component
 
 export const metadata: Metadata = {
-  title: 'Tuneflix',
+  title: 'Tuneflix || Web Music Player',
   description: 'Get instant access to millions of songs, albums, and playlists. Discover new music, revisit old favorites, and let every moment have its perfect soundtrack — anytime, anywhere.',
   keywords: ['music', 'top songs', 'trending artists', 'genres', 'moods', 'anime songs', 'country songs', 'kids songs', 'Tuneflix', 'Playlists'],
   authors: [{ name: 'Code Nova' }],
