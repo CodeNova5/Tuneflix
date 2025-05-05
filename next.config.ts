@@ -1,7 +1,27 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/app/page.tsx",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800",
+          },
+        ],
+      },
+      {
+        source: "/public/login.html",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800",
+          },
+        ],
+      },
+    ];
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
