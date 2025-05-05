@@ -61,44 +61,6 @@ export default function HomePage() {
 
   return (
     <div className="p-4 bg-gray-900 text-white min-h-screen">
-      <Head>
-        <title>Tuneflix - Top Songs and Artists</title>
-        <meta name="description" content="Discover top songs, trending artists, and music genres, Playlists, Albums and many more on Tuneflix. Your ultimate music discovery platform." />
-        <meta name="keywords" content="music, top songs, trending artists, genres, moods, anime songs, country songs, kids songs, Tuneflix, Playlists" />
-        <meta name="author" content="Code Nova" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        name: "Tuneflix",
-        description: "Discover top songs, trending artists, and music genres on Tuneflix. Your ultimate music discovery platform.",
-        url: "https://tuneflix.com", // Replace with your actual URL
-        publisher: {
-          "@type": "Organization",
-          name: "Tuneflix",
-          logo: {
-            "@type": "ImageObject",
-            url: "https://tuneflix.com/logo.png", // Replace with your logo URL
-          },
-        },
-      }),
-    }}
-  />
-<meta property="og:title" content="Tuneflix - Discover Songs, Artists, Albums, Playlist" />
-        <meta property="og:description" content="Get access to millions of songs on Tuneflix. Stream and discover the latest hits from your favorite artists. Explore trending tracks, albums, and personalized playlists on Tuneflix." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://tuneflix.com" /> {/* Replace with your actual website URL */}
-        <meta property="og:image" content="https://tuneflix.com/images/og-image.jpg" />
-        <meta property="og:image:alt" content="Tuneflix logo" />
-        <meta property="og:locale" content="en_US" /> {/* Adjust locale as needed */}
-        <meta property="og:site_name" content="Tuneflix" />
-
-</Head>
-
       <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
       <main>
       <section aria-labelledby="top-songs">
