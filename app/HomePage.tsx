@@ -59,7 +59,7 @@ export default function HomePage() {
     }
 
     return (
-        <div className="p-4 bg-gray-900 text-white min-h-screen">
+        <div className="p-4 bg-black text-white min-h-screen">
             <Header />
             <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
             <main>

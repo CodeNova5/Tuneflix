@@ -64,9 +64,8 @@ const Header = () => {
       </Link>
 
       <Link href="/" style={siteNameStyle}>
-        WebName
+        Tuneflix
       </Link>
-
       <Link href="/search" style={searchIconStyle}>
         <FontAwesomeIcon icon={faSearch} />
       </Link>
