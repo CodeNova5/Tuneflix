@@ -88,6 +88,15 @@ export default function HomePage() {
       }),
     }}
   />
+<meta property="og:title" content="Tuneflix - Discover Songs, Artists, Albums, Playlist" />
+        <meta property="og:description" content="Get access to millions of songs on Tuneflix. Stream and discover the latest hits from your favorite artists. Explore trending tracks, albums, and personalized playlists on Tuneflix." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://tuneflix.com" /> {/* Replace with your actual website URL */}
+        <meta property="og:image" content="https://tuneflix.com/images/og-image.jpg" />
+        <meta property="og:image:alt" content="Tuneflix logo" />
+        <meta property="og:locale" content="en_US" /> {/* Adjust locale as needed */}
+        <meta property="og:site_name" content="Tuneflix" />
+
 </Head>
 
       <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
