@@ -67,7 +67,28 @@ export default function HomePage() {
         <meta name="keywords" content="music, top songs, trending artists, genres, moods, anime songs, country songs, kids songs, Tuneflix, Playlists" />
         <meta name="author" content="Code Nova" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
+      
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "Tuneflix - Top Songs and Artists",
+        description: "Discover top songs, trending artists, and music genres on Tuneflix. Your ultimate music discovery platform.",
+        url: "https://tuneflix.com", // Replace with your actual URL
+        publisher: {
+          "@type": "Organization",
+          name: "Tuneflix",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://tuneflix.com/logo.png", // Replace with your logo URL
+          },
+        },
+      }),
+    }}
+  />
+</Head>
 
       <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
       <main>
