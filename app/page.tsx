@@ -1,8 +1,8 @@
 "use client";
-
+import Head from "next/head";
 import React, { useEffect, useState } from "react";
-import Link from "next/link"; // Import Link from next/link
-import { genre, mood, animeVerse, countrySongs, kids } from "../components/arrays"; // Import genre, mood, animeVerse, and countrySongs from arrays.js
+import Link from "next/link";
+import { genre, mood, animeVerse, countrySongs, kids } from "../components/arrays";
 interface ChartItem {
   title: string;
   artist: string;
@@ -61,6 +61,14 @@ export default function HomePage() {
 
   return (
     <div className="p-4 bg-gray-900 text-white min-h-screen">
+      <Head>
+        <title>Tuneflix - Top Songs and Artists</title>
+        <meta name="description" content="Discover top songs, trending artists, and music genres, Playlists, Albums and many more on Tuneflix. Your ultimate music discovery platform." />
+        <meta name="keywords" content="music, top songs, trending artists, genres, moods, anime songs, country songs, kids songs, Tuneflix, Playlists" />
+        <meta name="author" content="Code Nova" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+
       <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
       <div className="overflow-x-auto">
         <div className="grid grid-flow-col grid-rows-4 auto-cols-max gap-4 w-max">
