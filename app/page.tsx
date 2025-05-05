@@ -70,45 +70,51 @@ export default function HomePage() {
       </Head>
 
       <h1 className="text-3xl font-bold mb-4">Top songs this week</h1>
-      <div className="overflow-x-auto">
-        <div className="grid grid-flow-col grid-rows-4 auto-cols-max gap-4 w-max">
-          {songs.map((song, idx) => (
-            <Link
-              key={idx}
-              href={`/music/${getFirstArtist(song.artist)}/song/${song.title}`}
-            >
-              <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
-                <img
-                  src={song.image}
-                  alt={song.title}
-                  className="w-full h-30 object-cover rounded"
-                />
-                <h2 className="font-semibold mt-2">{song.title}</h2>
-                <p className="text-gray-400">{song.artist}</p>
-              </div>
-            </Link>
-          ))}
+      <main>
+      <section aria-labelledby="top-songs">
+        <h2 id="top-songs" className="text-2xl font-bold mb-4">Top Songs</h2>
+        <div className="overflow-x-auto">
+          <div className="grid grid-flow-col grid-rows-4 auto-cols-max gap-4 w-max">
+            {songs.map((song, idx) => (
+              <Link
+                key={idx}
+                href={`/music/${getFirstArtist(song.artist)}/song/${song.title}`}
+              >
+                <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
+                  <img
+                    src={song.image}
+                    alt={song.title}
+                    className="w-full h-30 object-cover rounded"
+                  />
+                  <h3 className="font-semibold mt-2">{song.title}</h3>
+                  <p className="text-gray-400">{song.artist}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
-
-      <div className="overflow-x-auto">
-        <h1 className="text-2xl font-bold mb-4">Top Artists</h1>
-        <div className="flex space-x-4 p-4">
-          {artists.map((artist, idx) => (
-            <Link key={idx} href={`/music/${encodeURIComponent(artist.name)}`}>
-              <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
-                <img
-                  src={artist.img}
-                  alt={artist.name}
-                  className="w-30 h-30 object-cover rounded-full mb-2"
-                />
-                <h2 className="font-semibold text-lg">{artist.name}</h2>
-              </div>
-            </Link>
-          ))}
+      <section aria-labelledby="top-artists">
+        <h2 id="top-artists" className="text-2xl font-bold mb-4">Top Artists</h2>
+        <div className="overflow-x-auto">
+          <div className="flex space-x-4 p-4">
+            {artists.map((artist, idx) => (
+              <Link key={idx} href={`/music/${encodeURIComponent(artist.name)}`}>
+                <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer w-64">
+                  <img
+                    src={artist.img}
+                    alt={artist.name}
+                    className="w-30 h-30 object-cover rounded-full mb-2"
+                  />
+                  <h3 className="font-semibold text-lg">{artist.name}</h3>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+</main>
 
       <div className="overflow-x-auto">
         <h2 className="text-2xl font-bold mb-4">Genre</h2>
