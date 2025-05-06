@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -69,6 +69,7 @@ const Header = () => {
   const [profileImg, setProfileImg] = useState("/images/default-profile.png");
   const [userInfo, setUserInfo] = useState(null);
   const [showUserInfo, setShowUserInfo] = useState(false);
+  const userInfoRef = useRef(null);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userInfo") || "null");
@@ -82,6 +83,33 @@ const Header = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        userInfoRef.current &&
+        !userInfoRef.current.contains(e.target)
+      ) {
+        setShowUserInfo(false);
+      }
+    };
+
+    const handleScroll = () => {
+      setShowUserInfo(false);
+    };
+
+    if (showUserInfo) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+      window.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [showUserInfo]);
+
   const toggleUserInfo = () => {
     setShowUserInfo((prev) => !prev);
   };
@@ -93,7 +121,7 @@ const Header = () => {
       </div>
 
       {showUserInfo && userInfo && (
-        <div style={userInfoBoxStyle}>
+        <div style={userInfoBoxStyle} ref={userInfoRef}>
           <img src={profileImg} alt="Profile" style={fullProfileImgStyle} />
           <div><strong>{userInfo.data.name || "No Name"}</strong></div>
           <div style={{ fontSize: "0.9rem", marginTop: "4px" }}>
