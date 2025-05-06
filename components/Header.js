@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
@@ -69,7 +70,9 @@ const Header = () => {
   const [profileImg, setProfileImg] = useState("/images/default-profile.png");
   const [userInfo, setUserInfo] = useState(null);
   const [showUserInfo, setShowUserInfo] = useState(false);
+  const [notLoggedIn, setNotLoggedIn] = useState(false);
   const userInfoRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userInfo") || "null");
@@ -85,10 +88,7 @@ const Header = () => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        userInfoRef.current &&
-        !userInfoRef.current.contains(e.target)
-      ) {
+      if (userInfoRef.current && !userInfoRef.current.contains(e.target)) {
         setShowUserInfo(false);
       }
     };
@@ -97,21 +97,26 @@ const Header = () => {
       setShowUserInfo(false);
     };
 
-    if (showUserInfo) {
+    if (showUserInfo || notLoggedIn) {
       document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchstart", handleClickOutside);
       window.addEventListener("scroll", handleScroll);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [showUserInfo]);
+  }, [showUserInfo, notLoggedIn]);
 
   const toggleUserInfo = () => {
-    setShowUserInfo((prev) => !prev);
+    if (!userInfo) {
+      setNotLoggedIn(true);
+      setTimeout(() => {
+        router.push("/login");
+      }, 1000);
+    } else {
+      setShowUserInfo((prev) => !prev);
+    }
   };
 
   return (
@@ -120,7 +125,7 @@ const Header = () => {
         <img src={profileImg} alt="Profile" style={profileImgStyle} />
       </div>
 
-      {showUserInfo && userInfo && (
+      {(showUserInfo && userInfo) && (
         <div style={userInfoBoxStyle} ref={userInfoRef}>
           <img src={profileImg} alt="Profile" style={fullProfileImgStyle} />
           <div><strong>{userInfo.data.name || "No Name"}</strong></div>
@@ -131,6 +136,15 @@ const Header = () => {
             <Link href="/login" style={{ color: "#4fc3f7", textDecoration: "underline" }}>
               Switch Account
             </Link>
+          </div>
+        </div>
+      )}
+
+      {notLoggedIn && (
+        <div style={userInfoBoxStyle} ref={userInfoRef}>
+          <strong>You are not logged in. </strong>
+          <div style={{ marginTop: "10px" }}>
+            Redirecting to login page...
           </div>
         </div>
       )}
