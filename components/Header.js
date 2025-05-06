@@ -20,6 +20,7 @@ const headerStyle = {
 const profileImgLinkStyle = {
   position: "absolute",
   left: "20px",
+  cursor: "pointer",
 };
 
 const profileImgStyle = {
@@ -43,29 +44,70 @@ const searchIconStyle = {
   textDecoration: "none",
 };
 
+const userInfoBoxStyle = {
+  position: "absolute",
+  top: "60px",
+  left: "20px",
+  backgroundColor: "#222",
+  color: "white",
+  padding: "15px",
+  borderRadius: "8px",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+  zIndex: 1001,
+  width: "250px",
+};
+
+const fullProfileImgStyle = {
+  width: "60px",
+  height: "60px",
+  borderRadius: "50%",
+  display: "block",
+  marginBottom: "10px",
+};
+
 const Header = () => {
   const [profileImg, setProfileImg] = useState("/images/default-profile.png");
+  const [userInfo, setUserInfo] = useState(null);
+  const [showUserInfo, setShowUserInfo] = useState(false);
 
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    if (userInfo && userInfo.data) {
-      if (userInfo.provider === "google") {
-        setProfileImg(userInfo.data.picture || "/images/default-profile.png");
-      } else if (userInfo.provider === "facebook") {
-        setProfileImg(userInfo.data.picture?.data?.url || "/images/default-profile.png");
+    const storedUser = JSON.parse(localStorage.getItem("userInfo") || "null");
+    if (storedUser && storedUser.data) {
+      setUserInfo(storedUser);
+      if (storedUser.provider === "google") {
+        setProfileImg(storedUser.data.picture || "/images/default-profile.png");
+      } else if (storedUser.provider === "facebook") {
+        setProfileImg(storedUser.data.picture?.data?.url || "/images/default-profile.png");
       }
     }
   }, []);
 
+  const toggleUserInfo = () => {
+    setShowUserInfo((prev) => !prev);
+  };
+
   return (
     <header style={headerStyle}>
-      <Link href="/profile" style={profileImgLinkStyle}>
+      <div onClick={toggleUserInfo} style={profileImgLinkStyle}>
         <img src={profileImg} alt="Profile" style={profileImgStyle} />
-      </Link>
+      </div>
 
-      <Link href="/" style={siteNameStyle}>
-        Tuneflix
-      </Link>
+      {showUserInfo && userInfo && (
+        <div style={userInfoBoxStyle}>
+          <img src={profileImg} alt="Profile" style={fullProfileImgStyle} />
+          <div><strong>{userInfo.data.name || "No Name"}</strong></div>
+          <div style={{ fontSize: "0.9rem", marginTop: "4px" }}>
+            ID: {userInfo.data.sub || userInfo.data.id || "N/A"}
+          </div>
+          <div style={{ marginTop: "10px" }}>
+            <Link href="/login" style={{ color: "#4fc3f7", textDecoration: "underline" }}>
+              Switch Account
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <Link href="/" style={siteNameStyle}>Tuneflix</Link>
       <Link href="/search" style={searchIconStyle}>
         <FontAwesomeIcon icon={faSearch} />
       </Link>
