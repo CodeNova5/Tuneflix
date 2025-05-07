@@ -233,7 +233,7 @@ const Header = () => {
         </div>
         {results.length > 0 && (
           <div style={{
-            marginTop: "5px",
+            marginTop: "20px",
             backgroundColor: "#333",
             borderRadius: "8px",
             width: "220px",
