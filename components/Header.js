@@ -81,7 +81,7 @@ const Header = () => {
   useEffect(() => {
     // Fetch Spotify access token
     const getToken = async () => {
-      const res = await fetch("/api/route?type=searchToken");
+      const res = await fetch("/api/Music/route?type=searchToken");
       const data = await res.json();
       setToken(data.access_token);
     };
