@@ -141,7 +141,17 @@ const Header = () => {
       )}
 
       {notLoggedIn && (
-        <div style={userInfoBoxStyle} ref={userInfoRef}>
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.7)", // darker overlay
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 1000,
+        }} ref={userInfoRef}>
           <strong>You are not logged in. </strong>
           <div style={{ marginTop: "10px" }}>
             Redirecting to login page...
