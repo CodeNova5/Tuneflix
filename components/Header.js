@@ -73,6 +73,49 @@ const Header = () => {
   const [notLoggedIn, setNotLoggedIn] = useState(false);
   const userInfoRef = useRef(null);
   const router = useRouter();
+  const [search, setSearch] = useState("");
+  const [token, setToken] = useState("");
+  const [results, setResults] = useState([]);
+  const [typingTimeout, setTypingTimeout] = useState(null);
+
+  useEffect(() => {
+    // Fetch Spotify access token
+    const getToken = async () => {
+      const res = await fetch("/api/searchToken");
+      const data = await res.json();
+      setToken(data.access_token);
+    };
+    getToken();
+  }, []);
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearch(query);
+
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    setTypingTimeout(setTimeout(() => {
+      if (query.trim() === "") {
+        setResults([]);
+        return;
+      }
+      fetchSearchResults(query);
+    }, 400)); // debounce delay
+  };
+
+  const fetchSearchResults = async (query) => {
+    const res = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    setResults(data.tracks?.items || []);
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userInfo") || "null");
@@ -141,17 +184,7 @@ const Header = () => {
       )}
 
       {notLoggedIn && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.7)", // darker overlay
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000,
-        }} ref={userInfoRef}>
+        <div style={userInfoBoxStyle} ref={userInfoRef}>
           <strong>You are not logged in. </strong>
           <div style={{ marginTop: "10px" }}>
             Redirecting to login page...
@@ -160,9 +193,72 @@ const Header = () => {
       )}
 
       <Link href="/" style={siteNameStyle}>Tuneflix</Link>
-      <Link href="/search" style={searchIconStyle}>
-        <FontAwesomeIcon icon={faSearch} />
-      </Link>
+      <div style={{
+        position: "absolute",
+        right: "70px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+      }}>
+        <div style={{ position: "relative" }}>
+          <FontAwesomeIcon
+            icon={faSearch}
+            style={{
+              position: "absolute",
+              left: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "#aaa",
+              pointerEvents: "none",
+              fontSize: "1rem",
+            }}
+          />
+          <textarea
+            rows="1"
+            placeholder="Search songs..."
+            value={search}
+            onChange={handleSearchChange}
+            style={{
+              padding: "8px 8px 8px 32px",
+              borderRadius: "20px",
+              border: "1px solid #444",
+              backgroundColor: "#222",
+              color: "white",
+              resize: "none",
+              fontSize: "1rem",
+              outline: "none",
+              width: "220px",
+            }}
+          />
+        </div>
+        {results.length > 0 && (
+          <div style={{
+            marginTop: "5px",
+            backgroundColor: "#333",
+            borderRadius: "8px",
+            width: "220px",
+            maxHeight: "200px",
+            overflowY: "auto",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
+            zIndex: 1002,
+          }}>
+            {results.map(track => (
+              <div key={track.id} style={{
+                padding: "10px",
+                borderBottom: "1px solid #444",
+                cursor: "pointer",
+              }}>
+                <strong>{track.name}</strong>
+                <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
+                  {track.artists.map(artist => artist.name).join(", ")}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+
     </header>
   );
 };

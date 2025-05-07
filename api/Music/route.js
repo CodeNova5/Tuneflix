@@ -68,6 +68,11 @@ export default async function handler(req, res) {
     const decodedArtistName = decodeURIComponent(artistName || "");
     const decodedSongName = decodeURIComponent(songName || "");
 
+    if (type === "searchToken") {
+      const accessToken = await getSpotifyAccessToken();
+      res.setHeader('Cache-Control', 'max-age=60000, stale-while-revalidate');
+      return res.status(200).json({ access_token: accessToken });
+    }
     if (type === "songDetails") {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist or song" });
