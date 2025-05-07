@@ -195,6 +195,7 @@ const Header = () => {
       <Link href="/" style={siteNameStyle}>Tuneflix</Link>
       <div style={{
         position: "absolute",
+        top: "10px",
         right: "70px",
         display: "flex",
         flexDirection: "column",
