@@ -194,88 +194,70 @@ const Header = () => {
 
       <Link href="/" style={siteNameStyle}>Tuneflix</Link>
       <div style={{
-  position: "absolute",
-  top: "10px",
-  right: "70px",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-end",
-}}>
-  <div style={{ position: "relative" }}>
-    <FontAwesomeIcon
-      icon={faSearch}
-      style={{
         position: "absolute",
-        left: "10px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        color: "#aaa",
-        pointerEvents: "none",
-        fontSize: "1rem",
-      }}
-    />
-    <textarea
-      rows="1"
-      placeholder="Search songs, artists, albums..."
-      value={search}
-      onChange={handleSearchChange}
-      style={{
-        padding: "8px 8px 8px 32px",
-        borderRadius: "20px",
-        border: "1px solid #444",
-        backgroundColor: "#222",
-        color: "white",
-        resize: "none",
-        fontSize: "1rem",
-        outline: "none",
-        width: "220px",
-      }}
-    />
-  </div>
-
-  {results.length > 0 && (
-    <div style={{
-      marginTop: "5px",
-      backgroundColor: "#333",
-      borderRadius: "8px",
-      width: "220px",
-      maxHeight: "300px",
-      overflowY: "auto",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
-      zIndex: 1002,
-    }}>
-      {results.map(item => (
-        <div
-          key={item.id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            padding: "10px",
-            borderBottom: "1px solid #444",
-            cursor: "pointer",
-          }}
-        >
-          <img
-            src={item.album?.images[0]?.url || "/placeholder.jpg"}
-            alt="{item.name}"
-            style={{ width: "40px", height: "40px", borderRadius: "4px", objectFit: "cover" }}
+        top: "10px",
+        right: "70px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+      }}>
+        <div style={{ position: "relative" }}>
+          <FontAwesomeIcon
+            icon={faSearch}
+            style={{
+              position: "absolute",
+              left: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "#aaa",
+              pointerEvents: "none",
+              fontSize: "1rem",
+            }}
           />
-          <div style={{ flex: 1 }}>
-            <strong>{item.name}</strong>
-            <div style={{ fontSize: "0.8rem", color: "#bbb" }}>
-              {item.type === "track" && item.artists?.map(a => a.name).join(", ")}
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "#888" }}>
-              {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-            </div>
-          </div>
+          <textarea
+            rows="1"
+            placeholder="Search songs..."
+            value={search}
+            onChange={handleSearchChange}
+            style={{
+              padding: "8px 8px 8px 32px",
+              borderRadius: "20px",
+              border: "1px solid #444",
+              backgroundColor: "#222",
+              color: "white",
+              resize: "none",
+              fontSize: "1rem",
+              outline: "none",
+              width: "220px",
+            }}
+          />
         </div>
-      ))}
-    </div>
-  )}
-</div>
-
+        {results.length > 0 && (
+          <div style={{
+            marginTop: "5px",
+            backgroundColor: "#333",
+            borderRadius: "8px",
+            width: "220px",
+            maxHeight: "200px",
+            overflowY: "auto",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
+            zIndex: 1002,
+          }}>
+            {results.map(track => (
+              <div key={track.id} style={{
+                padding: "10px",
+                borderBottom: "1px solid #444",
+                cursor: "pointer",
+              }}>
+                <strong>{track.name}</strong>
+                <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
+                  {track.artists.map(artist => artist.name).join(", ")}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </header>
   );
 };
