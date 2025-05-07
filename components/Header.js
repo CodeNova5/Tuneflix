@@ -199,9 +199,7 @@ const Header = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-end",
-        position: "relative", // ADD THIS
       }}>
-
         <div style={{ position: "relative" }}>
           <FontAwesomeIcon
             icon={faSearch}
@@ -259,8 +257,6 @@ const Header = () => {
           </div>
         )}
       </div>
-
-
     </header>
   );
 };
