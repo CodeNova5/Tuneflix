@@ -232,33 +232,71 @@ const Header = () => {
             }}
           />
         </div>
-        {results.map(track => (
-          <div key={track.id} style={{
-            display: "flex",
-            alignItems: "center",
-            padding: "10px",
-            borderBottom: "1px solid #444",
-            cursor: "pointer",
+        {results.length > 0 && (
+          <div style={{
+            position: "fixed",
+            top: "60px",
+            left: 0,
+            width: "100%",
+            height: "80%",
+            backgroundColor: "#111",
+            zIndex: 1002,
+            overflowY: "auto",
+            padding: "20px",
           }}>
-            <img
-              src={track.album.images[2]?.url || track.album.images[0]?.url}
-              alt="Album Art"
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "4px",
-                marginRight: "10px",
-                objectFit: "cover",
+            <button
+              onClick={() => {
+                setSearch("");
+                setResults([]);
               }}
-            />
-            <div>
-              <strong>{track.name}</strong>
-              <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
-                {track.artists.map(artist => artist.name).join(", ")}
-              </div>
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "20px",
+                background: "#333",
+                color: "white",
+                border: "none",
+                padding: "8px 12px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "0.9rem",
+              }}
+            >
+              Cancel
+            </button>
+
+            <div style={{ marginTop: "40px" }}>
+              {results.map(track => (
+                <div key={track.id} style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "12px 0",
+                  borderBottom: "1px solid #444",
+                  cursor: "pointer",
+                }}>
+                  <img
+                    src={track.album.images[2]?.url || track.album.images[0]?.url}
+                    alt="Album Art"
+                    style={{
+                      width: "60px",
+                      height: "60px",
+                      borderRadius: "4px",
+                      marginRight: "15px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <div>
+                    <strong style={{ color: "white" }}>{track.name}</strong>
+                    <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
+                      {track.artists.map(artist => artist.name).join(", ")}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
+        )}
+
 
       </div>
     </header>
