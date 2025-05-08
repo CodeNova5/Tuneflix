@@ -84,9 +84,7 @@ export default function LoginPage() {
 
   const checkLocalStorage = () => {
     const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      router.push('/');
-    }
+
   };
 
   const loginWithFacebook = () => {
@@ -108,7 +106,7 @@ export default function LoginPage() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Google and Facebook Login</h1>
+      <h1 style={styles.title}>Login with Google or Facebook</h1>
 
       <div style={styles.section}>
         <h2 style={styles.subtitle}>Google Login</h2>
@@ -135,32 +133,42 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '2rem',
     fontFamily: 'Arial, sans-serif',
     textAlign: 'center',
-    backgroundColor: '#f0f0f0',
-    height: '100vh',
+    backgroundColor: '#121212', // Dark background
+    color: '#FFFFFF', // White text
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
-    fontSize: '2rem',
-    marginBottom: '1.5rem',
+    fontSize: '2.5rem',
+    marginBottom: '2rem',
+    fontWeight: 'bold',
   },
   subtitle: {
-    fontSize: '1.25rem',
+    fontSize: '1.5rem',
     marginBottom: '1rem',
+    fontWeight: 'bold',
   },
   section: {
     marginBottom: '2rem',
-    padding: '1rem',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    display: 'inline-block',
-    minWidth: '300px',
+    padding: '1.5rem',
+    backgroundColor: '#1E1E1E', // Slightly lighter dark background
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
+    width: '100%',
+    maxWidth: '400px',
+    textAlign: 'center',
   },
   button: {
-    padding: '0.5rem 1rem',
+    padding: '0.75rem 1.5rem',
     fontSize: '1rem',
-    backgroundColor: '#1877F2',
-    color: '#fff',
+    backgroundColor: '#1877F2', // Facebook blue
+    color: '#FFFFFF',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+    transition: 'background-color 0.3s',
   },
 };
