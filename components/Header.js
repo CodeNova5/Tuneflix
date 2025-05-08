@@ -74,19 +74,11 @@ const Header = () => {
   const userInfoRef = useRef(null);
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [token, setToken] = useState("");
+
   const [results, setResults] = useState([]);
   const [typingTimeout, setTypingTimeout] = useState(null);
 
-  useEffect(() => {
-    // Fetch Spotify access token
-    const getToken = async () => {
-      const res = await fetch("/api/Music/route?type=searchToken");
-      const data = await res.json();
-      setToken(data.access_token);
-    };
-    getToken();
-  }, []);
+
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
@@ -104,18 +96,11 @@ const Header = () => {
   };
 
   const fetchSearchResults = async (query) => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
+    const res = await fetch(`/api/Music/route?type=search&query=${encodeURIComponent(query)}`);
     const data = await res.json();
     setResults(data.tracks?.items || []);
   };
+  
   useEffect(() => {
     if (results.length > 0) {
       document.body.style.overflow = "hidden"; // disable background scroll

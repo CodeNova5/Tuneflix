@@ -68,37 +68,20 @@ export default async function handler(req, res) {
     const decodedArtistName = decodeURIComponent(artistName || "");
     const decodedSongName = decodeURIComponent(songName || "");
 
-    if (type === "searchToken") {
-      const accessToken = await getSpotifyAccessToken();
-      res.setHeader('Cache-Control', 'max-age=60000, stale-while-revalidate');
-      return res.status(200).json({ access_token: accessToken });
+    if (type === "search") {
+      const query = req.query.query;
+      const token = await getSpotifyToken(); // however you're getting it
+    
+      const searchRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    
+      const json = await searchRes.json();
+      return res.status(200).json(json);
     }
-    if (type === "songDetails") {
-      if (!artistName || !songName) {
-        return res.status(400).json({ error: "Missing artist or song" });
-      }
-      try {
-        const accessToken = await getSpotifyAccessToken();
-        const query = `${decodedArtistName} ${decodedSongName}`;
-        const searchResponse = await fetch(
-          `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`,
-          { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-
-        if (!searchResponse.ok) throw new Error("Failed to fetch song details");
-
-        const searchData = await searchResponse.json();
-        if (!searchData.tracks?.items?.length) {
-          return res.status(404).json({ error: "Song not found" });
-        }
-
-        res.setHeader('Cache-Control', 'max-age=31536000, immutable'); return res.status(200).json(searchData.tracks.items[0]);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch song details" });
-      }
-    }
-
+    
     else if (type === "youtubeMusicVideo") {
       if (!YOUTUBE_API_KEY) {
         console.error("Missing YouTube API key.");
