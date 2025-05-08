@@ -1,167 +1,166 @@
-// app/login/page.tsx (Next.js 13+ with App Router)
 'use client';
-
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+declare global {
+  interface Window {
+    google: any;
+    FB: any;
+    fbAsyncInit: any;
+    handleCredentialResponse?: (response: any) => void;
+  }
+}
 
 export default function LoginPage() {
+  const router = useRouter();
+
   useEffect(() => {
-    // Google script load
+    // Google script
     const googleScript = document.createElement('script');
     googleScript.src = 'https://accounts.google.com/gsi/client';
     googleScript.async = true;
     googleScript.defer = true;
     document.body.appendChild(googleScript);
 
-    // Facebook script load
-    const facebookScript = document.createElement('script');
-    facebookScript.src = 'https://connect.facebook.net/en_US/sdk.js';
-    facebookScript.async = true;
-    facebookScript.defer = true;
-    facebookScript.crossOrigin = 'anonymous';
-    facebookScript.id = 'facebook-jssdk';
-    document.body.appendChild(facebookScript);
-
-    // Google callback
-    (window as any).handleCredentialResponse = (response: any) => {
+    window.handleCredentialResponse = (response: any) => {
       if (response.credential) {
         const data = parseJwt(response.credential);
-        console.log('Decoded Google JWT:', data);
         saveUserInfo('google', data);
-        displayGoogleUserInfo(data);
+        router.push('/');
       } else {
-        console.error('Error: No Google credential received.');
+        console.error("Error: No Google credential received.");
       }
     };
 
-    // Facebook init
-    (window as any).fbAsyncInit = function () {
-      (window as any).FB.init({
+    window.onload = () => {
+      window.google?.accounts.id.initialize({
+        client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62',
+        callback: window.handleCredentialResponse,
+        cancel_on_tap_outside: false,
+      });
+      window.google?.accounts.id.prompt();
+    };
+
+    // Facebook script
+    const fbScript = document.createElement('script');
+    fbScript.src = 'https://connect.facebook.net/en_US/sdk.js';
+    fbScript.async = true;
+    fbScript.defer = true;
+    document.body.appendChild(fbScript);
+
+    window.fbAsyncInit = () => {
+      window.FB.init({
         appId: '2236984449983471',
         cookie: true,
         xfbml: true,
         version: 'v17.0',
       });
 
-      (window as any).FB.getLoginStatus(function (response: any) {
+      window.FB.getLoginStatus((response: any) => {
         if (response.status === 'connected') {
           fetchFacebookUserInfo();
         }
       });
     };
 
-    // Check existing session
     checkLocalStorage();
-
-    // Delay Google prompt init to ensure script is loaded
-    setTimeout(() => {
-      if ((window as any).google?.accounts?.id) {
-        (window as any).google.accounts.id.initialize({
-          client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62',
-          callback: (window as any).handleCredentialResponse,
-          cancel_on_tap_outside: false,
-        });
-        (window as any).google.accounts.id.prompt();
-      }
-    }, 1000);
   }, []);
 
-  function parseJwt(token: string) {
+  const parseJwt = (token: string) => {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
     return JSON.parse(jsonPayload);
-  }
+  };
 
-  function saveUserInfo(provider: string, data: any) {
+  const saveUserInfo = (provider: string, data: any) => {
     localStorage.setItem('userInfo', JSON.stringify({ provider, data }));
-  }
+  };
 
-  function displayGoogleUserInfo(data: any) {
-    const nameEl = document.getElementById('google-name');
-    const emailEl = document.getElementById('google-email');
-    const idEl = document.getElementById('google-id');
-    const imgEl = document.getElementById('google-profile-img') as HTMLImageElement;
+  const checkLocalStorage = () => {
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      router.push('/');
+    }
+  };
 
-    if (nameEl) nameEl.innerText = `Name: ${data.name}`;
-    if (emailEl) emailEl.innerText = `Email: ${data.email}`;
-    if (idEl) idEl.innerText = `Google ID: ${data.sub}`;
-    if (imgEl) imgEl.src = data.picture;
-  }
-
-  function displayFacebookUserInfo(data: any) {
-    const nameEl = document.getElementById('facebook-name');
-    const emailEl = document.getElementById('facebook-email');
-    const idEl = document.getElementById('facebook-id');
-    const imgEl = document.getElementById('facebook-profile-img') as HTMLImageElement;
-
-    if (nameEl) nameEl.innerText = `Name: ${data.name}`;
-    if (emailEl) emailEl.innerText = `Email: ${data.email}`;
-    if (idEl) idEl.innerText = `Facebook ID: ${data.id}`;
-    if (imgEl) imgEl.src = data.picture?.data?.url;
-  }
-
-  function checkLocalStorage() {
-    const stored = localStorage.getItem('userInfo');
-    if (!stored) return;
-    const { provider, data } = JSON.parse(stored);
-    provider === 'google'
-      ? displayGoogleUserInfo(data)
-      : displayFacebookUserInfo(data);
-  }
-
-  function loginWithFacebook() {
-    (window as any).FB.login((response: any) => {
+  const loginWithFacebook = () => {
+    window.FB.login((response: any) => {
       if (response.authResponse) {
         fetchFacebookUserInfo();
       } else {
-        console.error('User cancelled Facebook login.');
+        console.error('User cancelled Facebook login or did not authorize.');
       }
     }, { scope: 'public_profile,email' });
-  }
+  };
 
-  function fetchFacebookUserInfo() {
-    (window as any).FB.api('/me', { fields: 'id,name,email,picture.width(400).height(400)' }, (response: any) => {
-      console.log('Facebook User Info:', response);
+  const fetchFacebookUserInfo = () => {
+    window.FB.api('/me', { fields: 'id,name,email,picture.width(400).height(400)' }, (response: any) => {
       saveUserInfo('facebook', response);
-      displayFacebookUserInfo(response);
+      router.push('/');
     });
-  }
+  };
 
   return (
-    <div>
-      <h1>Google and Facebook Login Demo</h1>
+    <div style={styles.container}>
+      <h1 style={styles.title}>Google and Facebook Login</h1>
 
-      <h2>Google Login</h2>
-      <div
-        id="g_id_onload"
-        data-client_id="847644538886-h57vcktcmjhdlj553b33js8tnenlge62"
-        data-context="signin"
-        data-ux_mode="popup"
-        data-callback="handleCredentialResponse"
-        data-auto_prompt="false"
-      ></div>
-      <div className="g_id_signin" data-type="standard"></div>
-
-      <div>
-        <p id="google-name">Name: </p>
-        <p id="google-email">Email: </p>
-        <p id="google-id">Google ID: </p>
-        <img id="google-profile-img" alt="Google Profile" />
+      <div style={styles.section}>
+        <h2 style={styles.subtitle}>Google Login</h2>
+        <div id="g_id_onload"
+             data-client_id="847644538886-h57vcktcmjhdlj553b33js8tnenlge62"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false"
+        />
+        <div className="g_id_signin" data-type="standard" />
       </div>
 
-      <h2>Facebook Login</h2>
-      <button onClick={loginWithFacebook}>Login with Facebook</button>
-      <div>
-        <p id="facebook-name">Name: </p>
-        <p id="facebook-email">Email: </p>
-        <p id="facebook-id">Facebook ID: </p>
-        <img id="facebook-profile-img" alt="Facebook Profile" />
+      <div style={styles.section}>
+        <h2 style={styles.subtitle}>Facebook Login</h2>
+        <button onClick={loginWithFacebook} style={styles.button}>Login with Facebook</button>
       </div>
     </div>
   );
 }
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    padding: '2rem',
+    fontFamily: 'Arial, sans-serif',
+    textAlign: 'center',
+    backgroundColor: '#f0f0f0',
+    height: '100vh',
+  },
+  title: {
+    fontSize: '2rem',
+    marginBottom: '1.5rem',
+  },
+  subtitle: {
+    fontSize: '1.25rem',
+    marginBottom: '1rem',
+  },
+  section: {
+    marginBottom: '2rem',
+    padding: '1rem',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    display: 'inline-block',
+    minWidth: '300px',
+  },
+  button: {
+    padding: '0.5rem 1rem',
+    fontSize: '1rem',
+    backgroundColor: '#1877F2',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  },
+};
