@@ -232,31 +232,34 @@ const Header = () => {
             }}
           />
         </div>
-        {results.length > 0 && (
-          <div style={{
-            marginTop: "5px",
-            backgroundColor: "#333",
-            borderRadius: "8px",
-            width: "220px",
-            maxHeight: "200px",
-            overflowY: "auto",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
-            zIndex: 1002,
+        {results.map(track => (
+          <div key={track.id} style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "10px",
+            borderBottom: "1px solid #444",
+            cursor: "pointer",
           }}>
-            {results.map(track => (
-              <div key={track.id} style={{
-                padding: "10px",
-                borderBottom: "1px solid #444",
-                cursor: "pointer",
-              }}>
-                <strong>{track.name}</strong>
-                <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
-                  {track.artists.map(artist => artist.name).join(", ")}
-                </div>
+            <img
+              src={track.album.images[2]?.url || track.album.images[0]?.url}
+              alt="Album Art"
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "4px",
+                marginRight: "10px",
+                objectFit: "cover",
+              }}
+            />
+            <div>
+              <strong>{track.name}</strong>
+              <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
+                {track.artists.map(artist => artist.name).join(", ")}
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
+
       </div>
     </header>
   );
