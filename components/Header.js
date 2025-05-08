@@ -116,6 +116,17 @@ const Header = () => {
     const data = await res.json();
     setResults(data.tracks?.items || []);
   };
+  useEffect(() => {
+    if (results.length > 0) {
+      document.body.style.overflow = "hidden"; // disable background scroll
+    } else {
+      document.body.style.overflow = ""; // re-enable scroll
+    }
+
+    return () => {
+      document.body.style.overflow = ""; // cleanup on unmount
+    };
+  }, [results]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userInfo") || "null");
@@ -160,6 +171,7 @@ const Header = () => {
     } else {
       setShowUserInfo((prev) => !prev);
     }
+
   };
 
   return (
