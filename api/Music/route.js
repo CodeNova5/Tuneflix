@@ -70,7 +70,7 @@ export default async function handler(req, res) {
 
     if (type === "search") {
       const query = req.query.query;
-      const token = await getSpotifyToken(); // however you're getting it
+      const token = await getArtistAccessToken(); // however you're getting it
     
       const searchRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
         headers: {
