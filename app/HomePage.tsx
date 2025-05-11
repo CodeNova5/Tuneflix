@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { genre, mood, animeVerse, countrySongs, kids } from "../components/arrays";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 interface ChartItem {
     title: string;
     artist: string;
@@ -203,7 +204,7 @@ export default function HomePage() {
                     ))}
                 </div>
             </div>
-
+            <Footer />
         </div>
     );
 }
