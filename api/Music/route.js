@@ -58,7 +58,7 @@ async function getArtistAccessToken() {
 }
 export default async function handler(req, res) {
   try {
-    const { type, artistName, songName, artistDetails, artistId, albumId, playlistId, playlistType } = req.query;
+    const { type, artistName, songName, artistDetails, artistSongs, artistId, albumId, playlistId, playlistType } = req.query;
 
     if (!type) {
       return res.status(400).json({ error: "Missing type parameter (spotify or youtube)" });
