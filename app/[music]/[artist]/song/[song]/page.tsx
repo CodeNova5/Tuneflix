@@ -4,7 +4,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import '@fortawesome/fontawesome-free/css/all.min.css'; 
 import { ID3Writer } from 'browser-id3-writer';
-import CommentShareModule from '../../../../../components/CommentShareModule'
+import CommentShareModule from '@/components/CommentShareModule'
+import Header from '@/components/Header'
+import Footer from "@/components/Footer";
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -306,6 +308,7 @@ export default function Page() {
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
+      <Header />
       <h1>{track.name}</h1>
       <h2>by {track.artists.map((a) => a.name).join(", ")}</h2>
       <img src={track.album.images[0]?.url} alt={track.name} width="300" />
@@ -564,6 +567,7 @@ export default function Page() {
           <p>No related tracks found.</p>
         )}
       </div>
+      <Footer />
     </div >
   );
 }
