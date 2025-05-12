@@ -97,7 +97,7 @@ export default function ArtistPage() {
   }
 
   return (
-    <div style={{ textAlign: "center", padding: "20px", marginTop: "20px" }}>
+    <div style={{ textAlign: "center", padding: "20px", marginTop: "40px" }}>
       <Header />
       <h1>{artistDetails.name}</h1>
       <img
