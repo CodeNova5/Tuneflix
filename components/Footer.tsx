@@ -9,7 +9,7 @@ import {
     faInstagram,
     faWhatsapp,
 } from '@fortawesome/free-brands-svg-icons';
-import styles from '../Footer.module.css';
+import styles from './Footer.module.css';
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
