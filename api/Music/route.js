@@ -7,7 +7,6 @@ let spotifyAccessToken = null;
 let spotifyTokenExpiresAt = 0;
 let artistAccessToken = null;
 import axios from "axios";
-import * as cheerio from "cheerio";
 
 let artistTokenExpiresAt = 0;
 
@@ -58,7 +57,7 @@ async function getArtistAccessToken() {
 }
 export default async function handler(req, res) {
   try {
-    const { type, artistName, songName, artistDetails, artistSongs, artistId, albumId, playlistId, playlistType } = req.query;
+    const { type, artistName, songName, artistDetails, artistSongs, songDetails, artistId, albumId, playlistId, playlistType } = req.query;
 
     if (!type) {
       return res.status(400).json({ error: "Missing type parameter (spotify or youtube)" });
@@ -71,17 +70,60 @@ export default async function handler(req, res) {
     if (type === "search") {
       const query = req.query.query;
       const token = await getArtistAccessToken(); // however you're getting it
-    
+
       const searchRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-    
+
       const json = await searchRes.json();
       return res.status(200).json(json);
     }
-    
+
+    else if (type === "songDetails") {
+      if (!artistName || !songName) {
+        return res.status(400).json({ error: "Missing artist name or song name" });
+      }
+
+      try {
+        const accessToken = await getSpotifyAccessToken();
+        const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+          `${decodedArtistName} ${decodedSongName}`
+        )}&type=track&limit=1`;
+
+        const response = await fetch(apiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch song details");
+        }
+
+        const data = await response.json();
+        if (!data.tracks?.items?.length) {
+          return res.status(404).json({ error: "Song not found" });
+        }
+
+        const track = data.tracks.items[0];
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        return res.status(200).json({
+          name: track.name,
+          artists: track.artists.map((artist) => ({ name: artist.name })),
+          album: {
+            name: track.album.name,
+            images: track.album.images,
+            release_date: track.album.release_date,
+            type: track.album.album_type,
+          },
+          preview_url: track.preview_url,
+          duration_ms: track.duration_ms,
+        });
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch song details" });
+      }
+    }
     else if (type === "youtubeMusicVideo") {
       if (!YOUTUBE_API_KEY) {
         console.error("Missing YouTube API key.");
