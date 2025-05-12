@@ -2,10 +2,9 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import CommentSection from '../../../../../components/CommentSection';
 import '@fortawesome/fontawesome-free/css/all.min.css'; 
 import { ID3Writer } from 'browser-id3-writer';
-
+import CommentShareModule from '../../../../../components/CommentShareModule'
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -481,127 +480,7 @@ export default function Page() {
         )
       }
 
-      <style jsx>{`
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
-      <div style={{ marginTop: "20px", textAlign: "center" }}>
-        <h2 style={{ fontSize: "20px", color: "#fff", marginBottom: "10px" }}>Comment and Share</h2>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "20px" }}>
-          <button
-            onClick={toggleModal}
-            style={{
-              padding: "10px",
-              backgroundColor: "transparent",
-              border: "none",
-              cursor: "pointer",
-              height: "40px", // Set a reasonable height
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            aria-label={isModalOpen ? "Close Comments" : "Open Comments"}
-          >
-            <i className="fas fa-comments" style={{ fontSize: "20px" }}></i>
-          </button>
-
-          <button
-            onClick={async () => {
-              const shareData = {
-                title: `${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
-                text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(", ")}`,
-                url: window.location.href,
-              };
-
-              if (navigator.share) {
-                try {
-                  await navigator.share(shareData);
-                } catch (err) {
-                  console.error("Error sharing the link:", err);
-                }
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Link copied to clipboard!");
-              }
-            }}
-            style={{
-              padding: "10px",
-              backgroundColor: "transparent",
-              border: "none",
-              cursor: "pointer",
-              height: "40px", // Set a reasonable height
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            aria-label="Share Song"
-          >
-            <i className="fas fa-share-nodes" style={{ fontSize: "20px" }}></i>
-          </button>
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "10px" }}>
-          <span style={{ fontSize: "14px", color: "#555" }}>Comment</span>
-          <span style={{ fontSize: "14px", color: "#555" }}>Share</span>
-        </div>
-      </div>
-
-      {
-        isModalOpen && (
-          <div
-            style={{
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              width: "100%",
-              height: "80%",
-              backgroundColor: "#1e1e1e", // Dark mode modal background
-              color: "#ffffff", // Modal text color
-              boxShadow: "0 -4px 8px rgba(0, 0, 0, 0.2)",
-              borderTopLeftRadius: "16px",
-              borderTopRightRadius: "16px",
-              overflowY: "auto",
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                position: "sticky", // Keeps the header fixed at the top
-                top: 0,
-                backgroundColor: "#1e1e1e", // Match modal background
-                zIndex: 1001, // Ensure it stays above the content
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "10px 20px",
-                borderBottom: "1px solid #444", // Dark mode border
-              }}
-            >
-              <h2>Comments</h2>
-              <button
-                onClick={toggleModal}
-                style={{
-                  backgroundColor: "transparent",
-                  border: "none",
-                  fontSize: "20px",
-                  color: "#ffffff", // Close button color
-                  cursor: "pointer",
-                }}
-              >
-                ✖
-              </button>
-            </div>
-            <div style={{ padding: "20px" }}>
-              <CommentSection />
-            </div>
-          </div>
-        )
-      }
+      {track && <CommentShareModule track={track} />}
 
       {/* Lyrics Section */}
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
