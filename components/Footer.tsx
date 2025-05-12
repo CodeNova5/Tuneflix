@@ -1,119 +1,92 @@
 import Link from 'next/link';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faFacebookF,
-  faTwitter,
-  faInstagram,
-  faWhatsapp,
-} from "@fortawesome/free-brands-svg-icons";
+    faGithub,
+    faLinkedin,
+    faTwitter,
+    faCodepen,
+    faFacebookF,
+    faInstagram,
+    faWhatsapp,
+} from '@fortawesome/free-brands-svg-icons';
+import styles from '../Footer.module.css';
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer style={styles.footer}>
-            <div style={styles.container}>
-                {/* Contact Information */}
-                <div style={styles.section}>
-                    <h3 style={styles.heading}>Contact Information</h3>
-                    <p>Email: <a href="mailto:codenova02@gmail.com" style={styles.link}>codenova02@gmail.com</a></p>
-                    <p>Phone: <a href="tel:+2349072089091" style={styles.link}>+2349072089091</a></p>
-                </div>
+        <footer className={styles.footer}>
+            <div className={styles.container}>
 
-                {/* Social Media Links */}
-                <div style={styles.section}>
-                    <h3 style={styles.heading}>Follow Us</h3>
-                    <div style={styles.socialIcons}>
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={styles.icon}>
-                            <FontAwesomeIcon icon={faFacebookF} size="lg" />
-                        </a>
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" style={styles.icon}>
-                            <FontAwesomeIcon icon={faTwitter} size="lg" />
-                        </a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={styles.icon}>
-                            <FontAwesomeIcon icon={faInstagram} size="lg" />
-                        </a>
-                        <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" style={styles.icon}>
-                            <FontAwesomeIcon icon={faWhatsapp} size="lg" />
-                        </a>
-                    </div>
-                </div>
-
-                {/* Quick Navigation Links */}
-                <div style={styles.section}>
-                    <h3 style={styles.heading}>Quick Links</h3>
-                    <ul style={styles.linkList}>
-                        <li><Link href="/about" style={styles.link}>About</Link></li>
-                        <li><Link href="/contact" style={styles.link}>Contact</Link></li>
-                        <li><Link href="/faq" style={styles.link}>FAQ</Link></li>
-                        <li><Link href="/privacy-policy" style={styles.link}>Privacy Policy</Link></li>
-                        <li><Link href="/terms-of-service" style={styles.link}>Terms of Service</Link></li>
+                {/* Developer Info */}
+                <section className={styles.section}>
+                    <h3 className={styles.heading}>Developer</h3>
+                    <ul className={styles.linkList}>
+                        <li><a href="https://your-portfolio.com" target="_blank" rel="noopener noreferrer" className={styles.link}>Portfolio</a></li>
+                        <li><a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className={styles.link}>GitHub</a></li>
+                        <li><a href="https://www.linkedin.com/in/yourusername/" target="_blank" rel="noopener noreferrer" className={styles.link}>LinkedIn</a></li>
+                        <li><a href="https://codepen.io/yourusername" target="_blank" rel="noopener noreferrer" className={styles.link}>CodePen</a></li>
                     </ul>
-                </div>
+                </section>
+
+                {/* Stay Connected */}
+                <section className={styles.section}>
+                    <h3 className={styles.heading}>Stay Connected</h3>
+
+                    <div className={styles.connectedGrid}>
+                        <div className={styles.group}>
+                            <p className={styles.subheading}>Social</p>
+                            <div className={styles.iconRow}>
+                                <a href="https://facebook.com/yourusername" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className={styles.icon}>
+                                    <FontAwesomeIcon icon={faFacebookF} />
+                                </a>
+                                <a href="https://instagram.com/yourusername" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={styles.icon}>
+                                    <FontAwesomeIcon icon={faInstagram} />
+                                </a>
+                                <a href="https://wa.me/yourwhatsapplink" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className={styles.icon}>
+                                    <FontAwesomeIcon icon={faWhatsapp} />
+                                </a>
+                                <a href="https://twitter.com/yourusername" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className={styles.icon}>
+                                    <FontAwesomeIcon icon={faTwitter} />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className={styles.group}>
+                            <p className={styles.subheading}>Developer</p>
+                            <div className={styles.iconRow}>
+                                <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className={styles.icon}>
+                                    <FontAwesomeIcon icon={faGithub} />
+                                </a>
+                                <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={styles.icon}>
+                                    <FontAwesomeIcon icon={faLinkedin} />
+                                </a>
+                                <a href="https://codepen.io/yourusername" target="_blank" rel="noopener noreferrer" aria-label="CodePen" className={styles.icon}>
+                                    <FontAwesomeIcon icon={faCodepen} />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                {/* Site Navigation */}
+                <section className={styles.section}>
+                    <h3 className={styles.heading}>Explore</h3>
+                    <ul className={styles.linkList}>
+                        <li><Link href="/about" className={styles.link}>About</Link></li>
+                        <li><Link href="/projects" className={styles.link}>Projects</Link></li>
+                        <li><Link href="/blog" className={styles.link}>Blog</Link></li>
+                        <li><Link href="/privacy-policy" className={styles.link}>Privacy Policy</Link></li>
+                        <li><Link href="/terms-of-service" className={styles.link}>Terms of Service</Link></li>
+                    </ul>
+                </section>
+
             </div>
 
-            {/* Copyright Notice */}
-            <div style={styles.copyright}>
-                <p>&copy; {currentYear} Your Company Name. All rights reserved.</p>
+            <div className={styles.copyright}>
+                <p>&copy; {currentYear} Developed by Your Name. All rights reserved.</p>
             </div>
         </footer>
     );
 }
-
-const styles: { [key: string]: React.CSSProperties } = {
-    footer: {
-        backgroundColor: '#121212', // Dark background
-        color: '#FFFFFF', // White text
-        padding: '2rem 1rem',
-        textAlign: 'center',
-    },
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-        maxWidth: '1200px',
-        margin: '0 auto',
-    },
-    section: {
-        marginBottom: '1.5rem',
-        flex: '1 1 200px',
-        textAlign: 'left',
-    },
-    heading: {
-        fontSize: '1.25rem',
-        marginBottom: '0.5rem',
-        fontWeight: 'bold',
-    },
-    link: {
-        color: '#1E90FF', // Light blue for links
-        textDecoration: 'none',
-    },
-    socialIcons: {
-        display: 'flex',
-        gap: '0.5rem',
-        justifyContent: 'center',
-    },
-    icon: {
-        display: 'inline-block',
-        width: '32px',
-        height: '32px',
-    },
-    iconImage: {
-        width: '100%',
-        height: '100%',
-    },
-    linkList: {
-        listStyle: 'none',
-        padding: 0,
-        margin: 0,
-    },
-    linkListItem: {
-        marginBottom: '0.5rem',
-    },
-    copyright: {
-        marginTop: '1.5rem',
-        fontSize: '0.875rem',
-        borderTop: '1px solid #333',
-        paddingTop: '1rem',
-    },
-};
