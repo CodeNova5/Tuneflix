@@ -2,6 +2,9 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import CommentShareModule from "@/components/CommentShareModule";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 interface Track {
   name: string;
   album: {
@@ -94,13 +97,18 @@ export default function ArtistPage() {
   }
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
+    <div style={{ textAlign: "center", padding: "20px", marginTop: "20px" }}>
+      <Header />
       <h1>{artistDetails.name}</h1>
       <img
         src={artistDetails.image || "/placeholder.jpg"}
         alt={artistDetails.name}
         style={{ borderRadius: "50%", width: "200px", height: "200px" }}
       />
+      <p style={{ fontSize: "18px", color: "#555" }}>
+        Followers: {artistDetails.followers}
+      </p>
+      <CommentShareModule track={undefined} artist={artistDetails} />
       <h2>Top Tracks</h2>
       <div
         style={{
@@ -223,6 +231,8 @@ export default function ArtistPage() {
           <p>No related artists found.</p>
         )}
       </div>
+      <Footer />
+
     </div>
   );
 }
