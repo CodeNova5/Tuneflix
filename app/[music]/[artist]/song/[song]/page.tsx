@@ -327,7 +327,7 @@ export default function Page() {
             {track.artists.map((a) => a.name).join(", ")}
           </h2>
         </div>
-        <img style={{ textAlign:"center" }} src={track.album.images[0]?.url} alt={track.name} width="300" />
+        <img src={track.album.images[0]?.url} alt={track.name} width="300" />
 
         {/* Song Details Table */}
         <table style={{ margin: "20px auto", borderCollapse: "collapse", width: "80%" }}>
