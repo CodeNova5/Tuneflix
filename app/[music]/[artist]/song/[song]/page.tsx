@@ -23,7 +23,7 @@ interface Track {
   };
   preview_url: string | null;
   duration_ms: number; // Duration of the track in milliseconds
-}
+};
 
 export default function Page() {
   const { artist, song } = useParams() as { artist: string; song: string };
@@ -50,7 +50,7 @@ export default function Page() {
     if (artistName) {
       router.push(`/music/${encodeURIComponent(artistName)}`);
     }
-
+  }
     const toggleModal = () => {
       setIsModalOpen(!isModalOpen);
     };
@@ -644,5 +644,5 @@ export default function Page() {
         <Footer />
       </div >
     );
+    
   }
-}
