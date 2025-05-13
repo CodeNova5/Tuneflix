@@ -57,7 +57,7 @@ async function getArtistAccessToken() {
 }
 export default async function handler(req, res) {
   try {
-    const { type, artistName, songName, artistDetails, artistSongs, songDetails, artistId, albumId, playlistId, playlistType } = req.query;
+    const { type, artistName, songName, artistId, albumId, playlistId, playlistType } = req.query;
 
     if (!type) {
       return res.status(400).json({ error: "Missing type parameter (spotify or youtube)" });
@@ -259,7 +259,7 @@ export default async function handler(req, res) {
       try {
         const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}&track=${encodeURIComponent(decodedSongName)}&api_key=${LAST_FM_API_KEY}&format=json&limit=20`;
+        )}&track=${encodeURIComponent(decodedSongName)}&api_key=${LAST_FM_API_KEY}&format=json&limit=15`;
 
         const response = await fetch(apiUrl);
 
@@ -368,7 +368,7 @@ export default async function handler(req, res) {
         // Fetch related artists from Last.fm
         const lastFmApiUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}&api_key=${LAST_FM_API_KEY}&format=json&limit=20`;
+        )}&api_key=${LAST_FM_API_KEY}&format=json&limit=10`;
 
         const lastFmResponse = await fetch(lastFmApiUrl);
 

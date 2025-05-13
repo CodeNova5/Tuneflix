@@ -253,8 +253,6 @@ export default function Page() {
       const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
       const artistName = track?.artists[0]?.name ?? "Unknown Artist";
       const albumName = track?.album?.name ?? "Unknown Album";
-      const releaseYear = track?.album?.release_date?.split("-")[0] ?? "Unknown Year";
-
       try {
         const response = await fetch(
           `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
@@ -321,7 +319,7 @@ export default function Page() {
     }
 
     return (
-      <div style={{ textAlign: "center", padding: "20px", marginTop: "40px" }}>
+      <div style={{ textAlign: "center", backgroundColor:"#111", padding: "20px", marginTop: "40px" }}>
         <Header />
         <div style={{ fontSize: "30px", fontWeight: "bold" }}>
           <h1>{track.name}</h1>
@@ -329,7 +327,7 @@ export default function Page() {
             {track.artists.map((a) => a.name).join(", ")}
           </h2>
         </div>
-        <img src={track.album.images[0]?.url} alt={track.name} width="300" />
+        <img style={{ textAlign:"center" }} src={track.album.images[0]?.url} alt={track.name} width="300" />
 
         {/* Song Details Table */}
         <table style={{ margin: "20px auto", borderCollapse: "collapse", width: "80%" }}>
@@ -429,7 +427,7 @@ export default function Page() {
           )}
         </div>
         <div style={{ marginTop: "20px", textAlign: "center" }}>
-          <h3 style={{ fontSize: "16px", margin: "10px 0" }}>Listen to the song:</h3>
+          <h3 style={{ fontSize: "25px", margin: "10px 0" }}>Listen to the song</h3>
           {!downloadUrl ? (
             <p>Preparing audio, please wait...</p>
           ) : (
@@ -561,7 +559,7 @@ export default function Page() {
 
         {/* Lyrics Section */}
         <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
-          <h3>Lyrics:</h3>
+          <h2>Lyrics</h2>
           <p>Loading lyrics...</p>
         </div>
         <h1>Songs by {track.artists[0]?.name}</h1>
