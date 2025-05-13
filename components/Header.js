@@ -16,6 +16,7 @@ const headerStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  borderBottom: "1px solid #444",
   color: "white",
   zIndex: 1000,
 };

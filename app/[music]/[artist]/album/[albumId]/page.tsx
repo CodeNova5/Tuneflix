@@ -2,7 +2,9 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-
+import CommentShareModule from "@/components/CommentShareModule";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 export default function AlbumPage() {
   const { artist, albumId } = useParams() as { artist: string; albumId: string };
   const [albumDetails, setAlbumDetails] = React.useState<any | null>(null);
@@ -43,7 +45,8 @@ export default function AlbumPage() {
   }
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
+    <div style={{ textAlign: "center", padding: "20px", backgroundColor: "#111", marginTop: "20px" }}>
+      <Header />
       <h1>{albumDetails.name}</h1>
       <img
         src={albumDetails.image || "/placeholder.jpg"}
@@ -57,7 +60,11 @@ export default function AlbumPage() {
         Total Tracks: {albumDetails.totalTracks}
       </p>
       <h2>Tracks</h2>
-
+      <CommentShareModule
+        track={undefined}
+        album={albumDetails}
+        artist={artist}
+        />
       <ul style={{ listStyle: "none", padding: 0 }}>
 
         {albumDetails.tracks.map((track: any, index: number) => (
@@ -78,6 +85,7 @@ export default function AlbumPage() {
           </Link>
         ))}
       </ul>
+      <Footer />
     </div>
   );
 }

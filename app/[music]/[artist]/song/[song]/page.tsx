@@ -321,8 +321,8 @@ export default function Page() {
     return (
       <div style={{ textAlign: "center", backgroundColor:"#111", padding: "20px", marginTop: "40px" }}>
         <Header />
-        <div style={{ fontSize: "30px", fontWeight: "bold" }}>
-          <h1>{track.name}</h1>
+        <div style={{ fontSize: "25px", fontWeight: "bold" }}>
+          <h1>{track.name} by </h1>
           <h2>
             {track.artists.map((a) => a.name).join(", ")}
           </h2>
@@ -555,7 +555,7 @@ export default function Page() {
           )
         }
 
-        <CommentShareModule track={track} artist={undefined} />
+        <CommentShareModule track={track} artist={undefined} album={undefined} />
 
         {/* Lyrics Section */}
         <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>

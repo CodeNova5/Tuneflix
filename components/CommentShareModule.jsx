@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import CommentSection from './CommentSection'; // adjust path as needed
 
-const CommentShareModule = ({ track, artist }) => {
+const CommentShareModule = ({ track, artist, album }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
-  // Ensure only one of `track` or `artist` is provided
-  if (!track && !artist) {
-    console.error('CommentShareModule requires either a track or an artist.');
+  const inputs = [track, artist, album].filter(Boolean);
+  if (inputs.length === 0) {
+    console.error('CommentShareModule requires one of: track, artist, or album.');
     return null;
   }
-  if (track && artist) {
-    console.error('CommentShareModule should accept either a track or an artist, not both.');
+  if (inputs.length > 1) {
+    console.error('CommentShareModule should accept only one of: track, artist, or album.');
     return null;
   }
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   const shareContent = async () => {
-    if (isSharing) return; // prevent rapid multiple clicks
+    if (isSharing) return;
     setIsSharing(true);
 
     const shareData = track
@@ -31,6 +31,12 @@ const CommentShareModule = ({ track, artist }) => {
       ? {
           title: artist.name,
           text: `Check out this artist: ${artist.name}`,
+          url: window.location.href,
+        }
+      : album
+      ? {
+          title: `${album.name} by ${album.artists.map((a) => a.name).join(', ')}`,
+          text: `Check out this album: ${album.name} by ${album.artists.map((a) => a.name).join(', ')}`,
           url: window.location.href,
         }
       : null;
@@ -50,6 +56,7 @@ const CommentShareModule = ({ track, artist }) => {
 
     setIsSharing(false);
   };
+
 
   return (
     <>
