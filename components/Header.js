@@ -10,6 +10,7 @@ const headerStyle = {
   top: 0,
   width: "100%",
   height: "60px",
+  backgroundColor: "inherit",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

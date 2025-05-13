@@ -9,6 +9,9 @@ import Header from '@/components/Header'
 import Footer from "@/components/Footer";
 import 'react-h5-audio-player/lib/styles.css';
 import AudioPlayer from 'react-h5-audio-player';
+import './audioPlayerStyles.css'; // <-- import your custom styles
+
+
 interface Track {
   name: string;
   artists: { name: string }[];
