@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import CommentSection from './CommentSection'; // adjust path as needed
 
-const CommentShareModule = ({ track, artist, album }) => {
+const CommentShareModule = ({ track, artist, album, playlist }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
-  const inputs = [track, artist, album].filter(Boolean);
+  // Ensure only one of track, artist, album, or playlist is provided
+  const inputs = [track, artist, album, playlist].filter(Boolean);
   if (inputs.length === 0) {
-    console.error('CommentShareModule requires one of: track, artist, or album.');
+    console.error('CommentShareModule requires one of: track, artist, album, or playlist.');
     return null;
   }
   if (inputs.length > 1) {
-    console.error('CommentShareModule should accept only one of: track, artist, or album.');
+    console.error('CommentShareModule should accept only one of: track, artist, album, or playlist.');
     return null;
   }
 
@@ -25,19 +26,25 @@ const CommentShareModule = ({ track, artist, album }) => {
       ? {
           title: `${track.name} by ${track.artists.map((a) => a.name).join(', ')}`,
           text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(', ')}`,
-          url: window.location.href,
+          url: encodeURIComponent(window.location.href),
         }
       : artist
       ? {
           title: artist.name,
           text: `Check out this artist: ${artist.name}`,
-          url: window.location.href,
+          url: encodeURIComponent(window.location.href),
         }
       : album
       ? {
           title: `${album.name} by ${album.artists.map((a) => a.name).join(', ')}`,
           text: `Check out this album: ${album.name} by ${album.artists.map((a) => a.name).join(', ')}`,
-          url: window.location.href,
+          url: encodeURIComponent(window.location.href),
+        }
+      : playlist
+      ? {
+          title: playlist.name,
+          text: `Check out this playlist: ${playlist.name}`,
+          url: encodeURIComponent(window.location.href),
         }
       : null;
 
@@ -56,6 +63,7 @@ const CommentShareModule = ({ track, artist, album }) => {
 
     setIsSharing(false);
   };
+
 
 
   return (

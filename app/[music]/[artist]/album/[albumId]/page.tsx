@@ -61,6 +61,7 @@ export default function AlbumPage() {
       </p>
       <h2>Tracks</h2>
       <CommentShareModule
+        playlist={undefined}
         track={undefined}
         album={albumDetails}
         artist={artist}

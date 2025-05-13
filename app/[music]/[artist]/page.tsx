@@ -109,7 +109,7 @@ export default function ArtistPage() {
       <p style={{ fontSize: "18px", color: "white" }}>
         Followers: {artistDetails.followers}
       </p>
-      <CommentShareModule track={undefined} album={undefined} artist={artistDetails} />
+      <CommentShareModule playlist={undefined} track={undefined} album={undefined} artist={artistDetails} />
       <h2>Top Tracks</h2>
       <div
         style={{

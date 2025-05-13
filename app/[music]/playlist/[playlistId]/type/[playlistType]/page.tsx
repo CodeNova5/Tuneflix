@@ -3,7 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import CommentShareModule from "@/components/CommentShareModule";
 interface tracks {
   id: number;
   title: string;
@@ -22,7 +24,7 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [tracks, setTracks] = useState<tracks[]>([]);
   const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetails | null>(null);
-
+  
   useEffect(() => {
 
     async function fetchDeezerTracks() {
@@ -104,7 +106,8 @@ export default function HomePage() {
   }
 
   return (
-    <div className="p-4 bg-gray-900 text-white min-h-screen">
+    <div className="p-4 bg-#111 text-white min-h-screen">
+      <Header />
       {playlistDetails && (
         <div className="mb-8 text-center">
           <img
@@ -115,6 +118,12 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold mt-4">{playlistDetails.name}</h1>
         </div>
       )}
+      <CommentShareModule
+        playlist={{ name: playlistDetails?.name, image: playlistDetails?.image }}
+        track={undefined}
+        album={undefined}
+        artist={undefined}
+      />
       <h2 className="text-2xl font-bold mb-4">Tracks</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {tracks.map((track) => (

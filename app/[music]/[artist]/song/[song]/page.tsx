@@ -555,7 +555,7 @@ export default function Page() {
           )
         }
 
-        <CommentShareModule track={track} artist={undefined} album={undefined} />
+        <CommentShareModule playlist={undefined} track={track} artist={undefined} album={undefined} />
 
         {/* Lyrics Section */}
         <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
