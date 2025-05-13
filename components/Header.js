@@ -10,7 +10,6 @@ const headerStyle = {
   top: 0,
   width: "100%",
   height: "60px",
-  backgroundColor: "black",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -196,8 +195,8 @@ const Header = () => {
             icon={faSearch}
             style={{
               position: "absolute",
-              left: "8px",
-              top: "50%",
+              left: "10px",
+              top: "40%",
               transform: "translateY(-50%)",
               color: "#aaa",
               pointerEvents: "none",

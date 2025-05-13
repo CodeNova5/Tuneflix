@@ -7,6 +7,8 @@ import { ID3Writer } from 'browser-id3-writer';
 import CommentShareModule from '@/components/CommentShareModule'
 import Header from '@/components/Header'
 import Footer from "@/components/Footer";
+import 'react-h5-audio-player/lib/styles.css';
+import AudioPlayer from 'react-h5-audio-player';
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -389,14 +391,19 @@ export default function Page() {
           <p>No video available for this song.</p>
         )}
       </div>
-      {
-        downloadUrl && (
-          <audio controls style={{ marginTop: "20px" }}>
-            <source src={downloadUrl} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
-        )
-      }
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <h3 style={{ fontSize: "16px", margin: "10px 0" }}>Listen to the song:</h3>
+        {!downloadUrl ? (
+          <p>Preparing audio, please wait...</p>
+        ) : (
+          <AudioPlayer
+            src={downloadUrl}
+            style={{ marginTop: "20px" }}
+          />
+
+        )}
+      </div>
+
       <a
         download={
           downloadUrl
