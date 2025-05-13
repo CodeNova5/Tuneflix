@@ -10,7 +10,8 @@ import Footer from "@/components/Footer";
 import 'react-h5-audio-player/lib/styles.css';
 import AudioPlayer from 'react-h5-audio-player';
 import './audioPlayerStyles.css'; // <-- import your custom styles
-
+const [showDropdown, setShowDropdown] = React.useState(false);
+const handleToggle = () => setShowDropdown(prev => !prev);
 
 interface Track {
   name: string;
@@ -314,8 +315,12 @@ export default function Page() {
   return (
     <div style={{ textAlign: "center", padding: "20px", marginTop: "40px" }}>
       <Header />
-      <h1>{track.name}</h1>
-      <h2>by {track.artists.map((a) => a.name).join(", ")}</h2>
+      <div style={{ fontSize: "30px", fontWeight: "bold" }}>
+        <h1>{track.name}</h1>
+        <h2>
+          {track.artists.map((a) => a.name).join(", ")}
+        </h2>
+      </div>
       <img src={track.album.images[0]?.url} alt={track.name} width="300" />
 
       {/* Song Details Table */}
@@ -359,18 +364,31 @@ export default function Page() {
       <div style={{ marginTop: "20px" }}>
         {track.artists.length > 1 ? (
           <div>
-            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>View Artists:</h3>
-            <ul style={{ listStyleType: "none", padding: 0 }}>
-              {track.artists.map((artist, index) => (
-                <li key={index} style={{ margin: "5px 0" }}>
-                  <Link href={`/music/${encodeURIComponent(artist.name)}`} passHref>
-                    <a style={{ textDecoration: "none", color: "inherit" }}>
-                      {artist.name}
-                    </a>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3
+              onClick={handleToggle}
+              style={{
+                fontSize: "16px",
+                margin: "10px 0",
+                cursor: "pointer",
+                color: "#1db954"
+              }}
+            >
+              View Artists
+            </h3>
+
+            {showDropdown && (
+              <ul style={{ listStyleType: "none", padding: 0, marginTop: "5px" }}>
+                {track.artists.map((artist, index) => (
+                  <li key={index} style={{ margin: "5px 0" }}>
+                    <Link href={`/music/${encodeURIComponent(artist.name)}`} passHref>
+                      <a style={{ textDecoration: "none", color: "inherit" }}>
+                        {artist.name}
+                      </a>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         ) : (
           <Link href={`/music/${encodeURIComponent(track.artists[0].name)}`} passHref>
