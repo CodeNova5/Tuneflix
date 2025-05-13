@@ -10,7 +10,7 @@ const headerStyle = {
   top: 0,
   width: "100%",
   height: "60px",
-  backgroundColor: "#111",
+  backgroundColor: "black",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -37,13 +37,6 @@ const siteNameStyle = {
   fontWeight: "bold",
 };
 
-const searchIconStyle = {
-  position: "absolute",
-  right: "20px",
-  color: "white",
-  fontSize: "1.2rem",
-  textDecoration: "none",
-};
 
 const userInfoBoxStyle = {
   position: "absolute",
@@ -203,7 +196,7 @@ const Header = () => {
             icon={faSearch}
             style={{
               position: "absolute",
-              left: "10px",
+              left: "8px",
               top: "50%",
               transform: "translateY(-50%)",
               color: "#aaa",

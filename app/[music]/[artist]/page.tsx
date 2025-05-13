@@ -99,13 +99,13 @@ export default function ArtistPage() {
   return (
     <div style={{ textAlign: "center", padding: "20px", marginTop: "40px" }}>
       <Header />
-      <h1>{artistDetails.name}</h1>
+      <h1 style={{ fontSize: "30px", color: "white" }}>{artistDetails.name}</h1>
       <img
         src={artistDetails.image || "/placeholder.jpg"}
         alt={artistDetails.name}
         style={{ borderRadius: "50%", width: "200px", height: "200px" }}
       />
-      <p style={{ fontSize: "18px", color: "#555" }}>
+      <p style={{ fontSize: "18px", color: "white" }}>
         Followers: {artistDetails.followers}
       </p>
       <CommentShareModule track={undefined} artist={artistDetails} />

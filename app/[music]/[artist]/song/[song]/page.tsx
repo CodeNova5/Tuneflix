@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import '@fortawesome/fontawesome-free/css/all.min.css'; 
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ID3Writer } from 'browser-id3-writer';
 import CommentShareModule from '@/components/CommentShareModule'
 import Header from '@/components/Header'
@@ -226,41 +226,41 @@ export default function Page() {
     fetchSongs(song);
   }
 
-  
+
   async function handleConvertToMp3() {
     if (!lyricsVideoId) return;
-  
+
     const formatTitle = (title: string): string =>
       title
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join("-");
-  
+
     const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
     const artistName = track?.artists[0]?.name ?? "Unknown Artist";
     const albumName = track?.album?.name ?? "Unknown Album";
     const releaseYear = track?.album?.release_date?.split("-")[0] ?? "Unknown Year";
-  
+
     try {
       const response = await fetch(
         `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
       );
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         setModalMessage(errorData.error || "Failed to convert video to MP3");
         setIsUploading(false);
         return;
       }
-  
+
       const blob = await response.blob();
       const arrayBuffer = await blob.arrayBuffer();
-  
+
       // Add metadata using browser-id3-writer
       const writer = new ID3Writer(arrayBuffer);
       writer.setFrame('TIT2', track?.name ?? 'Unknown Title') // Title
-            .setFrame('TPE1', [artistName]) // Artist
-            .setFrame('TALB', albumName) // Album
+        .setFrame('TPE1', [artistName]) // Artist
+        .setFrame('TALB', albumName) // Album
       const coverImageUrl = track?.album?.images[0]?.url;
       if (coverImageUrl) {
         const coverResponse = await fetch(coverImageUrl);
@@ -272,18 +272,18 @@ export default function Page() {
           description: 'Cover',
         });
       }
-  
+
       writer.addTag();
-  
+
       const taggedBlob = writer.getBlob();
       const url = window.URL.createObjectURL(taggedBlob);
-  
+
       const a = document.createElement("a");
       a.id = "download-link";
       a.href = url;
       a.download = songName + ".mp3";
       document.body.appendChild(a);
-     
+
       document.body.removeChild(a);
       setDownloadUrl(url);
     } catch (err) {
@@ -351,7 +351,30 @@ export default function Page() {
           </tr>
         </tbody>
       </table>
-
+      <div style={{ marginTop: "20px" }}>
+        {track.artists.length > 1 ? (
+          <div>
+            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>View Artists:</h3>
+            <ul style={{ listStyleType: "none", padding: 0 }}>
+              {track.artists.map((artist, index) => (
+                <li key={index} style={{ margin: "5px 0" }}>
+                  <Link href={`/music/${encodeURIComponent(artist.name)}`} passHref>
+                    <a style={{ textDecoration: "none", color: "inherit" }}>
+                      {artist.name}
+                    </a>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <Link href={`/music/${encodeURIComponent(track.artists[0].name)}`} passHref>
+            <a style={{ textDecoration: "none", color: "inherit" }}>
+              <h3 style={{ fontSize: "16px", margin: "10px 0" }}>View Artist</h3>
+            </a>
+          </Link>
+        )}
+      </div>
 
       <div id="youtube-video" style={{ marginTop: "20px" }}>
         {videoId ? (
@@ -366,7 +389,14 @@ export default function Page() {
           <p>No video available for this song.</p>
         )}
       </div>
-
+      {
+        downloadUrl && (
+          <audio controls style={{ marginTop: "20px" }}>
+            <source src={downloadUrl} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        )
+      }
       <a
         download={
           downloadUrl
@@ -483,7 +513,7 @@ export default function Page() {
         )
       }
 
-     <CommentShareModule track={track} artist={undefined} />
+      <CommentShareModule track={track} artist={undefined} />
 
       {/* Lyrics Section */}
       <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
