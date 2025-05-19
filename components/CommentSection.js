@@ -4,8 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './CommentSection.module.css';
 import { usePathname } from 'next/navigation';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useRouter } from 'next/navigation';
 
 const CommentSection = () => {
+  const router = useRouter();
 
   const [comments, setComments] = useState([]);
   const [content, setContent] = useState('');
@@ -232,12 +234,7 @@ const CommentSection = () => {
     if (!content) return alert('Comment cannot be empty');
     if (!currentUser) {
       alert('You must login in to comment');
-      window.google?.accounts.id.initialize({
-        client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62',
-        callback: window.handleCredentialResponse,
-        cancel_on_tap_outside: false,
-      });
-      window.google?.accounts.id.prompt();
+      router.push('/login');
       return;
     }
     if (!pageUrl) return alert('Page URL not found');
@@ -346,6 +343,8 @@ const CommentSection = () => {
 
       if (!currentUser) {
         alert("Please log in to reply.");
+
+        router.push('/login');
         return;
       }
 

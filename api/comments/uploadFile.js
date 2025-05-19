@@ -15,8 +15,8 @@ export default async function handler(req, res) {
       auth: process.env.GITHUB_TOKEN, // Ensure this is set in .env.local
     });
 
-    const owner = 'Netdot12';
-    const repo = 'next';
+    const owner = 'CodeNova5';
+    const repo = 'Music-Backend';
     const path = `public/comment/${fileName}`;
 
     let sha;
