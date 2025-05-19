@@ -269,13 +269,21 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        if (!data.similartracks?.track?.length) {
+        let tracks = data.similartracks?.track;
+        if (!tracks) {
+          return res.status(404).json({ error: "No related tracks found" });
+        }
+        // Normalize to array if only one track is returned as an object
+        if (!Array.isArray(tracks)) {
+          tracks = [tracks];
+        }
+        if (!tracks.length) {
           return res.status(404).json({ error: "No related tracks found" });
         }
 
         // Fetch album images for each related track using Last.fm's track.getInfo API
         const relatedTracks = await Promise.all(
-          data.similartracks.track.map(async (track) => {
+          tracks.map(async (track) => {
             const trackInfoUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&artist=${encodeURIComponent(
               track.artist.name
             )}&track=${encodeURIComponent(track.name)}&api_key=${LAST_FM_API_KEY}&format=json`;

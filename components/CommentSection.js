@@ -230,7 +230,16 @@ const CommentSection = () => {
 
   const postComment = async () => {
     if (!content) return alert('Comment cannot be empty');
-    if (!currentUser) return alert('User not found');
+    if (!currentUser) {
+      alert('You must login in to comment');
+      window.google?.accounts.id.initialize({
+        client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62',
+        callback: window.handleCredentialResponse,
+        cancel_on_tap_outside: false,
+      });
+      window.google?.accounts.id.prompt();
+      return;
+    }
     if (!pageUrl) return alert('Page URL not found');
     // Show the spinner
     const spinner = document.getElementById('spinner');
