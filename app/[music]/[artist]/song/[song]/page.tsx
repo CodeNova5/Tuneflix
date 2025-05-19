@@ -12,6 +12,16 @@ import AudioPlayer from 'react-h5-audio-player';
 import './audioPlayerStyles.css'; // <-- import your custom styles
 import { useRouter } from "next/navigation";
 
+
+  declare global {
+    interface Window {
+      google: any;
+      FB: any;
+      fbAsyncInit: any;
+      handleCredentialResponse?: (response: any) => void;
+    }
+  }
+  
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -45,14 +55,6 @@ export default function Page() {
   const [showSelect, setShowSelect] = React.useState(false);
   const router = useRouter();
 
-  declare global {
-    interface Window {
-      google: any;
-      FB: any;
-      fbAsyncInit: any;
-      handleCredentialResponse?: (response: any) => void;
-    }
-  }
 
   // Google script
   const googleScript = document.createElement('script');
