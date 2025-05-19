@@ -13,15 +13,15 @@ import './audioPlayerStyles.css'; // <-- import your custom styles
 import { useRouter } from "next/navigation";
 
 
-  declare global {
-    interface Window {
-      google: any;
-      FB: any;
-      fbAsyncInit: any;
-      handleCredentialResponse?: (response: any) => void;
-    }
+declare global {
+  interface Window {
+    google: any;
+    FB: any;
+    fbAsyncInit: any;
+    handleCredentialResponse?: (response: any) => void;
   }
-  
+}
+
 interface Track {
   name: string;
   artists: { name: string }[];
@@ -84,7 +84,17 @@ export default function Page() {
   const saveUserInfo = (provider: string, data: any) => {
     localStorage.setItem('userInfo', JSON.stringify({ provider, data }));
   };
-
+  const parseJwt = (token: string) => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  };
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const artistName = e.target.value;
     if (artistName) {
