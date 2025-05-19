@@ -63,7 +63,6 @@ export default function Footer() {
                 <section className={styles.section}>
                     <h3 className={styles.heading}>Explore</h3>
                     <ul className={styles.linkList}>
-                        <li><Link href="/blog" className={styles.link}>Blog</Link></li>
                         <li><Link href="/terms" className={styles.link}>Terms of Service</Link></li>
                         <li><Link href="/dmca" className={styles.link}>DMCA</Link></li>
                     </ul>
@@ -72,7 +71,7 @@ export default function Footer() {
             </div>
 
             <div className={styles.copyright}>
-                <p>&copy; {currentYear} Developed by Your Name. All rights reserved.</p>
+                <p>&copy; {currentYear} Developed by Code Nova. All rights reserved.</p>
             </div>
         </footer>
     );
