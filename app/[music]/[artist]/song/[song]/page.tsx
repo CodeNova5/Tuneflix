@@ -49,9 +49,6 @@ export default function Page() {
   const [artistDetails, setArtistDetails] = React.useState<{ genres: string[] } | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>(null);
-  // Add a new state for related songs
-  const [relatedSongs, setRelatedSongs] = React.useState<any[]>([]);
-
   const [showSelect, setShowSelect] = React.useState(false);
   const router = useRouter();
 
@@ -202,28 +199,6 @@ export default function Page() {
     }
   }, [artist, song]);
 
-  React.useEffect(() => {
-    async function fetchRelatedTracks() {
-      try {
-        const response = await fetch(
-          `/api/Music/route?type=relatedTracks&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch related tracks");
-        }
-
-        const relatedTracks = await response.json();
-        console.log("Related Tracks:", relatedTracks);
-        setRelatedSongs(relatedTracks);
-      } catch (err) {
-        console.error("Error fetching related tracks:", err);
-      }
-    }
-
-    if (artist && song) {
-      fetchRelatedTracks();
-    }
-  }, [artist, song]);
 
   async function fetchAndDisplayLyrics(artistName: string, songName: string) {
     try {
@@ -648,46 +623,6 @@ export default function Page() {
 
           </div>
         ))}
-      </div>
-      {/* Related Tracks Section */}
-      <h1>Related Tracks</h1>
-      <div
-        style={{
-          display: "flex",
-          overflowX: "auto",
-          gap: "20px",
-          padding: "10px",
-        }}
-      >
-        {relatedSongs.length > 0 ? (
-          relatedSongs.map((song, index) => (
-            <div
-              key={index}
-              style={{
-                minWidth: "200px",
-                textAlign: "center",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "10px",
-              }}
-            >
-              <Link href={`/music/${encodeURIComponent(song.artist)}/song/${encodeURIComponent(song.name)}`}>
-                <a style={{ textDecoration: "none", color: "inherit" }}>
-                  <img
-                    src={song.image || "/placeholder.jpg"}
-                    alt={song.name}
-                    style={{ width: "100%", borderRadius: "8px" }}
-
-                  />
-                  <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
-                  <p style={{ fontSize: "14px", color: "#555" }}>{song.artist}</p>
-                </a>
-              </Link>
-            </div>
-          ))
-        ) : (
-          <p>No related tracks found.</p>
-        )}
       </div>
       <Footer />
     </div >
