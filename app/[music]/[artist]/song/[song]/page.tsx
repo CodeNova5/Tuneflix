@@ -11,7 +11,7 @@ import 'react-h5-audio-player/lib/styles.css';
 import AudioPlayer from 'react-h5-audio-player';
 import './audioPlayerStyles.css'; // <-- import your custom styles
 import { useRouter } from "next/navigation";
-
+import Head from "next/head";
 
 declare global {
   interface Window {
@@ -70,12 +70,15 @@ export default function Page() {
   };
 
   window.onload = () => {
-    window.google?.accounts.id.initialize({
-      client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62',
-      callback: window.handleCredentialResponse,
-      cancel_on_tap_outside: false,
-    });
-    window.google?.accounts.id.prompt();
+    const userInfo = localStorage.getItem('userInfo');
+    if (!userInfo) {
+      window.google?.accounts.id.initialize({
+        client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62',
+        callback: window.handleCredentialResponse,
+        cancel_on_tap_outside: false,
+      });
+      window.google?.accounts.id.prompt();
+    }
   };
 
   const saveUserInfo = (provider: string, data: any) => {
@@ -342,9 +345,26 @@ export default function Page() {
   if (!track) {
     return <h1>Loading...</h1>;
   }
+  const pageTitle = `${track.name} by ${track.artists.map((a) => a.name).join(", ")} | Listen, Download & Lyrics`;
+  const pageDescription = `Listen to "${track.name}" by ${track.artists.map((a) => a.name).join(", ")}. View album details, lyrics, YouTube video, and download the MP3.`;
+  const ogImage = track.album.images[0]?.url || "/placeholder.jpg";
+  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
 
   return (
     <div style={{ textAlign: "center", backgroundColor: "#111", padding: "20px", marginTop: "40px" }}>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:type" content="music.song" />
+        <meta property="og:url" content={pageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={ogImage} />
+      </Head>
       <Header />
       <div style={{ fontSize: "25px", fontWeight: "bold" }}>
         <h1>{track.name} by </h1>
