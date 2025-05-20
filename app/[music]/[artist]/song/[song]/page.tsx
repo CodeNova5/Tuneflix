@@ -2,14 +2,12 @@ import { Metadata } from "next";
 import SongPage from "./SongPage";
 
 // Server-side metadata generation
-export async function generateMetadata({ params }: { params: { artist: string; song: string } }): Promise<Metadata> {
-  const { artist, song } = params;
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const { artist, song } = props.params;
 
   // Fetch song details from your API
   const res = await fetch(
-    `/api/Music/route?type=songDetails&artistName=${encodeURIComponent(
-      artist
-    )}&songName=${encodeURIComponent(song)}`
+    `/api/Music/route?type=songDetails&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
   );
   if (!res.ok) {
     return {
