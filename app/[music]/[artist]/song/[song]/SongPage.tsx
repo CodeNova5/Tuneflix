@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ID3Writer } from 'browser-id3-writer';
@@ -9,17 +9,7 @@ import Header from '@/components/Header'
 import Footer from "@/components/Footer";
 import 'react-h5-audio-player/lib/styles.css';
 import AudioPlayer from 'react-h5-audio-player';
-import './audioPlayerStyles.css'; // <-- import your custom styles
-import { useRouter } from "next/navigation";
-
-declare global {
-    interface Window {
-        google: any;
-        FB: any;
-        fbAsyncInit: any;
-        handleCredentialResponse?: (response: any) => void;
-    }
-}
+import './audioPlayerStyles.css';
 
 interface Track {
     name: string;
@@ -27,30 +17,28 @@ interface Track {
     album: {
         name: string;
         images: { url: string }[];
-        release_date: string; // Release date of the album
-        type: string; // Type of the album (e.g., "album", "single")
+        release_date: string;
+        type: string;
     };
     preview_url: string | null;
-    duration_ms: number; // Duration of the track in milliseconds
-};
+    duration_ms: number;
+}
 
 export default function SongPage() {
     const { artist, song } = useParams() as { artist: string; song: string };
     const [track, setTrack] = React.useState<Track | null>(null);
     const [videoId, setVideoId] = React.useState<string | null>(null);
-    // Add a new state for lyrics video ID
     const [lyricsVideoId, setLyricsVideoId] = React.useState<string | null>(null);
-
     const [songs, setSongs] = React.useState<any[]>([]);
     const [error, setError] = React.useState<string | null>(null);
     const [isUploading, setIsUploading] = React.useState<boolean>(false);
     const [modalMessage, setModalMessage] = React.useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [downloadUrl, setDownloadUrl] = React.useState<string | null>(null);
     const [showSelect, setShowSelect] = React.useState(false);
+    const [lyricsHtml, setLyricsHtml] = React.useState<string>("Loading lyrics...");
     const router = useRouter();
 
-
+    // Google/Facebook scripts (browser-only)
     React.useEffect(() => {
         // Google script
         const googleScript = document.createElement('script');
@@ -80,10 +68,10 @@ export default function SongPage() {
             }
         };
 
-        const saveUserInfo = (provider: string, data: any) => {
+        function saveUserInfo(provider: string, data: any) {
             localStorage.setItem('userInfo', JSON.stringify({ provider, data }));
-        };
-        const parseJwt = (token: string) => {
+        }
+        function parseJwt(token: string) {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             const jsonPayload = decodeURIComponent(
@@ -93,198 +81,104 @@ export default function SongPage() {
                     .join('')
             );
             return JSON.parse(jsonPayload);
+        }
+
+        return () => {
+            document.body.removeChild(googleScript);
         };
     }, []);
-    const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const artistName = e.target.value;
-        if (artistName) {
-            router.push(`/music/${encodeURIComponent(artistName)}`);
-        }
-    }
-    const toggleModal = () => {
-        setIsModalOpen(!isModalOpen);
-    };
 
     // Disable background scroll when modal is open
     React.useEffect(() => {
-        if (isModalOpen) {
-            document.body.style.overflow = "hidden"; // Disable scrolling
+        if (modalMessage) {
+            document.body.style.overflow = "hidden";
         } else {
-            document.body.style.overflow = ""; // Reset scrolling
+            document.body.style.overflow = "";
         }
-
-        // Cleanup on component unmount
         return () => {
             document.body.style.overflow = "";
         };
-    }, [isModalOpen]);
+    }, [modalMessage]);
 
+    // Fetch main track and related data
     React.useEffect(() => {
-        
-    async function handleConvertToMp3() {
-        if (!lyricsVideoId) return;
+        if (!artist || !song) return;
+        setError(null);
+        setTrack(null);
+        setVideoId(null);
+        setLyricsVideoId(null);
+        setDownloadUrl(null);
+        setLyricsHtml("Loading lyrics...");
+        setSongs([]);
 
-        const formatTitle = (title: string): string =>
-            title
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join("-");
-
-        const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
-        const artistName = track?.artists[0]?.name ?? "Unknown Artist";
-        const albumName = track?.album?.name ?? "Unknown Album";
-        try {
-            const response = await fetch(
-                `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
-            );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                setModalMessage(errorData.error || "Failed to convert video to MP3");
-                setIsUploading(false);
-                return;
-            }
-
-            const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-
-            // Add metadata using browser-id3-writer
-            const writer = new ID3Writer(arrayBuffer);
-            writer.setFrame('TIT2', track?.name ?? 'Unknown Title') // Title
-                .setFrame('TPE1', [artistName]) // Artist
-                .setFrame('TALB', albumName) // Album
-            const coverImageUrl = track?.album?.images[0]?.url;
-            if (coverImageUrl) {
-                const coverResponse = await fetch(coverImageUrl);
-                const coverBlob = await coverResponse.blob();
-                const coverArrayBuffer = await coverBlob.arrayBuffer();
-                (writer as any).setFrame('APIC', {
-                    type: 3, // Front cover
-                    data: new Uint8Array(coverArrayBuffer),
-                    description: 'Cover',
-                });
-            }
-
-            writer.addTag();
-
-            const taggedBlob = writer.getBlob();
-            const url = window.URL.createObjectURL(taggedBlob);
-
-            const a = document.createElement("a");
-            a.id = "download-link";
-            a.href = url;
-            a.download = songName + ".mp3";
-            document.body.appendChild(a);
-
-            document.body.removeChild(a);
-            setDownloadUrl(url);
-        } catch (err) {
-            console.error("Error converting video to MP3:", err);
-            setModalMessage("An unexpected error occurred");
-        } finally {
-            setTimeout(() => {
-                setModalMessage(null);
-                setIsUploading(false);
-            }, 2000);
-        }
-    }
-        if (lyricsVideoId && !downloadUrl) {
-            handleConvertToMp3();
-        }
-    }, [lyricsVideoId]);
-
-
-
-    React.useEffect(() => {
-        if (artist && song) {
-            async function fetchData() {
-                try {
-                    // Fetch song details
-                    const response = await fetch(
-                        `/api/Music/route?type=songDetails&artistName=${encodeURIComponent(
-                            artist
-                        )}&songName=${encodeURIComponent(song)}`
-                    );
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        setError(errorData.error || "Failed to fetch song details");
-                        return;
-                    }
-                    const trackData = await response.json();
-                    setTrack(trackData);
-
-                    // Fetch YouTube video
-                    const videoResponse = await fetch(
-                        `/api/Music/route?type=youtubeMusicVideo&artistName=${encodeURIComponent(
-                            artist
-                        )}&songName=${encodeURIComponent(song)}`
-                    );
-                    const videoData = await videoResponse.json();
-                    if (videoData.videoId) {
-                        setVideoId(videoData.videoId);
-                    }
-
-                    // Fetch and display lyrics
-                    await fetchAndDisplayLyrics(artist, song);
-
-                    // Fetch lyrics video
-                    const lyricsVideoResponse = await fetch(
-                        `/api/Music/route?type=lyricsVideo&artistName=${encodeURIComponent(
-                            artist
-                        )}&songName=${encodeURIComponent(song)}`
-                    );
-                    const lyricsVideoData = await lyricsVideoResponse.json();
-                    if (lyricsVideoData.videoId) {
-                        setLyricsVideoId(lyricsVideoData.videoId);
-                    }
-
-                } catch (err) {
-                    console.error("Error fetching data:", err);
-                    setError("An unexpected error occurred");
+        async function fetchData() {
+            try {
+                // Fetch song details
+                const response = await fetch(
+                    `/api/Music/route?type=songDetails&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    setError(errorData.error || "Failed to fetch song details");
+                    return;
                 }
-            }
+                const trackData = await response.json();
+                setTrack(trackData);
 
-            fetchData();
+                // Fetch YouTube video
+                const videoResponse = await fetch(
+                    `/api/Music/route?type=youtubeMusicVideo&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
+                );
+                const videoData = await videoResponse.json();
+                if (videoData.videoId) setVideoId(videoData.videoId);
+
+                // Fetch lyrics video
+                const lyricsVideoResponse = await fetch(
+                    `/api/Music/route?type=lyricsVideo&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
+                );
+                const lyricsVideoData = await lyricsVideoResponse.json();
+                if (lyricsVideoData.videoId) setLyricsVideoId(lyricsVideoData.videoId);
+
+                // Fetch and display lyrics
+                fetchAndDisplayLyrics(artist, song);
+
+                // Fetch related songs
+                fetchSongs(song);
+
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                setError("An unexpected error occurred");
+            }
         }
+        fetchData();
+        // eslint-disable-next-line
     }, [artist, song]);
 
-
+    // Fetch and format lyrics
     async function fetchAndDisplayLyrics(artistName: string, songName: string) {
         try {
             const response = await fetch(
-                `/api/Music/route?type=lyrics&artistName=${encodeURIComponent(
-                    artistName
-                )}&songName=${encodeURIComponent(songName)}`
+                `/api/Music/route?type=lyrics&artistName=${encodeURIComponent(artistName)}&songName=${encodeURIComponent(songName)}`
             );
-            if (!response.ok) {
-                throw new Error("Failed to fetch lyrics");
-            }
-
+            if (!response.ok) throw new Error("Failed to fetch lyrics");
             const data = await response.json();
             if (data.lyrics) {
-                const formattedLyrics = formatLyrics(data.lyrics);
-                const lyricsContainer = document.getElementById("lyrics-container");
-                if (lyricsContainer) {
-                    lyricsContainer.innerHTML = '<h3 style="text-align:center; font-size:20px; margin:10px;" >Lyrics:</h3>' + formattedLyrics;
-                }
+                setLyricsHtml(formatLyrics(data.lyrics));
             } else {
-                throw new Error("Lyrics not found");
+                setLyricsHtml("Lyrics not found.");
             }
         } catch (error) {
-            console.error("Error fetching lyrics:", error);
-            const lyricsContainer = document.getElementById("lyrics-container");
-            if (lyricsContainer) {
-                lyricsContainer.textContent = "Failed to load lyrics.";
-            }
+            setLyricsHtml("Failed to load lyrics.");
         }
     }
-
 
     function formatLyrics(lyrics: string) {
         return lyrics
             .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
             .replace(/\n/g, "<br>");
     }
+
+    // Fetch related songs
     async function fetchSongs(songName: string) {
         try {
             const response = await fetch(
@@ -296,34 +190,93 @@ export default function SongPage() {
                 return;
             }
             const songsData = await response.json();
-
             // Filter out duplicates and the current song
             const filteredSongs = songsData
                 .filter(
                     (song: any, index: number, self: any[]) =>
-                        song.name.toLowerCase() !== songName.toLowerCase() && // Exclude the current song
-                        self.findIndex((s) => s.name.toLowerCase() === song.name.toLowerCase()) === index // Remove duplicates
-                )
+                        song.name.toLowerCase() !== songName.toLowerCase() &&
+                        self.findIndex((s) => s.name.toLowerCase() === song.name.toLowerCase()) === index
+                );
             setSongs(filteredSongs);
         } catch (err) {
-            console.error("Error fetching songs:", err);
             setError("An unexpected error occurred");
         }
     }
-    if (song) {
-        fetchSongs(song);
-    }
 
+    // Handle MP3 conversion and download
+    React.useEffect(() => {
+        async function handleConvertToMp3() {
+            if (!lyricsVideoId || !track) return;
+            setIsUploading(true);
+            setModalMessage("Preparing audio...");
 
+            const formatTitle = (title: string): string =>
+                title
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join("-");
 
+            const songName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}`;
+            const artistName = track.artists[0]?.name ?? "Unknown Artist";
+            const albumName = track.album?.name ?? "Unknown Album";
+            try {
+                const response = await fetch(
+                    `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    setModalMessage(errorData.error || "Failed to convert video to MP3");
+                    setIsUploading(false);
+                    return;
+                }
+                const blob = await response.blob();
+                const arrayBuffer = await blob.arrayBuffer();
 
-    if (error) {
-        return <h1>{error}</h1>;
-    }
+                // Add metadata using browser-id3-writer
+                const writer = new ID3Writer(arrayBuffer);
+                writer.setFrame('TIT2', track.name ?? 'Unknown Title')
+                    .setFrame('TPE1', [artistName])
+                    .setFrame('TALB', albumName);
+                const coverImageUrl = track.album?.images[0]?.url;
+                if (coverImageUrl) {
+                    const coverResponse = await fetch(coverImageUrl);
+                    const coverBlob = await coverResponse.blob();
+                    const coverArrayBuffer = await coverBlob.arrayBuffer();
+                    (writer as any).setFrame('APIC', {
+                        type: 3,
+                        data: new Uint8Array(coverArrayBuffer),
+                        description: 'Cover',
+                    });
+                }
+                writer.addTag();
+                const taggedBlob = writer.getBlob();
+                const url = window.URL.createObjectURL(taggedBlob);
+                setDownloadUrl(url);
+                setModalMessage("✅ Download ready!");
+            } catch (err) {
+                setModalMessage("An unexpected error occurred");
+            } finally {
+                setTimeout(() => {
+                    setModalMessage(null);
+                    setIsUploading(false);
+                }, 2000);
+            }
+        }
+        if (lyricsVideoId && !downloadUrl && track) {
+            handleConvertToMp3();
+        }
+        // eslint-disable-next-line
+    }, [lyricsVideoId, track]);
 
-    if (!track) {
-        return <h1>Loading...</h1>;
-    }
+    const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const artistName = e.target.value;
+        if (artistName) {
+            router.push(`/music/${encodeURIComponent(artistName)}`);
+        }
+    };
+
+    if (error) return <h1>{error}</h1>;
+    if (!track) return <h1>Loading...</h1>;
 
     return (
         <div style={{ textAlign: "center", backgroundColor: "#111", padding: "20px", marginTop: "40px" }}>
@@ -334,7 +287,7 @@ export default function SongPage() {
                     {track.artists.map((a) => a.name).join(", ")}
                 </h2>
             </div>
-            <img src={track.album.images[0]?.url} alt={track.name} width="300" />
+            <img src={track.album.images[0]?.url || "/placeholder.jpg"} alt={track.name} width="300" />
 
             {/* Song Details Table */}
             <table style={{ margin: "20px auto", borderCollapse: "collapse", width: "80%" }}>
@@ -413,10 +366,8 @@ export default function SongPage() {
                         )}
                     </div>
                 ) : (
-                    <Link href={`/music/${encodeURIComponent(track.artists[0].name)}`} passHref>
-                        <a style={{ textDecoration: "none", color: "inherit" }}>
-                            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>View Artist</h3>
-                        </a>
+                    <Link href={`/music/${encodeURIComponent(track.artists[0].name)}`}>
+                        <h3 style={{ fontSize: "16px", margin: "10px 0" }}>View Artist</h3>
                     </Link>
                 )}
             </div>
@@ -425,7 +376,6 @@ export default function SongPage() {
                     <iframe
                         src={`https://www.youtube.com/embed/${videoId}`}
                         allowFullScreen
-
                         height="315"
                         style={{ width: "90%" }}
                     ></iframe>
@@ -442,59 +392,21 @@ export default function SongPage() {
                         src={downloadUrl}
                         style={{ marginTop: "20px" }}
                     />
-
                 )}
             </div>
-
             <a
                 download={
                     downloadUrl
-                        ? `${track?.artists[0]?.name.replace(/ /g, "-")}_-_${track?.name.replace(/ /g, "-")}.mp3`
+                        ? `${track.artists[0]?.name.replace(/ /g, "-")}_-_${track.name.replace(/ /g, "-")}.mp3`
                         : undefined
                 }
-                onClick={async (e) => {
+                href={downloadUrl || undefined}
+                onClick={e => {
                     if (!downloadUrl) {
-                        e.preventDefault(); // Prevent default anchor behavior
-                        setIsUploading(true);
+                        e.preventDefault();
                         setModalMessage("Preparing download...");
-                        // MutationObserver to monitor for the addition of the #download-link element
-                        const observer = new MutationObserver((mutationsList) => {
-                            mutationsList.forEach((mutation) => {
-                                // Check if the added node is the download-link element
-                                if (mutation.type === 'childList') {
-                                    mutation.addedNodes.forEach((node) => {
-                                        if ((node as HTMLElement).id === 'download-link') {
-                                            setModalMessage("✅ Download has started!");
-                                            // Perform any other action needed once the element is found
-                                            (node as HTMLElement).click(); // Click the link once it is added
-                                            setTimeout(() => {
-                                                setModalMessage(null);
-                                                setIsUploading(false);
-                                            }, 2000);
-                                            observer.disconnect(); // Stop observing once the element is found
-                                        }
-                                    });
-                                }
-                            });
-                        });
-
-                        // Configure the MutationObserver to watch for child node additions to the body
-                        observer.observe(document.body, { childList: true, subtree: true });
-
-                    }
-                    else {
+                    } else {
                         setModalMessage("✅ Download has started");
-                        setIsUploading(false);
-
-
-                        // Auto-trigger the download
-                        const link = document.createElement("a");
-                        link.href = downloadUrl;
-                        link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_-_${track?.name.replace(/ /g, "-")}.mp3`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-
                         setTimeout(() => setModalMessage(null), 2000);
                     }
                 }}
@@ -511,63 +423,41 @@ export default function SongPage() {
             >
                 🎵 Download MP3
             </a>
-
             {/* Spinner Modal */}
-            {
-                modalMessage && (
+            {modalMessage && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0, 0, 0, 0.7)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 1000,
+                    }}
+                >
                     <div
                         style={{
-                            position: "fixed",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            backgroundColor: "rgba(0, 0, 0, 0.7)", // darker overlay
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            zIndex: 1000,
+                            backgroundColor: "#1e1e1e",
+                            padding: "20px",
+                            borderRadius: "8px",
+                            textAlign: "center",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.6)",
+                            color: "#fff",
                         }}
                     >
-                        <div
-                            style={{
-                                backgroundColor: "#1e1e1e", // dark background
-                                padding: "20px",
-                                borderRadius: "8px",
-                                textAlign: "center",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.6)",
-                                color: "#fff", // white text
-                            }}
-                        >
-                            {modalMessage === "Downloading Song..." ? (
-                                <div>
-                                    <div
-                                        style={{
-                                            width: "50px",
-                                            height: "50px",
-                                            border: "5px solid #444",
-                                            borderTop: "5px solid #00bfff", // bright spinner color
-                                            borderRadius: "50%",
-                                            animation: "spin 1s linear infinite",
-                                            margin: "0 auto 20px",
-                                        }}
-                                    ></div>
-                                    <p>{modalMessage}</p>
-                                </div>
-                            ) : (
-                                <p style={{ fontSize: "18px", fontWeight: "bold" }}>{modalMessage}</p>
-                            )}
-                        </div>
+                        <p style={{ fontSize: "18px", fontWeight: "bold" }}>{modalMessage}</p>
                     </div>
-                )
-            }
-
-            <CommentShareModule playlist={undefined} track={track} artist={undefined} album={undefined} />
-
+                </div>
+            )}
+            <CommentShareModule track={track} album={undefined} artist={undefined} playlist={undefined} />
             {/* Lyrics Section */}
             <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
                 <h2>Lyrics</h2>
-                <p>Loading lyrics...</p>
+                <div dangerouslySetInnerHTML={{ __html: lyricsHtml }} />
             </div>
             <h1>Songs by {track.artists[0]?.name}</h1>
             <div
@@ -590,24 +480,20 @@ export default function SongPage() {
                         }}
                     >
                         <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/song/${encodeURIComponent(song.name)}`}>
-                            <a style={{ textDecoration: "none", color: "inherit" }}>
-                                <img
-                                    src={song.album.images[0]?.url || "/placeholder.jpg"}
-                                    alt={song.name}
-                                    style={{ width: "100%", borderRadius: "8px" }}
-                                />
-                                <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
-                                <p style={{ fontSize: "14px", color: "#555" }}>
-                                    {song.artists.map((a: any) => a.name).join(", ")}
-                                </p>
-                            </a>
+                            <img
+                                src={song.album.images[0]?.url || "/placeholder.jpg"}
+                                alt={song.name}
+                                style={{ width: "100%", borderRadius: "8px" }}
+                            />
+                            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+                            <p style={{ fontSize: "14px", color: "#555" }}>
+                                {song.artists.map((a: any) => a.name).join(", ")}
+                            </p>
                         </Link>
-
                     </div>
                 ))}
             </div>
             <Footer />
-        </div >
+        </div>
     );
-
 }
