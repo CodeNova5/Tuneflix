@@ -120,6 +120,74 @@ export default function SongPage() {
     }, [isModalOpen]);
 
     React.useEffect(() => {
+        
+    async function handleConvertToMp3() {
+        if (!lyricsVideoId) return;
+
+        const formatTitle = (title: string): string =>
+            title
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join("-");
+
+        const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
+        const artistName = track?.artists[0]?.name ?? "Unknown Artist";
+        const albumName = track?.album?.name ?? "Unknown Album";
+        try {
+            const response = await fetch(
+                `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                setModalMessage(errorData.error || "Failed to convert video to MP3");
+                setIsUploading(false);
+                return;
+            }
+
+            const blob = await response.blob();
+            const arrayBuffer = await blob.arrayBuffer();
+
+            // Add metadata using browser-id3-writer
+            const writer = new ID3Writer(arrayBuffer);
+            writer.setFrame('TIT2', track?.name ?? 'Unknown Title') // Title
+                .setFrame('TPE1', [artistName]) // Artist
+                .setFrame('TALB', albumName) // Album
+            const coverImageUrl = track?.album?.images[0]?.url;
+            if (coverImageUrl) {
+                const coverResponse = await fetch(coverImageUrl);
+                const coverBlob = await coverResponse.blob();
+                const coverArrayBuffer = await coverBlob.arrayBuffer();
+                (writer as any).setFrame('APIC', {
+                    type: 3, // Front cover
+                    data: new Uint8Array(coverArrayBuffer),
+                    description: 'Cover',
+                });
+            }
+
+            writer.addTag();
+
+            const taggedBlob = writer.getBlob();
+            const url = window.URL.createObjectURL(taggedBlob);
+
+            const a = document.createElement("a");
+            a.id = "download-link";
+            a.href = url;
+            a.download = songName + ".mp3";
+            document.body.appendChild(a);
+
+            document.body.removeChild(a);
+            setDownloadUrl(url);
+        } catch (err) {
+            console.error("Error converting video to MP3:", err);
+            setModalMessage("An unexpected error occurred");
+        } finally {
+            setTimeout(() => {
+                setModalMessage(null);
+                setIsUploading(false);
+            }, 2000);
+        }
+    }
         if (lyricsVideoId && !downloadUrl) {
             handleConvertToMp3();
         }
@@ -247,73 +315,6 @@ export default function SongPage() {
     }
 
 
-    async function handleConvertToMp3() {
-        if (!lyricsVideoId) return;
-
-        const formatTitle = (title: string): string =>
-            title
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join("-");
-
-        const songName = `${formatTitle(track?.artists[0]?.name ?? "")}_-_${formatTitle(track?.name ?? "")}`;
-        const artistName = track?.artists[0]?.name ?? "Unknown Artist";
-        const albumName = track?.album?.name ?? "Unknown Album";
-        try {
-            const response = await fetch(
-                `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
-            );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                setModalMessage(errorData.error || "Failed to convert video to MP3");
-                setIsUploading(false);
-                return;
-            }
-
-            const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-
-            // Add metadata using browser-id3-writer
-            const writer = new ID3Writer(arrayBuffer);
-            writer.setFrame('TIT2', track?.name ?? 'Unknown Title') // Title
-                .setFrame('TPE1', [artistName]) // Artist
-                .setFrame('TALB', albumName) // Album
-            const coverImageUrl = track?.album?.images[0]?.url;
-            if (coverImageUrl) {
-                const coverResponse = await fetch(coverImageUrl);
-                const coverBlob = await coverResponse.blob();
-                const coverArrayBuffer = await coverBlob.arrayBuffer();
-                (writer as any).setFrame('APIC', {
-                    type: 3, // Front cover
-                    data: new Uint8Array(coverArrayBuffer),
-                    description: 'Cover',
-                });
-            }
-
-            writer.addTag();
-
-            const taggedBlob = writer.getBlob();
-            const url = window.URL.createObjectURL(taggedBlob);
-
-            const a = document.createElement("a");
-            a.id = "download-link";
-            a.href = url;
-            a.download = songName + ".mp3";
-            document.body.appendChild(a);
-
-            document.body.removeChild(a);
-            setDownloadUrl(url);
-        } catch (err) {
-            console.error("Error converting video to MP3:", err);
-            setModalMessage("An unexpected error occurred");
-        } finally {
-            setTimeout(() => {
-                setModalMessage(null);
-                setIsUploading(false);
-            }, 2000);
-        }
-    }
 
 
     if (error) {
