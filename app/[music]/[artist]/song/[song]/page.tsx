@@ -3,12 +3,20 @@ import SongPage from "./SongPage";
 
 // Server-side metadata generation
 export async function generateMetadata(props: any): Promise<Metadata> {
-  const { artist, song } = props.params;
+  // Await params if needed (for dynamic routes)
+  const params = typeof props.params?.then === "function" ? await props.params : props.params;
+  const { artist, song } = params;
 
-  // Fetch song details from your API
-  const res = await fetch(
-    `/api/Music/route?type=songDetails&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
-  );
+  // Use absolute URL for server-side fetch
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    "https://next-xi-opal.vercel.app"; // fallback to your production domain
+
+  const apiUrl = `${baseUrl}/api/Music/route?type=songDetails&artistName=${encodeURIComponent(
+    artist
+  )}&songName=${encodeURIComponent(song)}`;
+
+  const res = await fetch(apiUrl, { cache: "no-store" });
   if (!res.ok) {
     return {
       title: "Song Not Found | Tuneflix",
@@ -20,7 +28,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const title = `${track.name} by ${track.artists.map((a: { name: string }) => a.name).join(", ")} | Tuneflix`;
   const description = `Listen to "${track.name}" by ${track.artists.map((a: { name: string }) => a.name).join(", ")}. View album details, lyrics, YouTube video, and more on Tuneflix.`;
   const image = track.album?.images?.[0]?.url || "https://tuneflix.com/images/og-image.jpg";
-  const url = `https://tuneflix.com/music/${encodeURIComponent(artist)}/song/${encodeURIComponent(song)}`;
+  const url = `${baseUrl}/music/${encodeURIComponent(artist)}/song/${encodeURIComponent(song)}`;
 
   return {
     title,
