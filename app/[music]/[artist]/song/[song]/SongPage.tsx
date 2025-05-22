@@ -453,12 +453,7 @@ export default function SongPage() {
                     </div>
                 </div>
             )}
-            <CommentShareModule track={track} album={undefined} artist={undefined} playlist={undefined} />
-            {/* Lyrics Section */}
-            <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
-                <h2>Lyrics</h2>
-                <div dangerouslySetInnerHTML={{ __html: lyricsHtml }} />
-            </div>
+           
             <h1>Songs by {track.artists[0]?.name}</h1>
             <div
                 style={{
