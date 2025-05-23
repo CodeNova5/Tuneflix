@@ -8,9 +8,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const { artist, song } = params;
 
   // Use absolute URL for server-side fetch
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    "https://next-xi-opal.vercel.app"; // fallback to your production domain
+  const baseUrl = "https://next-xi-opal.vercel.app"; // fallback to your production domain
 
   const apiUrl = `${baseUrl}/api/Music/route?type=songDetails&artistName=${encodeURIComponent(
     artist
@@ -27,7 +25,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
 
   const title = `${track.name} by ${track.artists.map((a: { name: string }) => a.name).join(", ")} | Tuneflix`;
   const description = `Listen to "${track.name}" by ${track.artists.map((a: { name: string }) => a.name).join(", ")}. View album details, lyrics, YouTube video, and more on Tuneflix.`;
-  const image = track.album?.images?.[0]?.url || "https://tuneflix.com/images/og-image.jpg";
+  const image = track.album?.images?.[0]?.url;
   const url = `${baseUrl}/music/${encodeURIComponent(artist)}/song/${encodeURIComponent(song)}`;
 
   return {
