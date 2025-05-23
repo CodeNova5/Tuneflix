@@ -226,7 +226,6 @@ React.useEffect(() => {
 
         // 2. If not, convert and upload
         setIsUploading(true);
-        setModalMessage("Preparing audio...");
 
         try {
             const response = await fetch(

@@ -1,3 +1,11 @@
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '25mb', // or higher if needed
+    },
+  },
+};
+
 export default async function handler(req, res) {
   
   const { fileName, fileContent } = req.body;
