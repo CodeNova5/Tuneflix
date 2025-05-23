@@ -288,14 +288,26 @@ React.useEffect(() => {
     // eslint-disable-next-line
 }, [lyricsVideoId, track]);
 
-async function uploadFileToGithub(fileName: string, fileContent: string) {
+async function uploadFileToGithub(fileName: string, base64data: string) {
+    // Convert base64 to Blob
+    const byteCharacters = atob(base64data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "audio/mpeg" });
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("file", blob, fileName);
+    formData.append("fileName", fileName);
+
     await fetch("/api/comments/uploadFile", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileName, fileContent }),
+        body: formData,
     });
 }
-
 async function checkGithubFileExists(fileName: string): Promise<string | null> {
     const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${fileName}`;
     try {

@@ -1,58 +1,74 @@
+import formidable from "formidable";
+
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: '25mb', // or higher if needed
-    },
+    bodyParser: false, // Disable Next.js bodyParser
   },
 };
 
 export default async function handler(req, res) {
-  
-  const { fileName, fileContent } = req.body;
-
-  if (!fileName || !fileContent) {
-    return res.status(400).json({ message: 'Missing fileName or fileContent in request body' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
-  try {
-    // Dynamically import Octokit (ESM)
-    const { Octokit } = await import('@octokit/rest');
+  const form = new formidable.IncomingForm({ maxFileSize: 100 * 1024 * 1024 }); // 100MB
 
-    // Initialize Octokit with GitHub token
-    const octokit = new Octokit({
-      auth: process.env.GITHUB_TOKEN, // Ensure this is set in .env.local
-    });
-
-    const owner = 'CodeNova5';
-    const repo = 'Music-Backend';
-    const path = `public/comment/${fileName}`;
-
-    let sha;
-    try {
-      const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
-      sha = data.sha;
-    } catch (error) {
-      console.log('File does not exist and will be created.');
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error("Formidable error:", err);
+      return res.status(400).json({ message: "File upload error" });
     }
 
-    const commitMessage = sha ? 'Update file' : 'Add new file';
+    const file = files.file;
+    const fileName = fields.fileName;
 
-    const response = await octokit.rest.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path,
-      message: commitMessage,
-      content: fileContent,
-      sha,
-    });
+    if (!file || !fileName) {
+      return res.status(400).json({ message: "Missing file or fileName" });
+    }
 
-    return res.status(200).json({
-      message: 'File uploaded successfully',
-      data: response.data,
-      path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/refs/heads/main/public/comment/${fileName}`,
-    });
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    return res.status(500).json({ message: error.message });
-  }
+    try {
+      // Read file as base64
+      const fs = await import("fs/promises");
+      const fileBuffer = await fs.readFile(file.filepath);
+      const fileContent = fileBuffer.toString("base64");
+
+      // Dynamically import Octokit (ESM)
+      const { Octokit } = await import("@octokit/rest");
+      const octokit = new Octokit({
+        auth: process.env.GITHUB_TOKEN,
+      });
+
+      const owner = "CodeNova5";
+      const repo = "Music-Backend";
+      const path = `public/comment/${fileName}`;
+
+      let sha;
+      try {
+        const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
+        sha = data.sha;
+      } catch {
+        // File does not exist, will be created
+      }
+
+      const commitMessage = sha ? "Update file" : "Add new file";
+
+      const response = await octokit.rest.repos.createOrUpdateFileContents({
+        owner,
+        repo,
+        path,
+        message: commitMessage,
+        content: fileContent,
+        sha,
+      });
+
+      return res.status(200).json({
+        message: "File uploaded successfully",
+        data: response.data,
+        path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/refs/heads/main/public/comment/${fileName}`,
+      });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      return res.status(500).json({ message: error.message });
+    }
+  });
 }
