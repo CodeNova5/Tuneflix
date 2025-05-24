@@ -2,7 +2,7 @@ import formidable from "formidable";
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: false, // Disable Next.js bodyParser
   },
 };
 
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const form = formidable({ maxFileSize: 100 * 1024 * 1024 }); // 100MB
+  const form = new formidable.IncomingForm({ maxFileSize: 100 * 1024 * 1024 }); // 100MB
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -27,10 +27,12 @@ export default async function handler(req, res) {
     }
 
     try {
+      // Read file as base64
       const fs = await import("fs/promises");
       const fileBuffer = await fs.readFile(file.filepath);
       const fileContent = fileBuffer.toString("base64");
 
+      // Dynamically import Octokit (ESM)
       const { Octokit } = await import("@octokit/rest");
       const octokit = new Octokit({
         auth: process.env.GITHUB_TOKEN,
