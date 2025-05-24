@@ -2,7 +2,7 @@ import formidable from "formidable";
 
 export const config = {
   api: {
-    bodyParser: false, // Disable Next.js bodyParser
+    bodyParser: false,
   },
 };
 
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const form = new formidable.IncomingForm({ maxFileSize: 100 * 1024 * 1024 }); // 100MB
+  const form = formidable({ maxFileSize: 100 * 1024 * 1024 }); // 100MB
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -19,20 +19,21 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "File upload error" });
     }
 
-    const file = files.file;
-    const fileName = fields.fileName;
+    // Handle both array and object for file and fileName
+    const fileField = files.file;
+    const file = Array.isArray(fileField) ? fileField[0] : fileField;
+    const fileNameField = fields.fileName;
+    const fileName = Array.isArray(fileNameField) ? fileNameField[0] : fileNameField;
 
     if (!file || !fileName) {
       return res.status(400).json({ message: "Missing file or fileName" });
     }
 
     try {
-      // Read file as base64
       const fs = await import("fs/promises");
       const fileBuffer = await fs.readFile(file.filepath);
       const fileContent = fileBuffer.toString("base64");
 
-      // Dynamically import Octokit (ESM)
       const { Octokit } = await import("@octokit/rest");
       const octokit = new Octokit({
         auth: process.env.GITHUB_TOKEN,
