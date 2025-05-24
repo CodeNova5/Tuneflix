@@ -203,123 +203,70 @@ export default function SongPage() {
         }
     }
 
-React.useEffect(() => {
-    async function processAudio() {
-        if (!lyricsVideoId || !track) return;
+    // Handle MP3 conversion and download
+    React.useEffect(() => {
+        async function handleConvertToMp3() {
+            if (!lyricsVideoId || !track) return;
+            setIsUploading(true);
+            setModalMessage("Preparing audio...");
 
-        const formatTitle = (title: string): string =>
-            title
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join("-");
+            const formatTitle = (title: string): string =>
+                title
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join("-");
 
-        const fileName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}.mp3`;
-
-        // 1. Check if file exists in GitHub
-        const githubUrl = await checkGithubFileExists(fileName);
-        if (githubUrl) {
-            setDownloadUrl(githubUrl);
-            setModalMessage("✅ Download ready from GitHub!");
-            setTimeout(() => setModalMessage(null), 2000);
-            return;
-        }
-
-        // 2. If not, convert and upload
-        setIsUploading(true);
-
-        try {
-            const response = await fetch(
-                `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
-            );
-            if (!response.ok) {
-                const errorData = await response.json();
-                setModalMessage(errorData.error || "Failed to convert video to MP3");
-                setIsUploading(false);
-                return;
-            }
-            const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-
-            // Add metadata using browser-id3-writer
-            const writer = new ID3Writer(arrayBuffer);
-            writer.setFrame('TIT2', track.name ?? 'Unknown Title')
-                .setFrame('TPE1', [track.artists[0]?.name ?? "Unknown Artist"])
-                .setFrame('TALB', track.album?.name ?? "Unknown Album");
-            const coverImageUrl = track.album?.images[0]?.url;
-            if (coverImageUrl) {
-                const coverResponse = await fetch(coverImageUrl);
-                const coverBlob = await coverResponse.blob();
-                const coverArrayBuffer = await coverBlob.arrayBuffer();
-                (writer as any).setFrame('APIC', {
-                    type: 3,
-                    data: new Uint8Array(coverArrayBuffer),
-                    description: 'Cover',
-                });
-            }
-            writer.addTag();
-            const taggedBlob = writer.getBlob();
-
-            // Convert to base64 for upload
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                const base64data = (reader.result as string).split(',')[1];
-                await uploadFileToGithub(fileName, base64data);
-                const githubUrlAfterUpload = await checkGithubFileExists(fileName);
-                if (githubUrlAfterUpload) {
-                    setDownloadUrl(githubUrlAfterUpload);
-                    setModalMessage("✅ Download ready!");
-                } else {
-                    setModalMessage("Upload failed.");
+            const songName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}`;
+            const artistName = track.artists[0]?.name ?? "Unknown Artist";
+            const albumName = track.album?.name ?? "Unknown Album";
+            try {
+                const response = await fetch(
+                    `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    setModalMessage(errorData.error || "Failed to convert video to MP3");
+                    setIsUploading(false);
+                    return;
                 }
-                setTimeout(() => setModalMessage(null), 2000);
-                setIsUploading(false);
-            };
-            reader.readAsDataURL(taggedBlob);
-        } catch (err) {
-            setModalMessage("An unexpected error occurred");
-            setTimeout(() => setModalMessage(null), 2000);
-            setIsUploading(false);
+                const blob = await response.blob();
+                const arrayBuffer = await blob.arrayBuffer();
+
+                // Add metadata using browser-id3-writer
+                const writer = new ID3Writer(arrayBuffer);
+                writer.setFrame('TIT2', track.name ?? 'Unknown Title')
+                    .setFrame('TPE1', [artistName])
+                    .setFrame('TALB', albumName);
+                const coverImageUrl = track.album?.images[0]?.url;
+                if (coverImageUrl) {
+                    const coverResponse = await fetch(coverImageUrl);
+                    const coverBlob = await coverResponse.blob();
+                    const coverArrayBuffer = await coverBlob.arrayBuffer();
+                    (writer as any).setFrame('APIC', {
+                        type: 3,
+                        data: new Uint8Array(coverArrayBuffer),
+                        description: 'Cover',
+                    });
+                }
+                writer.addTag();
+                const taggedBlob = writer.getBlob();
+                const url = window.URL.createObjectURL(taggedBlob);
+                setDownloadUrl(url);
+                setModalMessage("✅ Download ready!");
+            } catch (err) {
+                setModalMessage("An unexpected error occurred");
+            } finally {
+                setTimeout(() => {
+                    setModalMessage(null);
+                    setIsUploading(false);
+                }, 2000);
+            }
         }
-    }
-
-    if (lyricsVideoId && track && !downloadUrl) {
-        processAudio();
-    }
-    // eslint-disable-next-line
-}, [lyricsVideoId, track]);
-
-async function uploadFileToGithub(fileName: string, base64data: string) {
-    // Convert base64 to Blob
-    const byteCharacters = atob(base64data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: "audio/mpeg" });
-
-    // Prepare FormData
-    const formData = new FormData();
-    formData.append("file", blob, fileName);
-    formData.append("fileName", fileName);
-
-    await fetch("/api/comments/uploadFile", {
-        method: "POST",
-        body: formData,
-    });
-}
-async function checkGithubFileExists(fileName: string): Promise<string | null> {
-    const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${fileName}`;
-    try {
-        const res = await fetch(githubRawUrl, { method: "HEAD" });
-        if (res.ok) {
-            return githubRawUrl;
+        if (lyricsVideoId && !downloadUrl && track) {
+            handleConvertToMp3();
         }
-        return null;
-    } catch {
-        return null;
-    }
-}
+        // eslint-disable-next-line
+    }, [lyricsVideoId, track]);
 
     const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const artistName = e.target.value;
@@ -509,7 +456,7 @@ async function checkGithubFileExists(fileName: string): Promise<string | null> {
             <CommentShareModule track={track} album={undefined} artist={undefined} playlist={undefined} />
             {/* Lyrics Section */}
             <div id="lyrics-container" style={{ marginTop: "20px", textAlign: "left" }}>
-                <h1>Lyrics</h1>
+                <h2>Lyrics</h2>
                 <div dangerouslySetInnerHTML={{ __html: lyricsHtml }} />
             </div>
             <h1>Songs by {track.artists[0]?.name}</h1>
