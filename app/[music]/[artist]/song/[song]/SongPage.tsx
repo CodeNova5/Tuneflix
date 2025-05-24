@@ -205,7 +205,7 @@ export default function SongPage() {
 
     // Add this helper to check GitHub for the file
 async function checkGithubFileExists(fileName: string): Promise<string | null> {
-    const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/music/${fileName}`;
+    const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${fileName}`;
     try {
         const res = await fetch(githubRawUrl, { method: "HEAD" });
         if (res.ok) {
@@ -223,7 +223,7 @@ async function uploadFileToGithub(fileName: string, blob: Blob) {
     formData.append("file", blob, fileName);
     formData.append("fileName", fileName);
 
-    await fetch("/api/comments/uploadFile?type=music", {
+    await fetch("/api/comments/uploadFile", {
         method: "POST",
         body: formData,
     });
