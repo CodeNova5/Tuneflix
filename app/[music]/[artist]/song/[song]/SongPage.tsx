@@ -203,74 +203,9 @@ export default function SongPage() {
         }
     }
 
-    // Handle MP3 conversion and download
-    React.useEffect(() => {
-        async function handleConvertToMp3() {
-            if (!lyricsVideoId || !track) return;
-            setIsUploading(true);
-            setModalMessage("Preparing audio...");
-
-            const formatTitle = (title: string): string =>
-                title
-                    .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join("-");
-
-            const songName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}`;
-            const artistName = track.artists[0]?.name ?? "Unknown Artist";
-            const albumName = track.album?.name ?? "Unknown Album";
-            try {
-                const response = await fetch(
-                    `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
-                );
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    setModalMessage(errorData.error || "Failed to convert video to MP3");
-                    setIsUploading(false);
-                    return;
-                }
-                const blob = await response.blob();
-                const arrayBuffer = await blob.arrayBuffer();
-
-                // Add metadata using browser-id3-writer
-                const writer = new ID3Writer(arrayBuffer);
-                writer.setFrame('TIT2', track.name ?? 'Unknown Title')
-                    .setFrame('TPE1', [artistName])
-                    .setFrame('TALB', albumName);
-                const coverImageUrl = track.album?.images[0]?.url;
-                if (coverImageUrl) {
-                    const coverResponse = await fetch(coverImageUrl);
-                    const coverBlob = await coverResponse.blob();
-                    const coverArrayBuffer = await coverBlob.arrayBuffer();
-                    (writer as any).setFrame('APIC', {
-                        type: 3,
-                        data: new Uint8Array(coverArrayBuffer),
-                        description: 'Cover',
-                    });
-                }
-                writer.addTag();
-                const taggedBlob = writer.getBlob();
-                const url = window.URL.createObjectURL(taggedBlob);
-                setDownloadUrl(url);
-                setModalMessage("✅ Download ready!");
-            } catch (err) {
-                setModalMessage("An unexpected error occurred");
-            } finally {
-                setTimeout(() => {
-                    setModalMessage(null);
-                    setIsUploading(false);
-                }, 2000);
-            }
-        }
-        if (lyricsVideoId && !downloadUrl && track) {
-            handleConvertToMp3();
-        }
-        // eslint-disable-next-line
-    }, [lyricsVideoId, track]);
-
     // Add this helper to check GitHub for the file
 async function checkGithubFileExists(fileName: string): Promise<string | null> {
-    const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${fileName}`;
+    const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/music/${fileName}`;
     try {
         const res = await fetch(githubRawUrl, { method: "HEAD" });
         if (res.ok) {
@@ -288,7 +223,7 @@ async function uploadFileToGithub(fileName: string, blob: Blob) {
     formData.append("file", blob, fileName);
     formData.append("fileName", fileName);
 
-    await fetch("/api/comments/uploadFile", {
+    await fetch("/api/comments/uploadFile?type=music", {
         method: "POST",
         body: formData,
     });
