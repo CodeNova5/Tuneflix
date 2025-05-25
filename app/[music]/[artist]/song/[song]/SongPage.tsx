@@ -304,7 +304,6 @@ export default function SongPage() {
                 const githubUrlAfterUpload = await checkGithubFileExists(fileName);
                 if (githubUrlAfterUpload) {
                     setDownloadUrl(githubUrlAfterUpload);
-                    setModalMessage("✅ Download ready! From github");
                 } else {
                     setModalMessage("Upload failed.");
                     setDownloadUrl(url);
