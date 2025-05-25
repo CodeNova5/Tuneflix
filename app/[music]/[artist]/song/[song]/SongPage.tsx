@@ -204,125 +204,125 @@ export default function SongPage() {
     }
 
     // Add this helper to check GitHub for the file
-async function checkGithubFileExists(fileName: string): Promise<string | null> {
-    const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${fileName}`;
-    try {
-        const res = await fetch(githubRawUrl, { method: "HEAD" });
-        if (res.ok) {
-            return githubRawUrl;
-        }
-        return null;
-    } catch {
-        return null;
-    }
-}
-
-// Add this helper to upload using FormData (for formidable)
-async function uploadFileToGithub(fileName: string, blob: Blob) {
-    const formData = new FormData();
-    formData.append("file", blob, fileName);
-    formData.append("fileName", fileName);
-
-    await fetch("/api/comments/uploadFile", {
-        method: "POST",
-        body: formData,
-    });
-}
-
-// Replace your useEffect for MP3 conversion and download with this:
-React.useEffect(() => {
-    async function processAudio() {
-        if (!lyricsVideoId || !track) return;
-
-        const formatTitle = (title: string): string =>
-            title
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join("-");
-
-        const fileName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}.mp3`;
-
-        // 1. Check if file exists in GitHub
-        const githubUrl = await checkGithubFileExists(fileName);
-        if (githubUrl) {
-            setDownloadUrl(githubUrl);
-            setModalMessage("✅ Download ready from GitHub!");
-            setTimeout(() => setModalMessage(null), 2000);
-            return;
-        }
-
-        // 2. If not, convert and upload
-        setIsUploading(true);
-        setModalMessage("Preparing audio...");
-
+    async function checkGithubFileExists(fileName: string): Promise<string | null> {
+        const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${fileName}`;
         try {
-            const response = await fetch(
-                `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
-            );
-            if (!response.ok) {
-                const errorData = await response.json();
-                setModalMessage(errorData.error || "Failed to convert video to MP3");
-                setIsUploading(false);
+            const res = await fetch(githubRawUrl, { method: "HEAD" });
+            if (res.ok) {
+                return githubRawUrl;
+            }
+            return null;
+        } catch {
+            return null;
+        }
+    }
+
+    // Add this helper to upload using FormData (for formidable)
+    async function uploadFileToGithub(fileName: string, blob: Blob) {
+        const formData = new FormData();
+        formData.append("file", blob, fileName);
+        formData.append("fileName", fileName);
+
+        await fetch("/api/comments/uploadFile", {
+            method: "POST",
+            body: formData,
+        });
+    }
+
+    // Replace your useEffect for MP3 conversion and download with this:
+    React.useEffect(() => {
+        async function processAudio() {
+            if (!lyricsVideoId || !track) return;
+
+            const formatTitle = (title: string): string =>
+                title
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join("-");
+
+            const fileName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}.mp3`;
+
+            // 1. Check if file exists in GitHub
+            const githubUrl = await checkGithubFileExists(fileName);
+            if (githubUrl) {
+                setDownloadUrl(githubUrl);
+                setModalMessage("✅ Download ready from GitHub!");
+                setTimeout(() => setModalMessage(null), 2000);
                 return;
             }
-            const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
 
-            // Add metadata using browser-id3-writer
-            const writer = new ID3Writer(arrayBuffer);
-            writer.setFrame('TIT2', track.name ?? 'Unknown Title')
-                .setFrame('TPE1', [track.artists[0]?.name ?? "Unknown Artist"])
-                .setFrame('TALB', track.album?.name ?? "Unknown Album");
-            const coverImageUrl = track.album?.images[0]?.url;
-            if (coverImageUrl) {
-                const coverResponse = await fetch(coverImageUrl);
-                const coverBlob = await coverResponse.blob();
-                const coverArrayBuffer = await coverBlob.arrayBuffer();
-                (writer as any).setFrame('APIC', {
-                    type: 3,
-                    data: new Uint8Array(coverArrayBuffer),
-                    description: 'Cover',
-                });
+            // 2. If not, convert and upload
+            setIsUploading(true);
+            setModalMessage("Preparing audio...");
+
+            try {
+                const response = await fetch(
+                    `https://video-downloader-server.fly.dev/download?url=https://www.youtube.com/watch?v=${lyricsVideoId}&type=audio`
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    setModalMessage(errorData.error || "Failed to convert video to MP3");
+                    setIsUploading(false);
+                    return;
+                }
+                const blob = await response.blob();
+                const arrayBuffer = await blob.arrayBuffer();
+
+                // Add metadata using browser-id3-writer
+                const writer = new ID3Writer(arrayBuffer);
+                writer.setFrame('TIT2', track.name ?? 'Unknown Title')
+                    .setFrame('TPE1', [track.artists[0]?.name ?? "Unknown Artist"])
+                    .setFrame('TALB', track.album?.name ?? "Unknown Album");
+                const coverImageUrl = track.album?.images[0]?.url;
+                if (coverImageUrl) {
+                    const coverResponse = await fetch(coverImageUrl);
+                    const coverBlob = await coverResponse.blob();
+                    const coverArrayBuffer = await coverBlob.arrayBuffer();
+                    (writer as any).setFrame('APIC', {
+                        type: 3,
+                        data: new Uint8Array(coverArrayBuffer),
+                        description: 'Cover',
+                    });
+                }
+                writer.addTag();
+                const taggedBlob = writer.getBlob();
+                const url = window.URL.createObjectURL(taggedBlob);
+
+                const a = document.createElement("a");
+                a.id = "download-link";
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+
+                document.body.removeChild(a);
+
+                // Upload to GitHub using FormData (for formidable)
+                await uploadFileToGithub(fileName, taggedBlob);
+
+                // After upload, check again and set download URL
+                const githubUrlAfterUpload = await checkGithubFileExists(fileName);
+                if (githubUrlAfterUpload) {
+                    setDownloadUrl(githubUrlAfterUpload);
+                    setModalMessage("✅ Download ready! From github");
+                } else {
+                    setModalMessage("Upload failed.");
+                    setDownloadUrl(url);
+
+                }
+                setTimeout(() => setModalMessage(null), 2000);
+                setIsUploading(false);
+            } catch (err) {
+                setModalMessage("An unexpected error occurred");
+                setTimeout(() => setModalMessage(null), 2000);
+                setIsUploading(false);
             }
-            writer.addTag();
-            const taggedBlob = writer.getBlob();
-             const url = window.URL.createObjectURL(taggedBlob);
-
-            const a = document.createElement("a");
-            a.id = "download-link";
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-
-            document.body.removeChild(a);
-            
-            // Upload to GitHub using FormData (for formidable)
-            await uploadFileToGithub(fileName, taggedBlob);
-
-            // After upload, check again and set download URL
-            const githubUrlAfterUpload = await checkGithubFileExists(fileName);
-            if (githubUrlAfterUpload) {
-                setDownloadUrl(githubUrlAfterUpload);
-                setModalMessage("✅ Download ready!");
-            } else {
-                setModalMessage("Upload failed.");
-                setDownloadUrl(url);
-
-            }
-            setTimeout(() => setModalMessage(null), 2000);
-            setIsUploading(false);
-        } catch (err) {
-            setModalMessage("An unexpected error occurred");
-            setTimeout(() => setModalMessage(null), 2000);
-            setIsUploading(false);
         }
-    }
 
-    if (lyricsVideoId && track && !downloadUrl) {
-        processAudio();
-    }
-    // eslint-disable-next-line
-}, [lyricsVideoId, track]);
+        if (lyricsVideoId && track && !downloadUrl) {
+            processAudio();
+        }
+        // eslint-disable-next-line
+    }, [lyricsVideoId, track]);
 
     const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const artistName = e.target.value;
@@ -453,16 +453,52 @@ React.useEffect(() => {
             <a
                 download={
                     downloadUrl
-                        ? `${track.artists[0]?.name.replace(/ /g, "-")}_-_${track.name.replace(/ /g, "-")}.mp3`
+                        ? `${track?.artists[0]?.name.replace(/ /g, "-")}_-_${track?.name.replace(/ /g, "-")}.mp3`
                         : undefined
                 }
-                href={downloadUrl || undefined}
-                onClick={e => {
+                onClick={async (e) => {
                     if (!downloadUrl) {
-                        e.preventDefault();
+                        e.preventDefault(); // Prevent default anchor behavior
+                        setIsUploading(true);
                         setModalMessage("Preparing download...");
-                    } else {
+                        // MutationObserver to monitor for the addition of the #download-link element
+                        const observer = new MutationObserver((mutationsList) => {
+                            mutationsList.forEach((mutation) => {
+                                // Check if the added node is the download-link element
+                                if (mutation.type === 'childList') {
+                                    mutation.addedNodes.forEach((node) => {
+                                        if ((node as HTMLElement).id === 'download-link') {
+                                            setModalMessage("✅ Download has started!");
+                                            // Perform any other action needed once the element is found
+                                            (node as HTMLElement).click(); // Click the link once it is added
+                                            setTimeout(() => {
+                                                setModalMessage(null);
+                                                setIsUploading(false);
+                                            }, 2000);
+                                            observer.disconnect(); // Stop observing once the element is found
+                                        }
+                                    });
+                                }
+                            });
+                        });
+
+                        // Configure the MutationObserver to watch for child node additions to the body
+                        observer.observe(document.body, { childList: true, subtree: true });
+
+                    }
+                    else {
                         setModalMessage("✅ Download has started");
+                        setIsUploading(false);
+
+
+                        // Auto-trigger the download
+                        const link = document.createElement("a");
+                        link.href = downloadUrl;
+                        link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_-_${track?.name.replace(/ /g, "-")}.mp3`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
                         setTimeout(() => setModalMessage(null), 2000);
                     }
                 }}
