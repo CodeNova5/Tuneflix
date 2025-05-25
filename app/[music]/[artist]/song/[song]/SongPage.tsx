@@ -286,7 +286,16 @@ React.useEffect(() => {
             }
             writer.addTag();
             const taggedBlob = writer.getBlob();
+             const url = window.URL.createObjectURL(taggedBlob);
 
+            const a = document.createElement("a");
+            a.id = "download-link";
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+
+            document.body.removeChild(a);
+            
             // Upload to GitHub using FormData (for formidable)
             await uploadFileToGithub(fileName, taggedBlob);
 
@@ -297,6 +306,8 @@ React.useEffect(() => {
                 setModalMessage("✅ Download ready!");
             } else {
                 setModalMessage("Upload failed.");
+                setDownloadUrl(url);
+
             }
             setTimeout(() => setModalMessage(null), 2000);
             setIsUploading(false);
