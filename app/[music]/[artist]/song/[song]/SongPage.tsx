@@ -241,7 +241,7 @@ export default function SongPage() {
                     .join("-");
 
             const fileName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}.mp3`;
-
+            console.log("File name:", fileName);
             // 1. Check if file exists in GitHub
             const githubUrl = await checkGithubFileExists(fileName);
             if (githubUrl) {
@@ -250,6 +250,7 @@ export default function SongPage() {
                 setTimeout(() => setModalMessage(null), 2000);
                 return;
             }
+
 
             // 2. If not, convert and upload
             setIsUploading(true);
@@ -458,44 +459,41 @@ export default function SongPage() {
                 }
                 href={downloadUrl || undefined}
                 onClick={async (e) => {
+                    // Ensure the filename does not have "public_comment" attached to it
+                    const cleanFileName = `${track.artists[0]?.name.replace(/ /g, "-")}_-_${track.name.replace(/ /g, "-")}.mp3`;
+
                     if (!downloadUrl) {
-                        e.preventDefault(); // Prevent default anchor behavior
+                        e.preventDefault();
                         setIsUploading(true);
                         setModalMessage("Preparing download...");
-                        // MutationObserver to monitor for the addition of the #download-link element
                         const observer = new MutationObserver((mutationsList) => {
                             mutationsList.forEach((mutation) => {
-                                // Check if the added node is the download-link element
                                 if (mutation.type === 'childList') {
                                     mutation.addedNodes.forEach((node) => {
                                         if ((node as HTMLElement).id === 'download-link') {
                                             setModalMessage("✅ Download has started!");
-                                            // Perform any other action needed once the element is found
-                                            (node as HTMLElement).click(); // Click the link once it is added
+                                            (node as HTMLElement).setAttribute('download', cleanFileName);
+                                            (node as HTMLElement).click();
                                             setTimeout(() => {
                                                 setModalMessage(null);
                                                 setIsUploading(false);
                                             }, 2000);
-                                            observer.disconnect(); // Stop observing once the element is found
+                                            observer.disconnect();
                                         }
                                     });
                                 }
                             });
                         });
-
-                        // Configure the MutationObserver to watch for child node additions to the body
                         observer.observe(document.body, { childList: true, subtree: true });
-
                     }
                     else {
                         setModalMessage("✅ Download has started");
                         setIsUploading(false);
 
-
-                        // Auto-trigger the download
+                        // Always use the clean filename
                         const link = document.createElement("a");
                         link.href = downloadUrl;
-                        link.download = `${track?.artists[0]?.name.replace(/ /g, "-")}_-_${track?.name.replace(/ /g, "-")}.mp3`;
+                        link.download = cleanFileName;
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);

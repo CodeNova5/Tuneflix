@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     if (!uploadedFile || !uploadedFileName) {
       return res.status(400).json({ message: "Missing file or fileName" });
     }
-
+    console.log("Uploading file:", uploadedFileName);
     try {
       const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
       const fileContent = fileBuffer.toString("base64");
