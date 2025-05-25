@@ -325,6 +325,7 @@ export default function SongPage() {
         // eslint-disable-next-line
     }, [lyricsVideoId, track]);
 
+
     const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const artistName = e.target.value;
         if (artistName) {
@@ -489,16 +490,18 @@ export default function SongPage() {
                     else {
                         setModalMessage("✅ Download has started");
                         setIsUploading(false);
-
-                        // Always use the clean filename
-                        const link = document.createElement("a");
-                        link.href = downloadUrl;
-                        link.download = cleanFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-
-                        setTimeout(() => setModalMessage(null), 2000);
+                        const fileUrl = downloadUrl;
+                        fetch(fileUrl)
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const link = document.createElement("a");
+                                link.href = URL.createObjectURL(blob);
+                                link.download = cleanFileName;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            })
+                            .catch(console.error);
                     }
                 }}
                 style={{
