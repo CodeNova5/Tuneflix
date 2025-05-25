@@ -451,6 +451,12 @@ export default function SongPage() {
                 )}
             </div>
             <a
+                download={
+                    downloadUrl
+                        ? `${track.artists[0]?.name.replace(/ /g, "-")}_-_${track.name.replace(/ /g, "-")}.mp3`
+                        : undefined
+                }
+                href={downloadUrl || undefined}
                 onClick={async (e) => {
                     if (!downloadUrl) {
                         e.preventDefault(); // Prevent default anchor behavior
