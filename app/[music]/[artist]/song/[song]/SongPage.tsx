@@ -453,12 +453,6 @@ export default function SongPage() {
                 )}
             </div>
             <a
-                download={
-                    downloadUrl
-                        ? `${track.artists[0]?.name.replace(/ /g, "-")}_-_${track.name.replace(/ /g, "-")}.mp3`
-                        : undefined
-                }
-                href={downloadUrl || undefined}
                 onClick={async (e) => {
                     // Ensure the filename does not have "public_comment" attached to it
                     const cleanFileName = `${track.artists[0]?.name.replace(/ /g, "-")}_-_${track.name.replace(/ /g, "-")}.mp3`;
