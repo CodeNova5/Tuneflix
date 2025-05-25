@@ -8,11 +8,8 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
 
-  const form = new formidable.IncomingForm();
+const form = formidable();
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
