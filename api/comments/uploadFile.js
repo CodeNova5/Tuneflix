@@ -9,24 +9,25 @@ export const config = {
 
 export default async function handler(req, res) {
 
-const form = formidable();
+  const form = formidable();
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
       return res.status(500).json({ message: "Error parsing form data" });
     }
 
-    const file = files.file;
-    const fileName = fields.fileName;
+    const uploadedFile = Array.isArray(files.file) ? files.file[0] : files.file;
+    const uploadedFileName = Array.isArray(fields.fileName) ? fields.fileName[0] : fields.fileName;
 
-    if (!file || !fileName) {
+    if (!uploadedFile || !uploadedFileName) {
       return res.status(400).json({ message: "Missing file or fileName" });
     }
 
     try {
-      // Read file as base64
-      const fileBuffer = fs.readFileSync(file.filepath);
+      const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
       const fileContent = fileBuffer.toString("base64");
+
+      // GitHub upload code continues here...
 
       // Dynamically import Octokit (ESM)
       const { Octokit } = await import("@octokit/rest");
