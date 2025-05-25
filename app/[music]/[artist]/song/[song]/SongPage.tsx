@@ -408,6 +408,8 @@ export default function SongPage() {
                                 onChange={handleSelect}
                                 defaultValue=""
                                 style={{
+                                    backgroundColor: '#1e1e1e',
+                                    color: '#fff',
                                     marginTop: '10px',
                                     padding: '8px',
                                     fontSize: '14px',
@@ -483,6 +485,7 @@ export default function SongPage() {
                     }
                     else {
                         setModalMessage("✅ Download has started");
+                        setTimeout(() => setModalMessage(null), 2000);
                         setIsUploading(false);
                         const fileUrl = downloadUrl;
                         fetch(fileUrl)
