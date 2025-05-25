@@ -39,7 +39,7 @@ export default async function handler(req, res) {
 
       const owner = "CodeNova5";
       const repo = "Music-Backend";
-      const path = `public/comment/${fileName}`;
+      const path = `public/comment/${uploadedFileName}`;
 
       let sha;
       try {
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
       return res.status(200).json({
         message: "File uploaded successfully",
         data: response.data,
-        path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${fileName}`,
+        path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${uploadedFileName}`,
       });
     } catch (error) {
       console.error("Error uploading file:", error);
