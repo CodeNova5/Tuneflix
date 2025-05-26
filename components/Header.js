@@ -172,6 +172,8 @@ const Header = () => {
   left: "50%",
   transform: "translateX(-50%)",
 }}>
+Tuneflix
+      </Link>
 
       {/* Search Input */}
       <div style={{
