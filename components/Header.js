@@ -24,18 +24,26 @@ const Header = () => {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearch(query);
-    if (typingTimeout) clearTimeout(typingTimeout);
+  // Only fetch on Enter key
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      fetchSearchResults(search);
+    }
+  };
 
-    setTypingTimeout(setTimeout(() => {
-      if (query.trim() === "") return setResults([]);
-      fetchSearchResults(query);
-    }, 400));
+
+  // Only update search state, don't fetch on change
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setResults([]); // Clear results while typing
   };
 
   const fetchSearchResults = async (query) => {
+    if (query.trim() === "") {
+      setResults([]);
+      return;
+    }
     const res = await fetch(`/api/Music/route?type=search&query=${encodeURIComponent(query)}`);
     const data = await res.json();
     setResults(data.tracks?.items || []);
@@ -163,28 +171,28 @@ const Header = () => {
       )}
 
       {/* Site Name */}
-     <Link href="/" style={{
-  fontSize: windowWidth <= 600 ? "1.2rem" : "1.5rem",
-  color: "white",
-  textDecoration: "none",
-  fontWeight: "bold",
-  position: "absolute",
-  left: "40%",
-  transform: "translateX(-50%)",
-}}>
-Tuneflix
+      <Link href="/" style={{
+        fontSize: windowWidth <= 600 ? "1.2rem" : "1.5rem",
+        color: "white",
+        textDecoration: "none",
+        fontWeight: "bold",
+        position: "absolute",
+        left: "40%",
+        transform: "translateX(-50%)",
+      }}>
+        Tuneflix
       </Link>
 
       {/* Search Input */}
       <div style={{
-  position: "absolute",
-  top: "10px",
-  right: "20px",
-  display: "flex",
-  flexDirection: windowWidth <= 600 ? "column" : "row",
-  alignItems: "flex-end",
-  gap: "10px",
-}}>
+        position: "absolute",
+        top: "10px",
+        right: "20px",
+        display: "flex",
+        flexDirection: windowWidth <= 600 ? "column" : "row",
+        alignItems: "flex-end",
+        gap: "10px",
+      }}>
         <div style={{ position: "relative" }}>
           <FontAwesomeIcon
             icon={faSearch}
@@ -199,22 +207,24 @@ Tuneflix
             }}
           />
           <textarea
-  rows="1"
-  placeholder="Search songs..."
-  value={search}
-  onChange={handleSearchChange}
-  style={{
-    padding: "8px 8px 8px 32px",
-    borderRadius: "20px",
-    border: "1px solid #444",
-    backgroundColor: "#222",
-    color: "white",
-    resize: "none",
-    fontSize: "1rem",
-    outline: "none",
-    width: "140px",
-  }}
-/>        </div>
+            rows="1"
+            placeholder="Search songs..."
+            value={search}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchKeyDown}
+            style={{
+              padding: "8px 8px 8px 32px",
+              borderRadius: "20px",
+              border: "1px solid #444",
+              backgroundColor: "#222",
+              color: "white",
+              resize: "none",
+              fontSize: "1rem",
+              outline: "none",
+              width: "140px",
+            }}
+          />
+        </div>
 
         {/* Search Results */}
         {results.length > 0 && (
