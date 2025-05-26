@@ -17,10 +17,12 @@ const Header = () => {
   const userInfoRef = useRef(null);
   const router = useRouter();
 
-  
-useEffect(() => {
+  useEffect(() => {
     const updateSize = () => setWindowWidth(window.innerWidth);
-    updateSize();
+    window.addEventListener("resize", updateSize);
+    updateSize(); // Call it once to set the initial width
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
