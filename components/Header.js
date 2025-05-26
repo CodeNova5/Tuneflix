@@ -19,8 +19,8 @@ const Header = () => {
 
   useEffect(() => {
     const updateSize = () => setWindowWidth(window.innerWidth);
+    updateSize();
     window.addEventListener("resize", updateSize);
-    updateSize(); // Call it once to set the initial width
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
@@ -178,7 +178,7 @@ Tuneflix
       {/* Search Input */}
       <div style={{
   position: "absolute",
-  top: "10px",
+  top: windowWidth <= 600 ? "70px" : "10px", // Push down on mobile
   right: "20px",
   display: "flex",
   flexDirection: windowWidth <= 600 ? "column" : "row",
@@ -199,22 +199,22 @@ Tuneflix
             }}
           />
           <textarea
-  rows="1"
-  placeholder="Search songs..."
-  value={search}
-  onChange={handleSearchChange}
-  style={{
-    padding: "8px 8px 8px 32px",
-    borderRadius: "20px",
-    border: "1px solid #444",
-    backgroundColor: "#222",
-    color: "white",
-    resize: "none",
-    fontSize: "1rem",
-    outline: "none",
-    width: window.innerWidth <= 600 ? "140px" : "220px",
-  }}
-/>
+            rows="1"
+            placeholder="Search songs..."
+            value={search}
+            onChange={handleSearchChange}
+            style={{
+              padding: "8px 8px 8px 32px",
+              borderRadius: "20px",
+              border: "1px solid #444",
+              backgroundColor: "#222",
+              color: "white",
+              resize: "none",
+              fontSize: "1rem",
+              outline: "none",
+              width: windowWidth <= 600 ? "180px" : "220px",
+            }}
+          />
         </div>
 
         {/* Search Results */}
