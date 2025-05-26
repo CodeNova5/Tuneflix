@@ -212,7 +212,7 @@ Tuneflix
     resize: "none",
     fontSize: "1rem",
     outline: "none",
-    width: window.innerWidth <= 600 ? "140px" : "220px",
+    width: "140px",
   }}
 />        </div>
 
