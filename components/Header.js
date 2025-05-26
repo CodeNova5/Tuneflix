@@ -5,90 +5,34 @@ import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
-const headerStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  marginLeft: "0",
-  width: "100%",
-  height: "60px",
-  backgroundColor: "#111",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  borderBottom: "1px solid #444",
-  color: "white",
-  zIndex: 1000,
-};
-
-const profileImgLinkStyle = {
-  position: "absolute",
-  left: "20px",
-  cursor: "pointer",
-};
-
-const profileImgStyle = {
-  width: "40px",
-  height: "40px",
-  borderRadius: "50%",
-};
-
-const siteNameStyle = {
-  fontSize: "1.5rem",
-  color: "white",
-  textDecoration: "none",
-  fontWeight: "bold",
-};
-
-
-const userInfoBoxStyle = {
-  position: "absolute",
-  top: "60px",
-  left: "20px",
-  backgroundColor: "#222",
-  color: "white",
-  padding: "15px",
-  borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
-  zIndex: 1001,
-  width: "250px",
-};
-
-const fullProfileImgStyle = {
-  width: "60px",
-  height: "60px",
-  borderRadius: "50%",
-  display: "block",
-  marginBottom: "10px",
-};
-
 const Header = () => {
   const [profileImg, setProfileImg] = useState("/images/default-profile.png");
   const [userInfo, setUserInfo] = useState(null);
   const [showUserInfo, setShowUserInfo] = useState(false);
   const [notLoggedIn, setNotLoggedIn] = useState(false);
-  const userInfoRef = useRef(null);
-  const router = useRouter();
   const [search, setSearch] = useState("");
-
   const [results, setResults] = useState([]);
   const [typingTimeout, setTypingTimeout] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(0);
+  const userInfoRef = useRef(null);
+  const router = useRouter();
 
-
+  useEffect(() => {
+    const updateSize = () => setWindowWidth(window.innerWidth);
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearch(query);
-
     if (typingTimeout) clearTimeout(typingTimeout);
 
     setTypingTimeout(setTimeout(() => {
-      if (query.trim() === "") {
-        setResults([]);
-        return;
-      }
+      if (query.trim() === "") return setResults([]);
       fetchSearchResults(query);
-    }, 400)); // debounce delay
+    }, 400));
   };
 
   const fetchSearchResults = async (query) => {
@@ -96,28 +40,20 @@ const Header = () => {
     const data = await res.json();
     setResults(data.tracks?.items || []);
   };
-  
-  useEffect(() => {
-    if (results.length > 0) {
-      document.body.style.overflow = "hidden"; // disable background scroll
-    } else {
-      document.body.style.overflow = ""; // re-enable scroll
-    }
 
-    return () => {
-      document.body.style.overflow = ""; // cleanup on unmount
-    };
+  useEffect(() => {
+    document.body.style.overflow = results.length > 0 ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [results]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userInfo") || "null");
-    if (storedUser && storedUser.data) {
+    if (storedUser?.data) {
       setUserInfo(storedUser);
-      if (storedUser.provider === "google") {
-        setProfileImg(storedUser.data.picture || "/images/default-profile.png");
-      } else if (storedUser.provider === "facebook") {
-        setProfileImg(storedUser.data.picture?.data?.url || "/images/default-profile.png");
-      }
+      const picture = storedUser.provider === "google"
+        ? storedUser.data.picture
+        : storedUser.data.picture?.data?.url;
+      setProfileImg(picture || "/images/default-profile.png");
     }
   }, []);
 
@@ -127,16 +63,12 @@ const Header = () => {
         setShowUserInfo(false);
       }
     };
-
-    const handleScroll = () => {
-      setShowUserInfo(false);
-    };
+    const handleScroll = () => setShowUserInfo(false);
 
     if (showUserInfo || notLoggedIn) {
       document.addEventListener("mousedown", handleClickOutside);
       window.addEventListener("scroll", handleScroll);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("scroll", handleScroll);
@@ -146,24 +78,61 @@ const Header = () => {
   const toggleUserInfo = () => {
     if (!userInfo) {
       setNotLoggedIn(true);
-      setTimeout(() => {
-        router.push("/login");
-      }, 1000);
+      setTimeout(() => router.push("/login"), 1000);
     } else {
       setShowUserInfo((prev) => !prev);
     }
-
   };
 
   return (
-    <header style={headerStyle}>
-      <div onClick={toggleUserInfo} style={profileImgLinkStyle}>
-        <img src={profileImg} alt="Profile" style={profileImgStyle} />
+    <header style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "60px",
+      backgroundColor: "#111",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderBottom: "1px solid #444",
+      color: "white",
+      zIndex: 1000,
+    }}>
+      {/* Profile Image */}
+      <div onClick={toggleUserInfo} style={{
+        position: "absolute",
+        left: "20px",
+        cursor: "pointer",
+      }}>
+        <img src={profileImg} alt="Profile" style={{
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+        }} />
       </div>
 
+      {/* User Info Modal */}
       {(showUserInfo && userInfo) && (
-        <div style={userInfoBoxStyle} ref={userInfoRef}>
-          <img src={profileImg} alt="Profile" style={fullProfileImgStyle} />
+        <div style={{
+          position: "absolute",
+          top: "60px",
+          left: "20px",
+          backgroundColor: "#222",
+          color: "white",
+          padding: "15px",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+          zIndex: 1001,
+          width: "250px",
+        }} ref={userInfoRef}>
+          <img src={profileImg} alt="Profile" style={{
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            display: "block",
+            marginBottom: "10px",
+          }} />
           <div><strong>{userInfo.data.name || "No Name"}</strong></div>
           <div style={{ fontSize: "0.9rem", marginTop: "4px" }}>
             ID: {userInfo.data.sub || userInfo.data.id || "N/A"}
@@ -175,24 +144,43 @@ const Header = () => {
           </div>
         </div>
       )}
-
       {notLoggedIn && (
-        <div style={userInfoBoxStyle} ref={userInfoRef}>
-          <strong>You are not logged in. </strong>
-          <div style={{ marginTop: "10px" }}>
-            Redirecting to login page...
-          </div>
+        <div style={{
+          position: "absolute",
+          top: "60px",
+          left: "20px",
+          backgroundColor: "#222",
+          color: "white",
+          padding: "15px",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+          zIndex: 1001,
+          width: "250px",
+        }} ref={userInfoRef}>
+          <strong>You are not logged in.</strong>
+          <div style={{ marginTop: "10px" }}>Redirecting to login page...</div>
         </div>
       )}
 
-      <Link href="/" style={siteNameStyle}>Tuneflix</Link>
+      {/* Site Name */}
+      <Link href="/" style={{
+        fontSize: windowWidth <= 600 ? "1.2rem" : "1.5rem",
+        color: "white",
+        textDecoration: "none",
+        fontWeight: "bold",
+      }}>
+        Tuneflix
+      </Link>
+
+      {/* Search Input */}
       <div style={{
         position: "absolute",
         top: "10px",
-        right: "70px",
+        right: "20px",
         display: "flex",
-        flexDirection: "column",
+        flexDirection: windowWidth <= 600 ? "column" : "row",
         alignItems: "flex-end",
+        gap: "10px",
       }}>
         <div style={{ position: "relative" }}>
           <FontAwesomeIcon
@@ -200,7 +188,7 @@ const Header = () => {
             style={{
               position: "absolute",
               left: "10px",
-              top: "40%",
+              top: "50%",
               transform: "translateY(-50%)",
               color: "#aaa",
               pointerEvents: "none",
@@ -221,21 +209,23 @@ const Header = () => {
               resize: "none",
               fontSize: "1rem",
               outline: "none",
-              width: "220px",
+              width: windowWidth <= 600 ? "180px" : "220px",
             }}
           />
         </div>
+
+        {/* Search Results */}
         {results.length > 0 && (
           <div style={{
             position: "fixed",
             top: "60px",
             left: 0,
             width: "100%",
-            height: "80%",
+            height: windowWidth <= 600 ? "calc(100% - 60px)" : "80%",
             backgroundColor: "#111",
             zIndex: 1002,
             overflowY: "auto",
-            padding: "20px",
+            padding: windowWidth <= 600 ? "10px" : "20px",
           }}>
             <button
               onClick={() => {
@@ -289,8 +279,6 @@ const Header = () => {
             </div>
           </div>
         )}
-
-
       </div>
     </header>
   );
