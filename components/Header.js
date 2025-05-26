@@ -163,25 +163,26 @@ const Header = () => {
       )}
 
       {/* Site Name */}
-      <Link href="/" style={{
-        fontSize: windowWidth <= 600 ? "1.2rem" : "1.5rem",
-        color: "white",
-        textDecoration: "none",
-        fontWeight: "bold",
-      }}>
-        Tuneflix
-      </Link>
+     <Link href="/" style={{
+  fontSize: windowWidth <= 600 ? "1.2rem" : "1.5rem",
+  color: "white",
+  textDecoration: "none",
+  fontWeight: "bold",
+  position: "absolute",
+  left: "50%",
+  transform: "translateX(-50%)",
+}}>
 
       {/* Search Input */}
       <div style={{
-        position: "absolute",
-        top: "10px",
-        right: "20px",
-        display: "flex",
-        flexDirection: windowWidth <= 600 ? "column" : "row",
-        alignItems: "flex-end",
-        gap: "10px",
-      }}>
+  position: "absolute",
+  top: windowWidth <= 600 ? "70px" : "10px", // Push down on mobile
+  right: "20px",
+  display: "flex",
+  flexDirection: windowWidth <= 600 ? "column" : "row",
+  alignItems: "flex-end",
+  gap: "10px",
+}}>
         <div style={{ position: "relative" }}>
           <FontAwesomeIcon
             icon={faSearch}
