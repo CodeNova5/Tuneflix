@@ -13,17 +13,16 @@ const Header = () => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [typingTimeout, setTypingTimeout] = useState(null);
-  const [windowWidth, setWindowWidth] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
   const userInfoRef = useRef(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const updateSize = () => setWindowWidth(window.innerWidth);
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-
+  
+useEffect(() => {
+  const handleResize = () => setWindowWidth(window.innerWidth);
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearch(query);
@@ -178,7 +177,7 @@ Tuneflix
       {/* Search Input */}
       <div style={{
   position: "absolute",
-  top: windowWidth <= 600 ? "70px" : "10px", // Push down on mobile
+  top: "10px",
   right: "20px",
   display: "flex",
   flexDirection: windowWidth <= 600 ? "column" : "row",
@@ -199,22 +198,22 @@ Tuneflix
             }}
           />
           <textarea
-            rows="1"
-            placeholder="Search songs..."
-            value={search}
-            onChange={handleSearchChange}
-            style={{
-              padding: "8px 8px 8px 32px",
-              borderRadius: "20px",
-              border: "1px solid #444",
-              backgroundColor: "#222",
-              color: "white",
-              resize: "none",
-              fontSize: "1rem",
-              outline: "none",
-              width: windowWidth <= 600 ? "180px" : "220px",
-            }}
-          />
+  rows="1"
+  placeholder="Search songs..."
+  value={search}
+  onChange={handleSearchChange}
+  style={{
+    padding: "8px 8px 8px 32px",
+    borderRadius: "20px",
+    border: "1px solid #444",
+    backgroundColor: "#222",
+    color: "white",
+    resize: "none",
+    fontSize: "1rem",
+    outline: "none",
+    width: window.innerWidth <= 600 ? "140px" : "220px",
+  }}
+/>
         </div>
 
         {/* Search Results */}
