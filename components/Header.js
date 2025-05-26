@@ -169,7 +169,7 @@ const Header = () => {
   textDecoration: "none",
   fontWeight: "bold",
   position: "absolute",
-  left: "30%",
+  left: "40%",
   transform: "translateX(-50%)",
 }}>
 Tuneflix
