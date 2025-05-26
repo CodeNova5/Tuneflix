@@ -13,16 +13,15 @@ const Header = () => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [typingTimeout, setTypingTimeout] = useState(null);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+  const [windowWidth, setWindowWidth] = useState(0);
   const userInfoRef = useRef(null);
   const router = useRouter();
 
   
 useEffect(() => {
-  const handleResize = () => setWindowWidth(window.innerWidth);
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+    const updateSize = () => setWindowWidth(window.innerWidth);
+    updateSize();
+
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearch(query);
