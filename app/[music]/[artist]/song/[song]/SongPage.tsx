@@ -246,15 +246,12 @@ export default function SongPage() {
             const githubUrl = await checkGithubFileExists(fileName);
             if (githubUrl) {
                 setDownloadUrl(githubUrl);
-                setModalMessage("✅ Download ready from GitHub!");
-                setTimeout(() => setModalMessage(null), 2000);
                 return;
             }
 
 
-            // 2. If not, convert and upload
+            
             setIsUploading(true);
-            setModalMessage("Preparing audio...");
 
             try {
                 const response = await fetch(
@@ -301,15 +298,8 @@ export default function SongPage() {
                 await uploadFileToGithub(fileName, taggedBlob);
 
                 // After upload, check again and set download URL
-                const githubUrlAfterUpload = await checkGithubFileExists(fileName);
-                if (githubUrlAfterUpload) {
-                    setDownloadUrl(githubUrlAfterUpload);
-                } else {
-                    setModalMessage("Upload failed.");
-                    setDownloadUrl(url);
 
-                }
-                setTimeout(() => setModalMessage(null), 2000);
+                setDownloadUrl(url);
                 setIsUploading(false);
             } catch (err) {
                 setModalMessage("An unexpected error occurred");
@@ -332,7 +322,6 @@ export default function SongPage() {
         }
     };
 
-    if (error) return <h1>{error}</h1>;
     if (!track) return <h1>Loading...</h1>;
 
     return (

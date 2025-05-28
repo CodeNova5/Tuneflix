@@ -26,7 +26,8 @@ const CommentShareModule = ({ track, artist, album, playlist }) => {
       ? {
           title: `${track.name} by ${track.artists.map((a) => a.name).join(', ')}`,
           text: `Check out this song: ${track.name} by ${track.artists.map((a) => a.name).join(', ')}`,
-          url: encodeURIComponent(window.location.href),
+          image: track.album.images[0]?.url || '',
+          url: window.location.href,
         }
       : artist
       ? {
