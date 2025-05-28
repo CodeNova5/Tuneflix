@@ -206,7 +206,7 @@ const Header = () => {
               fontSize: "1rem",
             }}
           />
-          <textarea
+          <input
             rows="1"
             placeholder="Search songs..."
             value={search}
