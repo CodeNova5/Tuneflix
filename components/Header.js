@@ -268,24 +268,27 @@ const Header = () => {
                   padding: "12px 0",
                   borderBottom: "1px solid #444",
                   cursor: "pointer",
+                  textAlign: "left",
                 }}>
-                  <img
-                    src={track.album.images[2]?.url || track.album.images[0]?.url}
-                    alt="Album Art"
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      borderRadius: "4px",
-                      marginRight: "15px",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <div>
-                    <strong style={{ color: "white" }}>{track.name}</strong>
-                    <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
-                      {track.artists.map(artist => artist.name).join(", ")}
+                  <Link href={`/music/${encodeURIComponent(track.artists[0]?.name)}/song/${encodeURIComponent(track.name)}`}>
+                    <img
+                      src={track.album.images[2]?.url || track.album.images[0]?.url}
+                      alt="Album Art"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        borderRadius: "4px",
+                        marginRight: "15px",
+                        objectFit: "cover",
+                      }}
+                    />
+                    <div>
+                      <strong style={{ color: "white" }}>{track.name}</strong>
+                      <div style={{ fontSize: "0.85rem", color: "#bbb" }}>
+                        {track.artists.map(artist => artist.name).join(", ")}
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>
