@@ -24,47 +24,94 @@ export default async function handler(req, res) {
     }
     console.log("Uploading file:", uploadedFileName);
     try {
-      const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
-      const fileContent = fileBuffer.toString("base64");
+      const { type } = req.query;
 
-      // GitHub upload code continues here...
+      if (type === "music") {
+        const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
+        const fileContent = fileBuffer.toString("base64");
 
-      // Dynamically import Octokit (ESM)
-      const { Octokit } = await import("@octokit/rest");
+        // GitHub upload code continues here...
 
-      // Initialize Octokit with GitHub token
-      const octokit = new Octokit({
-        auth: process.env.GITHUB_TOKEN,
-      });
+        // Dynamically import Octokit (ESM)
+        const { Octokit } = await import("@octokit/rest");
 
-      const owner = "CodeNova5";
-      const repo = "Music-Backend";
-      const path = `public/comment/${uploadedFileName}`;
+        // Initialize Octokit with GitHub token
+        const octokit = new Octokit({
+          auth: process.env.GITHUB_TOKEN,
+        });
 
-      let sha;
-      try {
-        const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
-        sha = data.sha;
-      } catch (error) {
-        console.log("File does not exist and will be created.");
+        const owner = "CodeNova5";
+        const repo = "Music-Backend";
+        const path = `public/music/${uploadedFileName}`;
+
+        let sha;
+        try {
+          const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
+          sha = data.sha;
+        } catch (error) {
+          console.log("File does not exist and will be created.");
+        }
+
+        const commitMessage = sha ? "Update file" : "Add new file";
+
+        const response = await octokit.rest.repos.createOrUpdateFileContents({
+          owner,
+          repo,
+          path,
+          message: commitMessage,
+          content: fileContent,
+          sha,
+        });
+
+        return res.status(200).json({
+          message: "File uploaded successfully",
+          data: response.data,
+          path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/music/${uploadedFileName}`,
+        });
       }
+      if (type === "commentFile") {
+        const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
+        const fileContent = fileBuffer.toString("base64");
 
-      const commitMessage = sha ? "Update file" : "Add new file";
+        // GitHub upload code continues here...
 
-      const response = await octokit.rest.repos.createOrUpdateFileContents({
-        owner,
-        repo,
-        path,
-        message: commitMessage,
-        content: fileContent,
-        sha,
-      });
+        // Dynamically import Octokit (ESM)
+        const { Octokit } = await import("@octokit/rest");
 
-      return res.status(200).json({
-        message: "File uploaded successfully",
-        data: response.data,
-        path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${uploadedFileName}`,
-      });
+        // Initialize Octokit with GitHub token
+        const octokit = new Octokit({
+          auth: process.env.GITHUB_TOKEN,
+        });
+
+        const owner = "CodeNova5";
+        const repo = "Music-Backend";
+        const path = `public/comment/${uploadedFileName}`;
+
+        let sha;
+        try {
+          const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
+          sha = data.sha;
+        } catch (error) {
+          console.log("File does not exist and will be created.");
+        }
+
+        const commitMessage = sha ? "Update file" : "Add new file";
+
+        const response = await octokit.rest.repos.createOrUpdateFileContents({
+          owner,
+          repo,
+          path,
+          message: commitMessage,
+          content: fileContent,
+          sha,
+        });
+
+        return res.status(200).json({
+          message: "File uploaded successfully",
+          data: response.data,
+          path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${uploadedFileName}`,
+        });
+      }
     } catch (error) {
       console.error("Error uploading file:", error);
       return res.status(500).json({ message: error.message });
