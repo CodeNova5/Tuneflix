@@ -106,7 +106,7 @@ export default async function handler(req, res) {
         }
 
         const track = data.tracks.items[0];
-        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+        res.setHeader('Cache-Control', 'max-age=31536000, immutable');
         return res.status(200).json({
           name: track.name,
           artists: track.artists.map((artist) => ({ name: artist.name })),

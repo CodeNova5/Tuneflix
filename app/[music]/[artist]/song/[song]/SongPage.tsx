@@ -250,7 +250,7 @@ export default function SongPage() {
             }
 
 
-            
+
             setIsUploading(true);
 
             try {
@@ -543,33 +543,28 @@ export default function SongPage() {
                 style={{
                     display: "flex",
                     overflowX: "auto",
-                    gap: "20px",
+                    gap: "10px",
                     padding: "10px",
                 }}
             >
                 {songs.map((song, index) => (
                     <div
                         key={index}
-                        style={{
-                            minWidth: "200px",
-                            textAlign: "center",
-                            border: "1px solid #ddd",
-                            borderRadius: "8px",
-                            padding: "10px",
-                        }}
-                    >
+                        className="min-w-[200px] text-center border border-gray-300 rounded-lg p-3 sm:min-w-[150px] sm:p-2"
+ >
                         <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/song/${encodeURIComponent(song.name)}`}>
                             <img
                                 src={song.album.images[0]?.url || "/placeholder.jpg"}
                                 alt={song.name}
-                                style={{ width: "100%", borderRadius: "8px" }}
+                                className="w-full rounded-lg"
                             />
-                            <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
-                            <p style={{ fontSize: "14px", color: "#555" }}>
+                            <h3 className="text-base mt-2 sm:text-sm">{song.name}</h3>
+                            <p className="text-sm text-gray-600 sm:text-xs">
                                 {song.artists.map((a: any) => a.name).join(", ")}
                             </p>
                         </Link>
                     </div>
+
                 ))}
             </div>
             <Footer />

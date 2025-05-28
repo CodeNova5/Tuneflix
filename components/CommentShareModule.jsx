@@ -33,19 +33,22 @@ const CommentShareModule = ({ track, artist, album, playlist }) => {
       ? {
           title: artist.name,
           text: `Check out this artist: ${artist.name}`,
-          url: encodeURIComponent(window.location.href),
+          image: artist.images[0]?.url || '',
+          url: window.location.href,
         }
       : album
       ? {
           title: `${album.name} by ${album.artists.map((a) => a.name).join(', ')}`,
           text: `Check out this album: ${album.name} by ${album.artists.map((a) => a.name).join(', ')}`,
-          url: encodeURIComponent(window.location.href),
+          image: album.images[0]?.url || '',
+          url: window.location.href,
         }
       : playlist
       ? {
           title: playlist.name,
           text: `Check out this playlist: ${playlist.name}`,
-          url: encodeURIComponent(window.location.href),
+          image: playlist.image || '',
+          url: window.location.href,
         }
       : null;
 
