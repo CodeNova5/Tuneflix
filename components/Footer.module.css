@@ -123,7 +123,7 @@
   }
 
   .section {
-    min-width: 250px;
+    min-width: 200px;
     flex: 0 0 auto;
     scroll-snap-align: start;
   }
