@@ -10,9 +10,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   // Use absolute URL for server-side fetch
   const baseUrl = "https://next-xi-opal.vercel.app"; // fallback to your production domain
 
-  const apiUrl = `${baseUrl}/api/Music/route?type=songDetails&artistName=${encodeURIComponent(
-    artist
-  )}&songName=${encodeURIComponent(song)}`;
+  const apiUrl = `${baseUrl}/api/Music/route?type=artistDetails&artistName=${encodeURIComponent(artist)}`;
 
   const res = await fetch(apiUrl, { cache: "no-store" });
   if (!res.ok) {
@@ -21,12 +19,12 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       description: "Sorry, this song could not be found.",
     };
   }
-  const track = await res.json();
+  const artistDetails = await res.json();
 
-  const title = `${track.name} by ${track.artists.map((a: { name: string }) => a.name).join(", ")} | Tuneflix`;
-  const description = `Listen to "${track.name}" by ${track.artists.map((a: { name: string }) => a.name).join(", ")}. View album details, lyrics, YouTube video, and more on Tuneflix.`;
-  const image = track.album?.images?.[0]?.url;
-  const url = `${baseUrl}/music/${encodeURIComponent(artist)}/song/${encodeURIComponent(song)}`;
+  const title = `${artistDetails.name}`;
+  const description = `Check out this artist"${artistDetails.name}". View songs, albums, and more on Tuneflix.`;
+  const image = `artistDetails.image`;
+  const url = window.location.href;
 
   return {
     title,
@@ -37,10 +35,10 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       url,
       type: "music.artist",
       siteName: "Tuneflix",
-      images: [
+     images: [
         {
           url: image,
-          alt: `${track.name} album cover`,
+          alt: `${artistDetails.name} album cover`,
         },
       ],
       locale: "en_US",
