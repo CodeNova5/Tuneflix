@@ -5,7 +5,7 @@ import ArtistPage from "./ArtistPage";
 export async function generateMetadata(props: any): Promise<Metadata> {
   // Await params if needed (for dynamic routes)
   const params = typeof props.params?.then === "function" ? await props.params : props.params;
-  const { artist, song } = params;
+  const { artist } = params; // Removed song if not needed
 
   // Use absolute URL for server-side fetch
   const baseUrl = "https://next-xi-opal.vercel.app"; // fallback to your production domain
@@ -23,35 +23,36 @@ export async function generateMetadata(props: any): Promise<Metadata> {
 
   const title = `${artistDetails.name}`;
   const description = `Check out this artist"${artistDetails.name}". View songs, albums, and more on Tuneflix.`;
-  const image = `artistDetails.image`;
-  const url = window.location.href;
+  
+const image = artistDetails.image;
 
-  return {
+const url = `${baseUrl}/music/${encodeURIComponent(artist)}`; // Use baseUrl and params
+
+return {
+  title,
+  description,
+  openGraph: {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      url,
-      type: "music.artist",
-      siteName: "Tuneflix",
-     images: [
-        {
-          url: image,
-          alt: `${artistDetails.name} album cover`,
-        },
-      ],
-      locale: "en_US",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [image],
-    },
-    authors: [{ name: "Code Nova" }],
-  };
-}
+    url,
+    type: "music.artist",
+    siteName: "Tuneflix",
+    images: [
+      {
+        url: image,
+        alt: `${artistDetails.name} album cover`,
+      },
+    ],
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [image],
+  },
+  authors: [{ name: "Code Nova" }],
+};
 
 // Your page component (can remain as-is)
 export default function Page() {
