@@ -557,7 +557,22 @@ export default function SongPage() {
                                 src={song.album.images[0]?.url || "/placeholder.jpg"}
                                 alt={song.name}
                                 className="w-full rounded-lg"
+                                style={{
+                                    width: "150px",
+                                    height: "150px",
+                                    objectFit: "cover",
+                                }}
+                                // Responsive inline style for mobile
+                                sizes="(max-width: 640px) 80px, 150px"
                             />
+                            <style jsx>{`
+                                @media (max-width: 640px) {
+                                    img {
+                                        width: 80px !important;
+                                        height: 80px !important;
+                                    }
+                                }
+                            `}</style>
                             <h3 className="text-base mt-2 sm:text-sm">{song.name}</h3>
                             <p className="text-sm text-gray-600 sm:text-xs">
                                 {song.artists.map((a: any) => a.name).join(", ")}
