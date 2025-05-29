@@ -543,21 +543,29 @@ export default function SongPage() {
                 style={{
                     display: "flex",
                     overflowX: "auto",
-                    gap: "10px",
-                    padding: "10px",
+                    gap: "16px",
+                    padding: "16px 0",
+                    margin: "0 auto 32px",
+                    maxWidth: "900px",
+                    background: "#181818",
+                    borderRadius: "10px",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                 }}
             >
                 {songs.map((song, index) => (
                     <div
                         key={index}
                         style={{
-                            width: "90px",
+                            minWidth: "120px",
+                            maxWidth: "120px",
+                            background: "#232323",
                             textAlign: "center",
-                            border: "1px solid #ddd",
-                            borderRadius: "8px",
-                            padding: "5px",
-                            margin: "5px",
+                            border: "1px solid #222",
+                            borderRadius: "10px",
+                            padding: "10px 8px",
                             boxSizing: "border-box",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.10)",
+                            transition: "transform 0.15s",
                         }}
                     >
                         <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/song/${encodeURIComponent(song.name)}`}>
@@ -565,35 +573,37 @@ export default function SongPage() {
                                 src={song.album.images[0]?.url || "/placeholder.jpg"}
                                 alt={song.name}
                                 style={{
-                                    width: "80px",
-                                    height: "80px",
+                                    width: "100px",
+                                    height: "100px",
                                     objectFit: "cover",
-                                    borderRadius: "6px",
-                                    marginBottom: "5px",
+                                    borderRadius: "8px",
+                                    marginBottom: "8px",
+                                    border: "1px solid #333",
                                 }}
                             />
                             <h3 style={{
-                                fontSize: "12px",
-                                margin: "0 0 3px",
-                                wordWrap: "break-word",
-                                whiteSpace: "normal",
-                                lineHeight: "1.2",
+                                fontSize: "13px",
+                                margin: "0 0 4px",
+                                color: "#fff",
+                                fontWeight: 600,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
                             }}>
                                 {song.name}
                             </h3>
                             <p style={{
-                                fontSize: "10px",
-                                color: "#555",
+                                fontSize: "11px",
+                                color: "#b3b3b3",
                                 margin: 0,
-                                wordWrap: "break-word",
-                                whiteSpace: "normal",
-                                lineHeight: "1.2",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
                             }}>
                                 {song.artists.map((a: any) => a.name).join(", ")}
                             </p>
                         </Link>
                     </div>
-
                 ))}
             </div>
             <Footer />
