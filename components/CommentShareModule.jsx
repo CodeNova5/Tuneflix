@@ -33,7 +33,7 @@ const CommentShareModule = ({ track, artist, album, playlist }) => {
       ? {
           title: artist.name,
           text: `Check out this artist: ${artist.name}`,
-          image: artist.images[0]?.url || '',
+          image: artist.image || '',
           url: window.location.href,
         }
       : album
