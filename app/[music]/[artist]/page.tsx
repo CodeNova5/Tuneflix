@@ -56,5 +56,5 @@ return {
 
 // Your page component (can remain as-is)
 export default function Page() {
-  return <ArtistPage/>;
+  return <ArtistPage />;
 }
