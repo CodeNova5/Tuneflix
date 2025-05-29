@@ -544,12 +544,8 @@ export default function SongPage() {
                     display: "flex",
                     overflowX: "auto",
                     gap: "16px",
-                    padding: "16px 0",
-                    margin: "0 auto 32px",
-                    maxWidth: "900px",
-                    background: "#181818",
                     borderRadius: "10px",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    
                 }}
             >
                 {songs.map((song, index) => (
