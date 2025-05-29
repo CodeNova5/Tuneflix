@@ -293,14 +293,14 @@ export default function SongPage() {
                 document.body.appendChild(a);
 
                 document.body.removeChild(a);
-   setDownloadUrl(url);
+                setDownloadUrl(url);
 
                 // Upload to GitHub using FormData (for formidable)
                 await uploadFileToGithub(fileName, taggedBlob);
 
                 // After upload, check again and set download URL
 
-                
+
                 setIsUploading(false);
             } catch (err) {
                 setModalMessage("An unexpected error occurred");
@@ -546,7 +546,7 @@ export default function SongPage() {
                     overflowX: "auto",
                     gap: "16px",
                     borderRadius: "10px",
-                    
+
                 }}
             >
                 {songs.map((song, index) => (
@@ -579,28 +579,28 @@ export default function SongPage() {
                                 }}
                             />
                             <h3 style={{
-    fontSize: "13px",
-    margin: "0 0 4px",
-    color: "#fff",
-    fontWeight: 600,
-    overflow: "hidden",
-    wordWrap: "break-word",
-    overflowWrap: "break-word",
-    whiteSpace: "normal",
-}}>
-    {song.name}
-</h3>
-<p style={{
-    fontSize: "11px",
-    color: "#b3b3b3",
-    margin: 0,
-    overflow: "hidden",
-    wordWrap: "break-word",
-    overflowWrap: "break-word",
-    whiteSpace: "normal",
-}}>
-    {song.artists.map((a: any) => a.name).join(", ")}
-</p>
+                                fontSize: "13px",
+                                margin: "0 0 4px",
+                                color: "#fff",
+                                fontWeight: 600,
+                                overflow: "hidden",
+                                wordWrap: "break-word",
+                                overflowWrap: "break-word",
+                                whiteSpace: "normal",
+                            }}>
+                                {song.name}
+                            </h3>
+                            <p style={{
+                                fontSize: "11px",
+                                color: "#b3b3b3",
+                                margin: 0,
+                                overflow: "hidden",
+                                wordWrap: "break-word",
+                                overflowWrap: "break-word",
+                                whiteSpace: "normal",
+                            }}>
+                                {song.artists.map((a: any) => a.name).join(", ")}
+                            </p>
                         </Link>
                     </div>
                 ))}

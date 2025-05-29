@@ -45,7 +45,7 @@ export default function AlbumPage() {
   }
 
   return (
-    <div style={{ textAlign: "center", padding: "20px", backgroundColor: "#111", marginTop: "20px" }}>
+    <div style={{ textAlign: "center", padding: "20px", backgroundColor: "#111", marginTop: "40px" }}>
       <Header />
       <h1>{albumDetails.name}</h1>
       <img
@@ -53,19 +53,20 @@ export default function AlbumPage() {
         alt={albumDetails.name}
         style={{ borderRadius: "8px", width: "300px", height: "300px" }}
       />
-      <p style={{ fontSize: "16px", color: "#555" }}>
+      <p style={{ fontSize: "16px", color: "white" }}>
         Release Date: {albumDetails.releaseDate}
       </p>
-      <p style={{ fontSize: "16px", color: "#555" }}>
+      <p style={{ fontSize: "16px", color: "white" }}>
         Total Tracks: {albumDetails.totalTracks}
       </p>
-      <h2>Tracks</h2>
+      
       <CommentShareModule
         playlist={undefined}
         track={undefined}
         album={albumDetails}
         artist={undefined}
         />
+        <h2>Tracks</h2>
       <ul style={{ listStyle: "none", padding: 0 }}>
 
         {albumDetails.tracks.map((track: any, index: number) => (
