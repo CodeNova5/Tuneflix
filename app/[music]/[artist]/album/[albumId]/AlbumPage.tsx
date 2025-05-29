@@ -47,7 +47,7 @@ export default function AlbumPage() {
   return (
     <div style={{ textAlign: "center", padding: "20px", backgroundColor: "#111", marginTop: "40px" }}>
       <Header />
-      <h1>{albumDetails.name}</h1>
+      <h1 style={{fontSize: "25px"}}>{albumDetails.name}</h1>
       <img
         src={albumDetails.image || "/placeholder.jpg"}
         alt={albumDetails.name}
