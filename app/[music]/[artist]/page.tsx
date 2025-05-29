@@ -3,13 +3,10 @@ import ArtistPage from "./ArtistPage";
 
 // Server-side metadata generation
 export async function generateMetadata(props: any): Promise<Metadata> {
-  // Await params if needed (for dynamic routes)
   const params = typeof props.params?.then === "function" ? await props.params : props.params;
-  const { artist } = params; // Removed song if not needed
+  const { artist } = params;
 
-  // Use absolute URL for server-side fetch
-  const baseUrl = "https://next-xi-opal.vercel.app"; // fallback to your production domain
-
+  const baseUrl = "https://next-xi-opal.vercel.app";
   const apiUrl = `${baseUrl}/api/Music/route?type=artistDetails&artistName=${encodeURIComponent(artist)}`;
 
   const res = await fetch(apiUrl, { cache: "no-store" });
@@ -19,42 +16,41 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       description: "Sorry, this song could not be found.",
     };
   }
+
   const artistDetails = await res.json();
-
   const title = `${artistDetails.name}`;
-  const description = `Check out this artist"${artistDetails.name}". View songs, albums, and more on Tuneflix.`;
-  
-const image = artistDetails.image;
+  const description = `Check out this artist "${artistDetails.name}". View songs, albums, and more on Tuneflix.`;
+  const image = artistDetails.image;
+  const url = `${baseUrl}/music/${encodeURIComponent(artist)}`;
 
-const url = `${baseUrl}/music/${encodeURIComponent(artist)}`; // Use baseUrl and params
-
-return {
-  title,
-  description,
-  openGraph: {
+  return {
     title,
     description,
-    url,
-    type: "music.artist",
-    siteName: "Tuneflix",
-    images: [
-      {
-        url: image,
-        alt: `${artistDetails.name} album cover`,
-      },
-    ],
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: [image],
-  },
-  authors: [{ name: "Code Nova" }],
-};
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "music.artist",
+      siteName: "Tuneflix",
+      images: [
+        {
+          url: image,
+          alt: `${artistDetails.name} album cover`,
+        },
+      ],
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    authors: [{ name: "Code Nova" }],
+  };
+}
 
-// Your page component (can remain as-is)
+// ✅ This MUST be outside the function, at the top level
 export default function Page() {
   return <ArtistPage />;
 }
