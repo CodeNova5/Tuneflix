@@ -21,7 +21,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const title = `${albumDetails.name}`;
   const description = `Explore the album "${albumDetails.name}" featuring tracks, artist info, and more on Tuneflix.`;
   const image = albumDetails.image;
-  const url = `${baseUrl}/album/${encodeURIComponent(album)}`;
+  const url = `${baseUrl}/album/${encodeURIComponent(albumId)}`;
 
   return {
     title,
