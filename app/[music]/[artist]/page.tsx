@@ -30,7 +30,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       title,
       description,
       url,
-      type: "music.artist",
+      type: "profile",
       siteName: "Tuneflix",
       images: [
         {
