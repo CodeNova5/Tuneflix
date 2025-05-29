@@ -579,29 +579,28 @@ export default function SongPage() {
                                 }}
                             />
                             <h3 style={{
-                                fontSize: "13px",
-                                margin: "0 0 4px",
-                                color: "#fff",
-                                fontWeight: 600,
-                                overflow: "hidden",
-                            
-                                word-wrap: "break-word",
-overflow-wrap: "break-word",
-white-space: "normal",
-                            }}>
-                                {song.name}
-                            </h3>
-                            <p style={{
-                                fontSize: "11px",
-                                color: "#b3b3b3",
-                                margin: 0,
-                                overflow: "hidden",
-                                word-wrap: "break-word",
-overflow-wrap: "break-word",
-white-space: "normal",
-                            }}>
-                                {song.artists.map((a: any) => a.name).join(", ")}
-                            </p>
+    fontSize: "13px",
+    margin: "0 0 4px",
+    color: "#fff",
+    fontWeight: 600,
+    overflow: "hidden",
+    wordWrap: "break-word",
+    overflowWrap: "break-word",
+    whiteSpace: "normal",
+}}>
+    {song.name}
+</h3>
+<p style={{
+    fontSize: "11px",
+    color: "#b3b3b3",
+    margin: 0,
+    overflow: "hidden",
+    wordWrap: "break-word",
+    overflowWrap: "break-word",
+    whiteSpace: "normal",
+}}>
+    {song.artists.map((a: any) => a.name).join(", ")}
+</p>
                         </Link>
                     </div>
                 ))}
