@@ -293,13 +293,14 @@ export default function SongPage() {
                 document.body.appendChild(a);
 
                 document.body.removeChild(a);
+   setDownloadUrl(url);
 
                 // Upload to GitHub using FormData (for formidable)
                 await uploadFileToGithub(fileName, taggedBlob);
 
                 // After upload, check again and set download URL
 
-                setDownloadUrl(url);
+                
                 setIsUploading(false);
             } catch (err) {
                 setModalMessage("An unexpected error occurred");
