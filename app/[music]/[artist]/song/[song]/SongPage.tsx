@@ -551,37 +551,44 @@ export default function SongPage() {
                     <div
                         key={index}
                         style={{
-                            minWidth: "200px",
+                            width: "90px",
                             textAlign: "center",
                             border: "1px solid #ddd",
                             borderRadius: "8px",
-                            padding: "10px",
+                            padding: "5px",
+                            margin: "5px",
+                            boxSizing: "border-box",
                         }}
                     >
-
                         <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/song/${encodeURIComponent(song.name)}`}>
                             <img
                                 src={song.album.images[0]?.url || "/placeholder.jpg"}
                                 alt={song.name}
-                                className="w-full rounded-lg"
                                 style={{
-                                    width: "150px",
-                                    height: "150px",
+                                    width: "80px",
+                                    height: "80px",
                                     objectFit: "cover",
+                                    borderRadius: "6px",
+                                    marginBottom: "5px",
                                 }}
-                                // Responsive inline style for mobile
-                                sizes="(max-width: 640px) 80px, 150px"
                             />
-                            <style jsx>{`
-                                @media (max-width: 640px) {
-                                    img {
-                                        width: 90px !important;
-                                        height: 90px !important;
-                                    }
-                                }
-                            `}</style>
-                            <h3 className="text-base mt-2 sm:text-sm">{song.name}</h3>
-                            <p className="text-sm text-gray-600 sm:text-xs">
+                            <h3 style={{
+                                fontSize: "12px",
+                                margin: "0 0 3px",
+                                wordWrap: "break-word",
+                                whiteSpace: "normal",
+                                lineHeight: "1.2",
+                            }}>
+                                {song.name}
+                            </h3>
+                            <p style={{
+                                fontSize: "10px",
+                                color: "#555",
+                                margin: 0,
+                                wordWrap: "break-word",
+                                whiteSpace: "normal",
+                                lineHeight: "1.2",
+                            }}>
                                 {song.artists.map((a: any) => a.name).join(", ")}
                             </p>
                         </Link>
