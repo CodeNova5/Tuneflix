@@ -550,8 +550,15 @@ export default function SongPage() {
                 {songs.map((song, index) => (
                     <div
                         key={index}
-                        className="min-w-[200px] text-center border border-gray-300 rounded-lg p-3 sm:min-w-[150px] sm:p-2"
- >
+                        style={{
+                            minWidth: "200px",
+                            textAlign: "center",
+                            border: "1px solid #ddd",
+                            borderRadius: "8px",
+                            padding: "10px",
+                        }}
+                    >
+
                         <Link href={`/music/${encodeURIComponent(song.artists[0]?.name)}/song/${encodeURIComponent(song.name)}`}>
                             <img
                                 src={song.album.images[0]?.url || "/placeholder.jpg"}
@@ -568,8 +575,8 @@ export default function SongPage() {
                             <style jsx>{`
                                 @media (max-width: 640px) {
                                     img {
-                                        width: 80px !important;
-                                        height: 80px !important;
+                                        width: 90px !important;
+                                        height: 90px !important;
                                     }
                                 }
                             `}</style>
