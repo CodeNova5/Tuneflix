@@ -16,15 +16,7 @@ export default function Footer() {
         <footer className={styles.footer}>
             <div className={styles.container}>
 
-                {/* Developer Info */}
-                <section className={styles.section}>
-                    <h3 className={styles.heading}>Developer</h3>
-                    <ul className={styles.linkList}>
-                        <li><a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className={styles.link}>GitHub</a></li>
-                        <li><a href="https://www.linkedin.com/in/yourusername/" target="_blank" rel="noopener noreferrer" className={styles.link}>LinkedIn</a></li>
-                    </ul>
-                </section>
-
+                
                 {/* Stay Connected */}
                 <section className={styles.section}>
                     <h3 className={styles.heading}>Stay Connected</h3>
@@ -65,6 +57,14 @@ export default function Footer() {
                     <ul className={styles.linkList}>
                         <li><Link href="/terms" className={styles.link}>Terms of Service</Link></li>
                         <li><Link href="/dmca" className={styles.link}>DMCA</Link></li>
+                    </ul>
+                </section>
+{/* Developer Info */}
+                <section className={styles.section}>
+                    <h3 className={styles.heading}>Developer</h3>
+                    <ul className={styles.linkList}>
+                        <li><a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className={styles.link}>GitHub</a></li>
+                        <li><a href="https://www.linkedin.com/in/yourusername/" target="_blank" rel="noopener noreferrer" className={styles.link}>LinkedIn</a></li>
                     </ul>
                 </section>
 
