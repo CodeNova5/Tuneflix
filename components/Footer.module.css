@@ -113,29 +113,27 @@
 
 @media (max-width: 768px) {
   .container {
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-    gap: 2rem;
+    flex-direction: row;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
   }
 
   .section {
-    text-align: center;
-    width: 100%;
+    min-width: 250px;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
   }
 
   .connectedGrid {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    grid-template-columns: 1fr;
   }
 
   .iconRow {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .linkList {
-    text-align: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
   }
 }
