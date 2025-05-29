@@ -584,8 +584,10 @@ export default function SongPage() {
                                 color: "#fff",
                                 fontWeight: 600,
                                 overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
+                            
+                                word-wrap: "break-word",
+overflow-wrap: "break-word",
+white-space: "normal",
                             }}>
                                 {song.name}
                             </h3>
@@ -594,8 +596,9 @@ export default function SongPage() {
                                 color: "#b3b3b3",
                                 margin: 0,
                                 overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
+                                word-wrap: "break-word",
+overflow-wrap: "break-word",
+white-space: "normal",
                             }}>
                                 {song.artists.map((a: any) => a.name).join(", ")}
                             </p>
