@@ -64,7 +64,7 @@ export default function AlbumPage() {
         playlist={undefined}
         track={undefined}
         album={albumDetails}
-        artist={artist}
+        artist={undefined}
         />
       <ul style={{ listStyle: "none", padding: 0 }}>
 
