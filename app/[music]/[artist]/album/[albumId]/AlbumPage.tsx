@@ -69,36 +69,26 @@ export default function AlbumPage() {
       <h2>Tracks</h2>
       <ul style={{ listStyle: "none", padding: 0 }}>
 
-        {albumDetails.tracks.map((track: any, index: number) => {
-          const firstArtistName =
-            Array.isArray(track.artists) && track.artists.length > 0
-              ? track.artists[0].name
-              : "unknown";
-          return (
-            <Link
-              href={`/music/${encodeURIComponent(firstArtistName)}/song/${encodeURIComponent(track.name)}`}
-              key={index}
-            >
-              <a style={{ textDecoration: "none", color: "inherit" }}>
-                <li
-                  style={{
-                    padding: "10px",
-                    borderBottom: "1px solid #ddd",
-                    textAlign: "left",
-                  }}
-                >
-                  {index + 1}. {track.name}{" "}
-                  <span style={{ color: "#aaa", fontSize: "14px" }}>
-                    by{" "}
-                    {Array.isArray(track.artists)
-                      ? track.artists.map((artist: any) => artist.name).join(", ")
-                      : "unknown"}
-                  </span>
-                </li>
-              </a>
-            </Link>
-          );
-        })}
+        {albumDetails.tracks.map((track: any, index: number) => (
+
+            <Link href={`/music/${encodeURIComponent(track.artists[0]?.name)}/song/${encodeURIComponent(track.name)}`}>
+            <a style={{ textDecoration: "none", color: "inherit" }}>
+              <li
+                key={index}
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #ddd",
+                  textAlign: "left",
+                }}
+              >
+                {index + 1}. {track.name}{" "}
+                <span style={{ color: "#aaa", fontSize: "14px" }}>
+                  by {track.artists.map((artist: any) => artist.name).join(", ")}
+                </span>
+              </li>
+            </a>
+          </Link>
+        ))}
       </ul>
       <Footer />
     </div>
