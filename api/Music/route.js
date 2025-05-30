@@ -499,6 +499,7 @@ export default async function handler(req, res) {
           image: albumData.images?.[0]?.url || "/placeholder.jpg",
           tracks: albumData.tracks.items.map((track) => ({
             name: track.name,
+            artists: track.artists.map((artist) => ({ name: artist.name })),
             duration: track.duration_ms,
           })),
         };
