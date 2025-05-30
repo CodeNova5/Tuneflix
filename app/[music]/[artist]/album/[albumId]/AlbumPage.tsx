@@ -68,28 +68,47 @@ export default function AlbumPage() {
       />
       <h2>Tracks</h2>
       <ul style={{ listStyle: "none", padding: 0 }}>
-        {albumDetails.tracks.map((track: any, index: number) => (
-          <li
-            key={index}
-            style={{
-              padding: "10px",
-              borderBottom: "1px solid #ddd",
-              textAlign: "left",
-            }}
-          >
-            <Link
-              href={`/music/song/${encodeURIComponent(track.name)}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              {index + 1}. {track.name}{" "}
-              <span style={{ color: "#aaa", fontSize: "14px" }}>
-                by {track.artists.map((a: any) => a.name).join(", ")}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+        {albumDetails.tracks.map((track: any, index: number) => {
+          // Find artists for this track using trackArtists
+          let artists: string[] = [];
+          console.log("Track Artists:", albumDetails.trackArtists);
+          if (Array.isArray(albumDetails.trackArtists)) {
+            const found = albumDetails.trackArtists.find(
+              (t: any) => t.track === track.name
+            );
+            if (found && Array.isArray(found.artists)) {
+              artists = found.artists;
+            }
+          }
+          // Fallback to track.artists if needed
+          if (!artists.length && Array.isArray(track.artists)) {
+            artists = track.artists.map((a: any) => a.name);
+          }
+          // Use the first artist for the link, or "unknown"
+          const artistName = artists[0] || "unknown";
 
+          return (
+            <li
+              key={index}
+              style={{
+                padding: "10px",
+                borderBottom: "1px solid #ddd",
+                textAlign: "left",
+              }}
+            >
+              <Link
+                href={`/music/${encodeURIComponent(artistName)}/song/${encodeURIComponent(track.name)}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {index + 1}. {track.name}{" "}
+                <span style={{ color: "#aaa", fontSize: "14px" }}>
+                  by {artists.join(", ")}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
       <Footer />
     </div>
   );

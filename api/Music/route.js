@@ -470,7 +470,8 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch artist albums" });
       }
     }
-    else if (type === "albumDetails") {
+
+else if (type === "albumDetails") {
   if (!albumId) {
     return res.status(400).json({ error: "Missing Album Id" });
   }
@@ -490,27 +491,32 @@ export default async function handler(req, res) {
 
     const albumData = await albumResponse.json();
 
+    // Build tracks and trackArtists arrays
+    const tracks = albumData.tracks.items.map((track) => ({
+      name: track.name,
+      duration: track.duration_ms,
+      artists: track.artists.map((artist) => ({
+        name: artist.name,
+        id: artist.id,
+        external_urls: artist.external_urls,
+      })),
+    }));
+
+    // This is the new array for easy artist access
+    const trackArtists = albumData.tracks.items.map((track) => ({
+      track: track.name,
+      artists: track.artists.map((artist) => artist.name),
+    }));
+
+    console.log("Track Artists:", trackArtists); // Debugging line
     const formattedAlbum = {
       name: albumData.name,
       releaseDate: albumData.release_date,
       totalTracks: albumData.total_tracks,
       image: albumData.images?.[0]?.url || "/placeholder.jpg",
-      tracks: albumData.tracks.items.map((track) => ({
-        name: track.name,
-        duration: track.duration_ms,
-        artists: track.artists.map((artist) => ({
-          name: artist.name,
-          id: artist.id,
-          external_urls: artist.external_urls,
-        })),
-      })),
+      tracks,
+      trackArtists, // <-- add this
     };
-
-    // Debug: Ensure all artist names are valid
-    console.log("Formatted Album (Sanity Check):", formattedAlbum.tracks.map((t) => ({
-      track: t.name,
-      artists: t.artists.map((a) => a.name),
-    })));
 
     res.setHeader("Cache-Control", "max-age=31536000, immutable");
     return res.status(200).json(formattedAlbum);
