@@ -47,7 +47,7 @@ export default function AlbumPage() {
   return (
     <div style={{ textAlign: "center", padding: "20px", backgroundColor: "#111", marginTop: "40px" }}>
       <Header />
-      <h1 style={{fontSize: "25px"}}>{albumDetails.name}</h1>
+      <h1 style={{ fontSize: "25px" }}>{albumDetails.name}</h1>
       <img
         src={albumDetails.image || "/placeholder.jpg"}
         alt={albumDetails.name}
@@ -59,32 +59,40 @@ export default function AlbumPage() {
       <p style={{ fontSize: "16px", color: "white" }}>
         Total Tracks: {albumDetails.totalTracks}
       </p>
-      
+
       <CommentShareModule
         playlist={undefined}
         track={undefined}
         album={albumDetails}
         artist={undefined}
-        />
-        <h2>Tracks</h2>
+      />
+      <h2>Tracks</h2>
       <ul style={{ listStyle: "none", padding: 0 }}>
 
-        {albumDetails.tracks.map((track: any, index: number) => (
-            <Link href={`/music/${encodeURIComponent(track.artist)}/song/${encodeURIComponent(track.name)}`}>
-            <a style={{ textDecoration: "none", color: "inherit" }}>
-              <li
+        {albumDetails.tracks.map((track: any, index: number) => {
+          // Use the first artist's name if available, otherwise fallback to album artist or "unknown"
+          const artistName =
+            (Array.isArray(track.artists) && track.artists[0]?.name) ||
+            albumDetails.artist ||
+            "unknown";
+          return (
+            <Link
               key={index}
-              style={{
-                padding: "10px",
-                borderBottom: "1px solid #ddd",
-                textAlign: "left",
-              }}
+              href={`/music/${encodeURIComponent(artistName)}/song/${encodeURIComponent(track.name)}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <li
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #ddd",
+                  textAlign: "left",
+                }}
               >
-              {index + 1}. {track.name}
+                {index + 1}. {track.name}
               </li>
-            </a>
             </Link>
-        ))}
+          );
+        })}
       </ul>
       <Footer />
     </div>
