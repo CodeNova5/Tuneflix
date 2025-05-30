@@ -70,7 +70,7 @@ export default function AlbumPage() {
       <ul style={{ listStyle: "none", padding: 0 }}>
 
         {albumDetails.tracks.map((track: any, index: number) => (
-            <Link href={`/music/${encodeURIComponent(track.artists?.name)}/song/${encodeURIComponent(track.name)}`}>
+            <Link href={`/music/${encodeURIComponent(track.artist)}/song/${encodeURIComponent(track.name)}`}>
             <a style={{ textDecoration: "none", color: "inherit" }}>
               <li
               key={index}
