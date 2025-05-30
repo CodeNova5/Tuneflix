@@ -322,7 +322,25 @@ export default function SongPage() {
             router.push(`/music/${encodeURIComponent(artistName)}`);
         }
     };
-
+    // Remove the invalid useEffect and handle "song not found" in the render logic below.
+    if (track && artist && !track.artists.some(a => a.name.toLowerCase() === artist.toLowerCase())) {
+        return (
+            <div style={{ textAlign: "center", marginTop: "60px", color: "#fff" }}>
+                <h1>Song not found</h1>
+                <p>
+                    The song you are looking for does not exist for this artist.
+                </p>
+                <Link href="/" style={{
+                    color: "#1db954",
+                    textDecoration: "underline",
+                    fontWeight: "bold",
+                    fontSize: "18px"
+                }}>
+                    Return to homepage
+                </Link>
+            </div>
+        );
+    }
     if (!track) return <h1>Loading...</h1>;
 
     return (
