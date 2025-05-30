@@ -471,50 +471,55 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "albumDetails") {
-      if (!albumId) {
-        return res.status(400).json({ error: "Missing Album Id" });
-      }
+  if (!albumId) {
+    return res.status(400).json({ error: "Missing Album Id" });
+  }
 
-      try {
-        // Get Spotify access token
-        const accessToken = await getArtistAccessToken();
+  try {
+    const accessToken = await getArtistAccessToken();
 
-        // Fetch album details
-        const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
-        const albumResponse = await fetch(albumApiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+    const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
+    const albumResponse = await fetch(albumApiUrl, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
-        if (!albumResponse.ok) {
-          throw new Error("Failed to fetch album details from Spotify");
-        }
-
-        const albumData = await albumResponse.json();
-      
-        const formattedAlbum = {
-          name: albumData.name,
-          releaseDate: albumData.release_date,
-          totalTracks: albumData.total_tracks,
-          image: albumData.images?.[0]?.url || "/placeholder.jpg",
-          tracks: albumData.tracks.items.map((track) => ({
-            name: track.name,
-            duration: track.duration_ms,
-            artists: track.artists?.map((artist) => ({
-              name: artist.name,
-              id: artist.id,
-              external_urls: artist.external_urls,
-            })) || [],
-          })),
-        };
-        console.log("Formatted Album:", formattedAlbum);
-        res.setHeader('Cache-Control', 'max-age=31536000, immutable');
-        return res.status(200).json(formattedAlbum);
-      } catch (err) {
-        console.error("Spotify API Error:", err);
-        return res.status(500).json({ error: "Failed to fetch album details" });
-
-      }
+    if (!albumResponse.ok) {
+      const errorDetails = await albumResponse.text();
+      throw new Error(`Spotify Error: ${errorDetails}`);
     }
+
+    const albumData = await albumResponse.json();
+
+    const formattedAlbum = {
+      name: albumData.name,
+      releaseDate: albumData.release_date,
+      totalTracks: albumData.total_tracks,
+      image: albumData.images?.[0]?.url || "/placeholder.jpg",
+      tracks: albumData.tracks.items.map((track) => ({
+        name: track.name,
+        duration: track.duration_ms,
+        artists: track.artists.map((artist) => ({
+          name: artist.name,
+          id: artist.id,
+          external_urls: artist.external_urls,
+        })),
+      })),
+    };
+
+    // Debug: Ensure all artist names are valid
+    console.log("Formatted Album (Sanity Check):", formattedAlbum.tracks.map((t) => ({
+      track: t.name,
+      artists: t.artists.map((a) => a.name),
+    })));
+
+    res.setHeader("Cache-Control", "max-age=31536000, immutable");
+    return res.status(200).json(formattedAlbum);
+  } catch (err) {
+    console.error("Spotify API Error:", err);
+    return res.status(500).json({ error: "Failed to fetch album details" });
+  }
+}
+
     else if (type === "topSongs") {
       try {
         const apiKey = 'c98799d0a98242258436e85147bc27fd'; // Replace with your actual Last.fm API key

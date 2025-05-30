@@ -68,28 +68,28 @@ export default function AlbumPage() {
       />
       <h2>Tracks</h2>
       <ul style={{ listStyle: "none", padding: 0 }}>
-
         {albumDetails.tracks.map((track: any, index: number) => (
-
-            <Link href={`/music/${encodeURIComponent(track.artists[0]?.name)}/song/${encodeURIComponent(track.name)}`}>
-            <a style={{ textDecoration: "none", color: "inherit" }}>
-              <li
-                key={index}
-                style={{
-                  padding: "10px",
-                  borderBottom: "1px solid #ddd",
-                  textAlign: "left",
-                }}
-              >
-                {index + 1}. {track.name}{" "}
-                <span style={{ color: "#aaa", fontSize: "14px" }}>
-                  by {track.artists.map((artist: any) => artist.name).join(", ")}
-                </span>
-              </li>
-            </a>
-          </Link>
+          <li
+            key={index}
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #ddd",
+              textAlign: "left",
+            }}
+          >
+            <Link
+              href={`/music/${encodeURIComponent(track.artists[0].name)}/song/${encodeURIComponent(track.name)}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              {index + 1}. {track.name}{" "}
+              <span style={{ color: "#aaa", fontSize: "14px" }}>
+                by {track.artists.map((a: any) => a.name).join(", ")}
+              </span>
+            </Link>
+          </li>
         ))}
       </ul>
+
       <Footer />
     </div>
   );
