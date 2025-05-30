@@ -212,13 +212,13 @@ const CommentSection = () => {
 
     const fileName = file.name;
     // Call the GitHub upload API (from your previous code)
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+    formData.append("fileName", file.name);
+
     const uploadResponse = await fetch('/api/comments/uploadFile?type=commentFile', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fileName: fileName,
-        fileContent: base64Content
-      })
+      body: formData,
     });
 
     const uploadData = await uploadResponse.json();
