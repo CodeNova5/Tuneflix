@@ -71,7 +71,7 @@ export default function AlbumPage() {
 
         {albumDetails.tracks.map((track: any, index: number) => (
 
-          <Link href={`/music/${encodeURIComponent(track.artists[0]?.name)}/song/${encodeURIComponent(track.name)}`}>
+            <Link href={`/music/${encodeURIComponent(track.artists[0]?.name)}/song/${encodeURIComponent(track.name)}`}>
             <a style={{ textDecoration: "none", color: "inherit" }}>
               <li
                 key={index}
