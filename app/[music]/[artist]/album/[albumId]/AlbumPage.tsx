@@ -78,7 +78,7 @@ export default function AlbumPage() {
             }}
           >
             <Link
-              href={`/music/${encodeURIComponent(track.artists[0].name)}/song/${encodeURIComponent(track.name)}`}
+              href={`/music/${encodeURIComponent(track.artists[0].name || undefined)} /song/${encodeURIComponent(track.name)}`}
               style={{ textDecoration: "none", color: "inherit" }}
             >
               {index + 1}. {track.name}{" "}
