@@ -490,21 +490,7 @@ export default async function handler(req, res) {
         }
 
         const albumData = await albumResponse.json();
-        const formattedAlbum = {
-          name: albumData.name,
-          releaseDate: albumData.release_date,
-          totalTracks: albumData.total_tracks,
-          image: albumData.images?.[0]?.url || "/placeholder.jpg",
-          tracks: albumData.tracks.items.map((track) => ({
-            name: track.name,
-            duration: track.duration_ms,
-            artists: track.artists?.map((artist) => ({
-              name: artist.name,
-              id: artist.id,
-              external_urls: artist.external_urls,
-            })) || [],
-          })),
-        };
+      
         const formattedAlbum = {
           name: albumData.name,
           releaseDate: albumData.release_date,
