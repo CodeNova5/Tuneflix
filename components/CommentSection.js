@@ -707,7 +707,7 @@ const CommentSection = () => {
                 <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} />
                 <div className={styles.commentDetails}>
                   <strong className={styles.commentUser}>{comment.user}          </strong>
-<span className={styles.timeAgo}>  .{comment.timeAgo}</span>
+<span className={styles.timeAgo}>{comment.timeAgo}</span>
                 </div>
               </div>
               <p className={styles.commentText}>{comment.content}</p>
