@@ -333,10 +333,7 @@ const CommentSection = () => {
       textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
     });
 
-    textarea.focus(); // Focus the textarea
-
-    textarea.focus(); // Focus the textarea
-    const form = document.getElementById('reply-form');
+        const form = document.getElementById('reply-form');
     const errorMsg = document.getElementById('reply-error');
     form.onsubmit = async (e) => {
       e.preventDefault();
