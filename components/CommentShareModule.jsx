@@ -5,6 +5,18 @@ const CommentShareModule = ({ track, artist, album, playlist }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
+useEffect(() => {
+  if (isModalOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+  // Cleanup in case the component unmounts while modal is open
+  return () => {
+    document.body.style.overflow = '';
+  };
+}, [isModalOpen]);
+
   // Ensure only one of track, artist, album, or playlist is provided
   const inputs = [track, artist, album, playlist].filter(Boolean);
   if (inputs.length === 0) {
