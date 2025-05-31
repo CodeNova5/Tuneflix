@@ -5,7 +5,7 @@ const CommentShareModule = ({ track, artist, album, playlist }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
-useEffect(() => {
+React.useEffect(() => {
   if (isModalOpen) {
     document.body.style.overflow = 'hidden';
   } else {
