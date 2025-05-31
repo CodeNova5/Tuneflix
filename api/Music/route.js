@@ -471,7 +471,7 @@ export default async function handler(req, res) {
       }
     }
 
-else if (type === "albumDetails") {
+else if (type === "albumDetail") {
   if (!albumId) {
     return res.status(400).json({ error: "Missing Album Id" });
   }
