@@ -25,8 +25,8 @@ export default function AlbumPage() {
             return;
           }
           const data = await response.json();
-          console.log("Artists", data.trackArtists);
           setAlbumDetails(data);
+          console.log("Track Artists:", data.trackArtists); // <-- LOG IT HERE
         } catch (err) {
           console.error("Error fetching album details:", err);
           setError("An unexpected error occurred");
