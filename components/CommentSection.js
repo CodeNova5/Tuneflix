@@ -333,10 +333,9 @@ const CommentSection = () => {
       textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
     });
 
-    textarea.focus(); // Focus the textarea
+textarea.focus();
 
-    textarea.focus(); // Focus the textarea
-    const form = document.getElementById('reply-form');
+        const form = document.getElementById('reply-form');
     const errorMsg = document.getElementById('reply-error');
     form.onsubmit = async (e) => {
       e.preventDefault();
@@ -557,7 +556,7 @@ const CommentSection = () => {
           ${reply.video ? `<video class="${styles.commentVideo}" src="${reply.video}" controls></video>` : ''}
           <div class="${styles.commentActions}">
             <span class="${styles.likeButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-liked="${likedByUser}" style="cursor: pointer; color: ${likedByUser ? 'blue' : 'gray'};">
-              ❤️ <span class="like-count">${(reply.likes || []).length}</span> Like
+              ❤️ <span class="like-count">${(reply.likes || []).length}</span>
             </span>
             <button class="${styles.editButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-content="${reply.content}">Edit</button>
             <button class="${styles.deleteButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}">Delete</button>
@@ -706,8 +705,8 @@ const CommentSection = () => {
               <div className={styles.commentHeader}>
                 <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} />
                 <div className={styles.commentDetails}>
-                  <strong className={styles.commentUser}>{comment.user}</strong>
-                  <span className={styles.timeAgo}>{comment.timeAgo}</span>
+                  <strong className={styles.commentUser}>{comment.user}          </strong>
+<span className={styles.timeAgo}>{comment.timeAgo}</span>
                 </div>
               </div>
               <p className={styles.commentText}>{comment.content}</p>

@@ -5,6 +5,18 @@ const CommentShareModule = ({ track, artist, album, playlist }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
+React.useEffect(() => {
+  if (isModalOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+  // Cleanup in case the component unmounts while modal is open
+  return () => {
+    document.body.style.overflow = '';
+  };
+}, [isModalOpen]);
+
   // Ensure only one of track, artist, album, or playlist is provided
   const inputs = [track, artist, album, playlist].filter(Boolean);
   if (inputs.length === 0) {
@@ -88,17 +100,21 @@ const CommentShareModule = ({ track, artist, album, playlist }) => {
         </div>
       </div>
 
-      {isModalOpen && (
-        <div style={styles.modal}>
-          <div style={styles.modalHeader}>
-            <h2>Comments</h2>
-            <button onClick={toggleModal} style={styles.closeBtn}>✖</button>
-          </div>
-          <div style={styles.modalContent}>
-            <CommentSection />
-          </div>
-        </div>
-      )}
+      { /* The modal overlay is always rendered, but hidden unless isModalOpen is true */ }
+<div
+  style={{
+    ...styles.modal,
+    display: isModalOpen ? 'block' : 'none'
+  }}
+>
+  <div style={styles.modalHeader}>
+    <h2>Comments</h2>
+    <button onClick={toggleModal} style={styles.closeBtn}>✖</button>
+  </div>
+  <div style={styles.modalContent}>
+    <CommentSection />
+  </div>
+</div>
     </>
   );
 };
