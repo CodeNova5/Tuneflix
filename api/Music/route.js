@@ -471,7 +471,7 @@ export default async function handler(req, res) {
       }
     }
 
-    else if (type === "albumDetails") {
+    else if (type === "albumDetail") {
       if (!albumId) {
         return res.status(400).json({ error: "Missing Album Id" });
       }
@@ -490,6 +490,7 @@ export default async function handler(req, res) {
         }
 
         const albumData = await albumResponse.json();
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         console.log("Album data fetched successfully:", albumData);
         return res.status(200).json(albumData);
       } catch (err) {

@@ -15,7 +15,7 @@ export default function AlbumPage() {
       async function fetchAlbumDetails() {
         try {
           const response = await fetch(
-            `/api/Music/route?type=albumDetails&artistName=${encodeURIComponent(
+            `/api/Music/route?type=albumDetail&artistName=${encodeURIComponent(
               artist
             )}&albumId=${encodeURIComponent(albumId)}`
           );
