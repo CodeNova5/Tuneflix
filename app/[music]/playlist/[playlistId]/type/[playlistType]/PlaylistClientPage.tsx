@@ -69,7 +69,7 @@ export default function PlaylistClientPage() {
   }
 
   return (
-    <div className="p-4 bg-#111 text-white min-h-screen">
+    <div className="p-4 bg-#111 text-white min-h-screen mt-40">
       <Header />
       {playlistDetails && (
         <div className="mb-8 text-center">
