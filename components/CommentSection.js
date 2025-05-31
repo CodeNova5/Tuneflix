@@ -706,8 +706,8 @@ const CommentSection = () => {
               <div className={styles.commentHeader}>
                 <img className={styles.commentAvatar} src={comment.userImage} alt={comment.user} />
                 <div className={styles.commentDetails}>
-                  <strong className={styles.commentUser}>{comment.user}</strong>
-                  <span className={styles.timeAgo}>{comment.timeAgo}</span>
+                  <strong className={styles.commentUser}>{comment.user} .  {comment.timeAgo}</strong>
+
                 </div>
               </div>
               <p className={styles.commentText}>{comment.content}</p>
