@@ -457,9 +457,14 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "No albums found for this artist" });
         }
 
-        res.setHeader("Cache-Control", "s-maxage=43200, stale-while-revalidate");
+        res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
         return res.status(200).json(albumsData.items.map((album) => ({
           name: album.name,
+          artists: album.artists.map((artist) => ({
+            name: artist.name,
+            id: artist.id,
+            external_urls: artist.external_urls,
+          })),
           releaseDate: album.release_date,
           totalTracks: album.total_tracks,
           image: album.images?.[0]?.url || "/placeholder.jpg",
