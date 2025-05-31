@@ -519,7 +519,7 @@ else if (type === "albumDetails") {
     };
 
     res.setHeader("Cache-Control", "max-age=31536000, immutable");
-    return res.status(200).json(formattedAlbum);
+    return res.status(200).json({ ...formattedAlbum, trackArtists });
   } catch (err) {
     console.error("Spotify API Error:", err);
     return res.status(500).json({ error: "Failed to fetch album details" });
