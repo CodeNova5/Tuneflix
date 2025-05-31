@@ -323,7 +323,15 @@ export default function SongPage() {
         }
     };
     // Remove the invalid useEffect and handle "song not found" in the render logic below.
-    if (track && artist && !track.artists.some(a => a.name.toLowerCase() === artist.toLowerCase())) {
+    const decodedArtist = decodeURIComponent(artist);
+    const songNotFound =
+        track &&
+        decodedArtist &&
+        !track.artists?.some((a: any) =>
+            a.name?.toLowerCase() === decodedArtist.toLowerCase()
+        );
+
+    if (songNotFound) {
         return (
             <div style={{ textAlign: "center", marginTop: "60px", color: "#fff" }}>
                 <h1>Song not found</h1>
