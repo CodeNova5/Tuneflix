@@ -241,7 +241,6 @@ export default function SongPage() {
                     .join("-");
 
             const fileName = `${formatTitle(track.artists[0]?.name ?? "")}_-_${formatTitle(track.name ?? "")}.mp3`;
-            console.log("File name:", fileName);
             // 1. Check if file exists in GitHub
             const githubUrl = await checkGithubFileExists(fileName);
             if (githubUrl) {

@@ -1,151 +1,55 @@
-"use client";
+import { Metadata } from "next";
+import PlaylistClientPage from "./PlaylistClientPage";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import CommentShareModule from "@/components/CommentShareModule";
-interface tracks {
-  id: number;
-  title: string;
-  artist: { name: string };
-  album: { cover_medium: string };
-}
+// Server-side metadata generation
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const params = typeof props.params?.then === "function" ? await props.params : props.params;
+  const { playlistId, playlistType } = params;
 
-interface PlaylistDetails {
-  name: string;
-  image: string;
-}
+  const baseUrl = "https://next-xi-opal.vercel.app";
+  const apiUrl = `${baseUrl}/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=${playlistType}`;
 
-export default function HomePage() {
-  const { playlistId } = useParams() as { playlistId: string };
-  const { playlistType } = useParams() as { playlistType: string };
-  const [error, setError] = useState<string | null>(null);
-  const [tracks, setTracks] = useState<tracks[]>([]);
-  const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetails | null>(null);
-  
-  useEffect(() => {
-
-    async function fetchDeezerTracks() {
-      try {
-        const response = await fetch(
-          `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=${playlistType}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch Deezer tracks");
-        const data = await response.json();
-        console.log("Deezer API Response:", data);
-    
-        // Map over the tracks array directly
-        if (data.tracks && Array.isArray(data.tracks)) {
-          setTracks(
-            data.tracks.map((track: any) => ({
-              id: track.id,
-              title: track.title,
-              artist: { name: track.artist.name },
-              album: { cover_medium: track.album.cover_medium },
-            }))
-          );
-        } else {
-          setTracks([]); // Set an empty array if no tracks are found
-        }
-    
-        setPlaylistDetails({
-          name: data.playlistDetails.name,
-          image: data.playlistDetails.image,
-        });
-      } catch (err: any) {
-        console.error(err.message);
-        setError(err.message);
-      }
-    }
-
-    async function fetchSpotifyTracks() {
-      try {
-        const response = await fetch(
-          `/api/Music/route?type=playlist&playlistId=${playlistId}&playlistType=${playlistType}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch Spotify tracks");
-        const data = await response.json();
-    
-        // Ensure tracks are mapped from data.tracks
-        setTracks(
-          data.tracks.map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            artist: { name: item.artist.name },
-            album: { cover_medium: item.album.cover_medium },
-          }))
-        );
-    
-        setPlaylistDetails({
-          name: data.playlistDetails.name,
-          image: data.playlistDetails.image,
-        });
-      } catch (err: any) {
-        console.error(err.message);
-        setError(err.message);
-      }
-    }
-
-    if (playlistId && playlistType) {
-      if (playlistType === "dz") {
-        fetchDeezerTracks();
-      } else if (playlistType === "sp") {
-        fetchSpotifyTracks();
-      } else {
-        setError("Invalid playlist type");
-      }
-    } else {
-      setError("Missing playlist ID or type");
-    }
-  }, [playlistId, playlistType]);
-
-  if (error) {
-    return <h1>Error: {error}</h1>;
+  const res = await fetch(apiUrl, { cache: "no-store" });
+  if (!res.ok) {
+    return {
+      title: "Playlist Not Found | Tuneflix",
+      description: "Sorry, this playlist could not be found.",
+    };
   }
+  const data = await res.json();
 
-  return (
-    <div className="p-4 bg-#111 text-white min-h-screen">
-      <Header />
-      {playlistDetails && (
-        <div className="mb-8 text-center">
-          <img
-            src={playlistDetails.image}
-            alt={playlistDetails.name}
-            className="w-32 h-32 mx-auto rounded-full object-cover"
-          />
-          <h1 className="text-3xl font-bold mt-4">{playlistDetails.name}</h1>
-        </div>
-      )}
-      <CommentShareModule
-        playlist={{ name: playlistDetails?.name, image: playlistDetails?.image }}
-        track={undefined}
-        album={undefined}
-        artist={undefined}
-      />
-      <h2 className="text-2xl font-bold mb-4">Tracks</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {tracks.map((track) => (
-          <Link
-            key={track.id}
-            href={`/music/${encodeURIComponent(track.artist.name)}/song/${encodeURIComponent(
-              track.title
-            )}`}
-          >
-            <div className="border rounded-lg p-2 shadow-md bg-gray-800 cursor-pointer">
-              <img
-                src={track.album.cover_medium}
-                alt={track.title}
-                className="w-full h-48 object-cover rounded"
-              />
-              <h2 className="font-semibold mt-2">{track.title}</h2>
-              <p className="text-gray-400">{track.artist.name}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-      <Footer />
-    </div>
-  );
+  const title = `${data.playlistDetails?.name || "Playlist"} | Tuneflix`;
+  const description = `Listen to the playlist "${data.playlistDetails?.name || ""}" on Tuneflix.`;
+  const image = data.playlistDetails?.image || "/placeholder.jpg";
+  const url = `${baseUrl}/music/playlist/${encodeURIComponent(playlistId)}/type/${encodeURIComponent(playlistType)}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "music.playlist",
+      siteName: "Tuneflix",
+      images: [
+        {
+          url: image,
+          alt: `${data.playlistDetails?.name || "Playlist"} cover`,
+        },
+      ],
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+    authors: [{ name: "Code Nova" }],
+  };
+}
+
+export default function Page() {
+  return <PlaylistClientPage />;
 }
