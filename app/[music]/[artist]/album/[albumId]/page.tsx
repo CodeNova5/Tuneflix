@@ -7,7 +7,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const { albumId } = params;
 
   const baseUrl = "https://next-xi-opal.vercel.app";
-  const apiUrl = `${baseUrl}/api/Music/route?type=albumDetails&albumId=${encodeURIComponent(albumId)}`;
+  const apiUrl = `${baseUrl}/api/Music/route?type=albumDetail&albumId=${encodeURIComponent(albumId)}`;
 
   const res = await fetch(apiUrl, { cache: "no-store" });
   if (!res.ok) {
