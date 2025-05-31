@@ -100,17 +100,21 @@ useEffect(() => {
         </div>
       </div>
 
-      {isModalOpen && (
-        <div style={styles.modal}>
-          <div style={styles.modalHeader}>
-            <h2>Comments</h2>
-            <button onClick={toggleModal} style={styles.closeBtn}>✖</button>
-          </div>
-          <div style={styles.modalContent}>
-            <CommentSection />
-          </div>
-        </div>
-      )}
+      { /* The modal overlay is always rendered, but hidden unless isModalOpen is true */ }
+<div
+  style={{
+    ...styles.modal,
+    display: isModalOpen ? 'block' : 'none'
+  }}
+>
+  <div style={styles.modalHeader}>
+    <h2>Comments</h2>
+    <button onClick={toggleModal} style={styles.closeBtn}>✖</button>
+  </div>
+  <div style={styles.modalContent}>
+    <CommentSection />
+  </div>
+</div>
     </>
   );
 };
