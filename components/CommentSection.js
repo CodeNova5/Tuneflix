@@ -556,7 +556,7 @@ textarea.focus();
           ${reply.video ? `<video class="${styles.commentVideo}" src="${reply.video}" controls></video>` : ''}
           <div class="${styles.commentActions}">
             <span class="${styles.likeButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-liked="${likedByUser}" style="cursor: pointer; color: ${likedByUser ? 'blue' : 'gray'};">
-              ❤️ <span class="like-count">${(reply.likes || []).length}</span> Like
+              ❤️ <span class="like-count">${(reply.likes || []).length}</span>
             </span>
             <button class="${styles.editButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-content="${reply.content}">Edit</button>
             <button class="${styles.deleteButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}">Delete</button>
