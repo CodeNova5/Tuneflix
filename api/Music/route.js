@@ -55,6 +55,28 @@ async function getArtistAccessToken() {
   artistTokenExpiresAt = Date.now() + tokenData.expires_in * 1000;
   return artistAccessToken;
 }
+
+async function fetchWithSpotifyTokens(url, getToken1, getToken2) {
+  // Try with first token
+  let token = await getToken1();
+  let response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+
+  // If 429, try with second token
+  if (response.status === 429 && getToken2) {
+    token = await getToken2();
+    response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  }
+
+  // If still 429, wait and retry ONCE
+  if (response.status === 429) {
+    const retryAfter = parseInt(response.headers.get("Retry-After") || "1", 10);
+    await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
+    response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  }
+
+  return response;
+}
+
 export default async function handler(req, res) {
   try {
     const { type, artistName, songName, artistId, albumId, playlistId, playlistType } = req.query;
@@ -71,30 +93,34 @@ export default async function handler(req, res) {
       const query = req.query.query;
       const token = await getArtistAccessToken(); // however you're getting it
 
-      const searchRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist,track,album&limit=5`;
+      const response = await fetchWithSpotifyTokens(
+        apiUrl,
+        getSpotifyAccessToken,
+        getArtistAccessToken
+      );
 
-      const json = await searchRes.json();
+      const json = await response.json();
       return res.status(200).json(json);
     }
 
+
+    // Example usage in songDetails:
     else if (type === "songDetails") {
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist name or song name" });
       }
 
       try {
-        const accessToken = await getSpotifyAccessToken();
         const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
           `${decodedArtistName} ${decodedSongName}`
-        )}&type=track&limit=1&market=US`;
+        )}&type=track&limit=1`;
 
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const response = await fetchWithSpotifyTokens(
+          apiUrl,
+          getSpotifyAccessToken,
+          getArtistAccessToken
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch song details");
@@ -476,58 +502,58 @@ export default async function handler(req, res) {
       }
     }
 
-else if (type === "albumDetail") {
-  if (!albumId) {
-    return res.status(400).json({ error: "Missing Album Id" });
-  }
+    else if (type === "albumDetail") {
+      if (!albumId) {
+        return res.status(400).json({ error: "Missing Album Id" });
+      }
 
-  try {
-    const accessToken = await getArtistAccessToken();
+      try {
+        const accessToken = await getArtistAccessToken();
 
-    const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
-    const albumResponse = await fetch(albumApiUrl, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+        const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
+        const albumResponse = await fetch(albumApiUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
 
-    if (!albumResponse.ok) {
-      const errorDetails = await albumResponse.text();
-      throw new Error(`Spotify Error: ${errorDetails}`);
+        if (!albumResponse.ok) {
+          const errorDetails = await albumResponse.text();
+          throw new Error(`Spotify Error: ${errorDetails}`);
+        }
+
+        const albumData = await albumResponse.json();
+
+        // Build tracks and trackArtists arrays
+        const tracks = albumData.tracks.items.map((track) => ({
+          name: track.name,
+          duration: track.duration_ms,
+          artists: track.artists.map((artist) => ({
+            name: artist.name,
+            id: artist.id,
+            external_urls: artist.external_urls,
+          })),
+        }));
+
+        const formattedAlbum = {
+          name: albumData.name,
+          releaseDate: albumData.release_date,
+          totalTracks: albumData.total_tracks,
+          image: albumData.images?.[0]?.url || "/placeholder.jpg",
+          id: albumData.id,
+          artists: albumData.artists.map((artist) => ({
+            name: artist.name,
+            id: artist.id,
+            external_urls: artist.external_urls,
+          })),
+          tracks: tracks,
+        };
+
+        res.setHeader("Cache-Control", "max-age=31536000, immutable");
+        return res.status(200).json(formattedAlbum);
+      } catch (err) {
+        console.error("Spotify API Error:", err);
+        return res.status(500).json({ error: "Failed to fetch album details" });
+      }
     }
-
-    const albumData = await albumResponse.json();
-
-    // Build tracks and trackArtists arrays
-    const tracks = albumData.tracks.items.map((track) => ({
-      name: track.name,
-      duration: track.duration_ms,
-      artists: track.artists.map((artist) => ({
-        name: artist.name,
-        id: artist.id,
-        external_urls: artist.external_urls,
-      })),
-    }));
-
-    const formattedAlbum = {
-      name: albumData.name,
-      releaseDate: albumData.release_date,
-      totalTracks: albumData.total_tracks,
-      image: albumData.images?.[0]?.url || "/placeholder.jpg",
-      id: albumData.id,
-      artists: albumData.artists.map((artist) => ({
-        name: artist.name,
-        id: artist.id,
-        external_urls: artist.external_urls,
-      })),
-      tracks: tracks,
-    };
-
-    res.setHeader("Cache-Control", "max-age=31536000, immutable");
-    return res.status(200).json(formattedAlbum);
-  } catch (err) {
-    console.error("Spotify API Error:", err);
-    return res.status(500).json({ error: "Failed to fetch album details" });
-  }
-}
 
     else if (type === "topSongs") {
       try {
