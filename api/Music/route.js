@@ -113,7 +113,7 @@ async function fetchWithLastFmKeys(url, getKey1, getKey2) {
 async function fetchWithYouTubeAPI(url, getKey1, getKey2) {
   // Try with first API key
   let apiKey = await getKey1();
-  let urlWithKey = new URL(url);  
+  let urlWithKey = new URL(url);
   urlWithKey.searchParams.set('key', apiKey);
   let response = await fetch(urlWithKey.toString());
   let data = await response.json();
@@ -134,7 +134,7 @@ async function fetchWithYouTubeAPI(url, getKey1, getKey2) {
     data = await response.json();
   }
   return { response, data };
- 
+
 }
 
 export default async function handler(req, res) {
@@ -209,7 +209,7 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "clientId") {
-       res.status(200).json({ clientId: process.env.GOOGLE_CLIENT_ID });
+      res.status(200).json({ clientId: process.env.GOOGLE_CLIENT_ID });
     }
     else if (type === "youtubeMusicVideo") {
 
@@ -221,8 +221,7 @@ export default async function handler(req, res) {
         const query = `${decodedArtistName} ${decodedSongName} official music video`;
         const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1`;
 
-        const response = await  fetchWithYouTubeAPI(apiUrl, YOUTUBE_API_KEY, YOUTUBE_API_KEY2);
-        if (!response.ok) throw new Error("Failed to fetch YouTube video");
+        const response = await fetchWithYouTubeAPI(apiUrl, () => YOUTUBE_API_KEY, () => YOUTUBE_API_KEY2); if (!response.ok) throw new Error("Failed to fetch YouTube video");
 
         const data = await response.json();
         if (!data.items || data.items.length === 0) {
@@ -247,8 +246,8 @@ export default async function handler(req, res) {
         const query = `${decodedArtistName} ${decodedSongName} lyrics video`;
         const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1`;
 
-        const response = await fetchWithYouTubeAPI(apiUrl, YOUTUBE_API_KEY, YOUTUBE_API_KEY2);
-        if (!response.ok) throw new Error("Failed to fetch YouTube video");
+        const response = await fetchWithYouTubeAPI(apiUrl, () => YOUTUBE_API_KEY, () => YOUTUBE_API_KEY2);
+         if (!response.ok) throw new Error("Failed to fetch YouTube video");
 
         const data = await response.json();
         if (!data.items || data.items.length === 0) {
