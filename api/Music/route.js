@@ -3,6 +3,7 @@ const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const ARTIST_CLIENT_ID = process.env.ARTIST_CLIENT_ID;
 const ARTIST_CLIENT_SECRET = process.env.ARTIST_CLIENT_SECRET;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const YOUTUBE_API_KEY2 = process.env.YOUTUBE_API_KEY2;
 const LAST_FM_API_KEY = process.env.LAST_FM_API_KEY;
 const LAST_FM_API_KEY2 = process.env.LAST_FM_API_KEY2;
 let spotifyAccessToken = null;
@@ -109,7 +110,32 @@ async function fetchWithLastFmKeys(url, getKey1, getKey2) {
 
   return { response, data };
 }
+async function fetchWithYouTubeAPI(url, getKey1, getKey2) {
+  // Try with first API key
+  let apiKey = await getKey1();
+  let urlWithKey = new URL(url);  
+  urlWithKey.searchParams.set('key', apiKey);
+  let response = await fetch(urlWithKey.toString());
+  let data = await response.json();
+  // If rate limited (HTTP 429)
+  if (response.status === 429 && getKey2) {
+    apiKey = await getKey2();
+    urlWithKey.searchParams.set('key', apiKey);
 
+    response = await fetch(urlWithKey.toString());
+    data = await response.json();
+  }
+  // Retry ONCE if still rate-limited
+  if (response.status === 429) {
+    const retryAfter = parseInt(response.headers.get('Retry-After') || '1', 10);
+    await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+
+    response = await fetch(urlWithKey.toString());
+    data = await response.json();
+  }
+  return { response, data };
+ 
+}
 
 export default async function handler(req, res) {
   try {
@@ -182,11 +208,10 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Failed to fetch song details" });
       }
     }
+    else if (type === "clientId") {
+       res.status(200).json({ clientId: process.env.GOOGLE_CLIENT_ID });
+    }
     else if (type === "youtubeMusicVideo") {
-      if (!YOUTUBE_API_KEY) {
-        console.error("Missing YouTube API key.");
-        return res.status(500).json({ error: "Internal server error" });
-      }
 
       if (!songName || !artistName) {
         return res.status(400).json({ error: "Missing song name or artist name" });
@@ -194,9 +219,9 @@ export default async function handler(req, res) {
 
       try {
         const query = `${decodedArtistName} ${decodedSongName} official music video`;
-        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}&maxResults=1`;
+        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1`;
 
-        const response = await fetch(apiUrl);
+        const response = await  fetchWithYouTubeAPI(apiUrl, YOUTUBE_API_KEY, YOUTUBE_API_KEY2);
         if (!response.ok) throw new Error("Failed to fetch YouTube video");
 
         const data = await response.json();
@@ -214,20 +239,15 @@ export default async function handler(req, res) {
     }
 
     else if (type === "lyricsVideo") {
-      if (!YOUTUBE_API_KEY) {
-        console.error("Missing YouTube API key.");
-        return res.status(500).json({ error: "Internal server error" });
-      }
-
       if (!songName || !artistName) {
         return res.status(400).json({ error: "Missing song name or artist name" });
       }
 
       try {
         const query = `${decodedArtistName} ${decodedSongName} lyrics video`;
-        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}&maxResults=1`;
+        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1`;
 
-        const response = await fetch(apiUrl);
+        const response = await fetchWithYouTubeAPI(apiUrl, YOUTUBE_API_KEY, YOUTUBE_API_KEY2);
         if (!response.ok) throw new Error("Failed to fetch YouTube video");
 
         const data = await response.json();

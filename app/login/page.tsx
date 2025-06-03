@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 declare global {
@@ -13,8 +13,13 @@ declare global {
 
 export default function LoginPage() {
   const router = useRouter();
+  const [googleClientId, setGoogleClientId] = useState<string | null>(null);
 
   useEffect(() => {
+    fetch('/api/Music/route?type=clientId')
+      .then(res => res.json())
+      .then(data => setGoogleClientId(data.clientId));
+  
     // Google script
     const googleScript = document.createElement('script');
     googleScript.src = 'https://accounts.google.com/gsi/client';
@@ -33,15 +38,17 @@ export default function LoginPage() {
     };
 
     window.onload = () => {
-      window.google?.accounts.id.initialize({
-        client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62',
-        callback: window.handleCredentialResponse,
-        cancel_on_tap_outside: false,
-      });
-      window.google?.accounts.id.prompt();
+      if (googleClientId && window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: window.handleCredentialResponse,
+          cancel_on_tap_outside: false,
+        });
+        window.google.accounts.id.prompt();
+      }
     };
 
-    // Facebook script
+    // Facebook script (unchanged)
     const fbScript = document.createElement('script');
     fbScript.src = 'https://connect.facebook.net/en_US/sdk.js';
     fbScript.async = true;
@@ -64,7 +71,9 @@ export default function LoginPage() {
     };
 
     checkLocalStorage();
-  }, []);
+  }, [googleClientId]); // Depend on googleClientId
+
+
 
   const parseJwt = (token: string) => {
     const base64Url = token.split('.')[1];
@@ -104,20 +113,26 @@ export default function LoginPage() {
     });
   };
 
+  // ...rest of your code remains unchanged...
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Login with Google or Facebook</h1>
 
       <div style={styles.section}>
         <h2 style={styles.subtitle}>Google Login</h2>
-        <div id="g_id_onload"
-             data-client_id="847644538886-h57vcktcmjhdlj553b33js8tnenlge62"
-             data-context="signin"
-             data-ux_mode="popup"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false"
-        />
-        <div className="g_id_signin" data-type="standard" />
+        {googleClientId && (
+          <>
+            <div id="g_id_onload"
+              data-client_id={googleClientId}
+              data-context="signin"
+              data-ux_mode="popup"
+              data-callback="handleCredentialResponse"
+              data-auto_prompt="false"
+            />
+            <div className="g_id_signin" data-type="standard" />
+          </>
+        )}
       </div>
 
       <div style={styles.section}>
