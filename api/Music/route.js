@@ -3,6 +3,8 @@ const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const ARTIST_CLIENT_ID = process.env.ARTIST_CLIENT_ID;
 const ARTIST_CLIENT_SECRET = process.env.ARTIST_CLIENT_SECRET;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const LAST_FM_API_KEY = process.env.LAST_FM_API_KEY;
+const LAST_FM_API_KEY2 = process.env.LAST_FM_API_KEY2;
 let spotifyAccessToken = null;
 let spotifyTokenExpiresAt = 0;
 let artistAccessToken = null;
@@ -77,6 +79,38 @@ async function fetchWithSpotifyTokens(url, getToken1, getToken2) {
   return response;
 }
 
+async function fetchWithLastFmKeys(url, getKey1, getKey2) {
+  // Try with first API key
+  let apiKey = await getKey1();
+  let urlWithKey = new URL(url);
+  urlWithKey.searchParams.set('api_key', apiKey);
+  urlWithKey.searchParams.set('format', 'json'); // Last.fm usually requires this
+
+  let response = await fetch(urlWithKey.toString());
+  let data = await response.json();
+
+  // If rate limited (HTTP 429 or Last.fm specific error code 29)
+  if ((response.status === 429 || data.error === 29) && getKey2) {
+    apiKey = await getKey2();
+    urlWithKey.searchParams.set('api_key', apiKey);
+
+    response = await fetch(urlWithKey.toString());
+    data = await response.json();
+  }
+
+  // Retry ONCE if still rate-limited
+  if (response.status === 429 || data.error === 29) {
+    const retryAfter = parseInt(response.headers.get('Retry-After') || '1', 10);
+    await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+
+    response = await fetch(urlWithKey.toString());
+    data = await response.json();
+  }
+
+  return { response, data };
+}
+
+
 export default async function handler(req, res) {
   try {
     const { type, artistName, songName, artistId, albumId, playlistId, playlistType } = req.query;
@@ -91,8 +125,6 @@ export default async function handler(req, res) {
 
     if (type === "search") {
       const query = req.query.query;
-      const token = await getArtistAccessToken(); // however you're getting it
-
       const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist,track,album&limit=5`;
       const response = await fetchWithSpotifyTokens(
         apiUrl,
@@ -244,14 +276,16 @@ export default async function handler(req, res) {
       }
 
       try {
-        const accessToken = await getSpotifyAccessToken();
+
         const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
           decodedArtistName
         )}&type=track&limit=30`;
 
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const response = await fetchWithSpotifyTokens(
+          apiUrl,
+          getSpotifyAccessToken,
+          getArtistAccessToken
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch artist's songs");
@@ -271,12 +305,6 @@ export default async function handler(req, res) {
     }
 
     else if (type === "relatedTracks") {
-      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd";
-
-      if (!LAST_FM_API_KEY) {
-        console.error("Missing Last.fm API key.");
-        return res.status(500).json({ error: "Internal server error" });
-      }
 
       if (!artistName || !songName) {
         return res.status(400).json({ error: "Missing artist name or song name" });
@@ -285,9 +313,14 @@ export default async function handler(req, res) {
       try {
         const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}&track=${encodeURIComponent(decodedSongName)}&api_key=${LAST_FM_API_KEY}&format=json&limit=15`;
+        )}&track=${encodeURIComponent(decodedSongName)}}&limit=15`;
 
-        const response = await fetch(apiUrl);
+        const response = await fetchWithLastFmKeys(
+          apiUrl,
+          LAST_FM_API_KEY,
+          LAST_FM_API_KEY2
+        );
+
 
         if (!response.ok) {
           throw new Error("Failed to fetch related tracks");
@@ -312,10 +345,15 @@ export default async function handler(req, res) {
           tracks.map(async (track) => {
             const trackInfoUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&artist=${encodeURIComponent(
               track.artist.name
-            )}&track=${encodeURIComponent(track.name)}&api_key=${LAST_FM_API_KEY}&format=json`;
+            )}&track=${encodeURIComponent(track.name)}`;
 
             try {
-              const trackInfoResponse = await fetch(trackInfoUrl);
+              const trackInfoResponse = await fetchWithLastFmKeys(
+                trackInfoUrl,
+                LAST_FM_API_KEY,
+                LAST_FM_API_KEY2
+              );
+
               const trackInfoData = await trackInfoResponse.json();
 
               const albumImage =
@@ -354,14 +392,15 @@ export default async function handler(req, res) {
       }
 
       try {
-        const accessToken = await getArtistAccessToken();
         const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
           decodedArtistName
         )}&type=artist&limit=1`;
 
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const response = await fetchWithSpotifyTokens(
+          apiUrl,
+          getSpotifyAccessToken,
+          getArtistAccessToken
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch artist details");
@@ -387,12 +426,6 @@ export default async function handler(req, res) {
       }
     }
     else if (type === "relatedArtists") {
-      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd";
-
-      if (!LAST_FM_API_KEY) {
-        console.error("Missing Last.fm API key.");
-        return res.status(500).json({ error: "Internal server error" });
-      }
 
       if (!artistName) {
         return res.status(400).json({ error: "Missing artist name" });
@@ -402,9 +435,14 @@ export default async function handler(req, res) {
         // Fetch related artists from Last.fm
         const lastFmApiUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}&api_key=${LAST_FM_API_KEY}&format=json&limit=10`;
+        )}&limit=10`;
 
-        const lastFmResponse = await fetch(lastFmApiUrl);
+        const lastFmResponse = await fetchWithLastFmKeys(
+          lastFmApiUrl,
+          LAST_FM_API_KEY,
+          LAST_FM_API_KEY2
+        );
+
 
         if (!lastFmResponse.ok) {
           throw new Error("Failed to fetch related artists from Last.fm");
@@ -467,14 +505,14 @@ export default async function handler(req, res) {
       }
 
       try {
-        // Get Spotify access token
-        const accessToken = await getArtistAccessToken();
 
         // Fetch artist albums
-        const albumsApiUrl = `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album,single,appears_on&market=US&limit=15`;
-        const albumsResponse = await fetch(albumsApiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const apiUrl = `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album,single,appears_on&market=US&limit=15`;
+        const albumsResponse = await fetchWithSpotifyTokens(
+          apiUrl,
+          getSpotifyAccessToken,
+          getArtistAccessToken
+        );
         if (!albumsResponse.ok) {
           throw new Error("Failed to fetch artist albums from Spotify");
         }
@@ -508,13 +546,12 @@ export default async function handler(req, res) {
       }
 
       try {
-        const accessToken = await getArtistAccessToken();
-
-        const albumApiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
-        const albumResponse = await fetch(albumApiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
+        const apiUrl = `https://api.spotify.com/v1/albums/${albumId}`;
+        const albumResponse = await fetchWithSpotifyTokens(
+          apiUrl,
+          getSpotifyAccessToken,
+          getArtistAccessToken
+        );
         if (!albumResponse.ok) {
           const errorDetails = await albumResponse.text();
           throw new Error(`Spotify Error: ${errorDetails}`);
@@ -557,10 +594,14 @@ export default async function handler(req, res) {
 
     else if (type === "topSongs") {
       try {
-        const apiKey = 'c98799d0a98242258436e85147bc27fd'; // Replace with your actual Last.fm API key
-        const url = `https://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apiKey}&format=json`;
+        const url = `https://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks`;
 
-        const { data } = await axios.get(url);
+        const { data } = await fetchWithLastFmKeys(
+          url,
+          LAST_FM_API_KEY,
+          LAST_FM_API_KEY2
+        );
+        ;
 
         const accessToken = await getArtistAccessToken();
 
@@ -604,18 +645,17 @@ export default async function handler(req, res) {
 
     }
     else if (type === "trendingArtists") {
-      const LAST_FM_API_KEY = "c98799d0a98242258436e85147bc27fd"; // Replace with your Last.fm API key
-
-      if (!LAST_FM_API_KEY) {
-        console.error("Missing Last.fm API key.");
-        return res.status(500).json({ error: "Internal server error" });
-      }
 
       try {
         // Fetch trending artists from Last.fm
         const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=${LAST_FM_API_KEY}&format=json&limit=20`;
 
-        const response = await fetch(apiUrl);
+        const response = await fetchWithLastFmKeys(
+          apiUrl,
+          LAST_FM_API_KEY,
+          LAST_FM_API_KEY2
+        );
+
 
         if (!response.ok) {
           throw new Error("Failed to fetch trending artists from Last.fm");
@@ -685,11 +725,12 @@ export default async function handler(req, res) {
       }
 
       if (playlistType === "sp") {
-        const accessToken = await getSpotifyAccessToken();
         const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const response = await fetchWithSpotifyTokens(
+          apiUrl,
+          getSpotifyAccessToken,
+          getArtistAccessToken
+        );
 
         if (!response.ok) {
           return res.status(500).json({ error: "Failed to fetch Spotify playlist details" });
