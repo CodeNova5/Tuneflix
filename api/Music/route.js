@@ -219,9 +219,10 @@ export default async function handler(req, res) {
 
       try {
         const query = `${decodedArtistName} ${decodedSongName} official music video`;
-        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1`;
+        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}&maxResults=1`;
 
-        const response = await fetchWithYouTubeAPI(apiUrl, () => YOUTUBE_API_KEY, () => YOUTUBE_API_KEY2); if (!response.ok) throw new Error("Failed to fetch YouTube video");
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Failed to fetch YouTube video");
 
         const data = await response.json();
         if (!data.items || data.items.length === 0) {
@@ -243,11 +244,11 @@ export default async function handler(req, res) {
       }
 
       try {
-        const query = `${decodedArtistName} ${decodedSongName} lyrics video`;
-        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1`;
+        const query = `${decodedArtistName} ${decodedSongName} official music video`;
+        const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}&maxResults=1`;
 
-        const response = await fetchWithYouTubeAPI(apiUrl, () => YOUTUBE_API_KEY, () => YOUTUBE_API_KEY2);
-         if (!response.ok) throw new Error("Failed to fetch YouTube video");
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Failed to fetch YouTube video");
 
         const data = await response.json();
         if (!data.items || data.items.length === 0) {
