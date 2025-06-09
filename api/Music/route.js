@@ -190,6 +190,37 @@ export default async function handler(req, res) {
         }
 
         const track = data.tracks.items[0];
+
+        // Prepare the data to cache
+        const cachedData = {
+          name: track.name,
+          artists: track.artists.map((artist) => ({ name: artist.name })),
+          album: {
+            name: track.album.name,
+            images: track.album.images,
+            release_date: track.album.release_date,
+            type: track.album.album_type,
+          },
+          preview_url: track.preview_url,
+          duration_ms: track.duration_ms,
+        };
+
+        // Upload cached data to GitHub
+        try {
+          const cacheForm = new FormData();
+          const cacheBlob = new Blob([JSON.stringify(cachedData, null, 2)], { type: "application/json" });
+          const fileName = `${decodedArtistName}_${decodedSongName}.json`.replace(/\s+/g, "_");
+
+          cacheForm.append("file", cacheBlob, fileName);
+          cacheForm.append("fileName", fileName);
+
+          await fetch(`/api/uploadFile?type=cachedResponse`, {
+            method: "POST",
+            body: cacheForm,
+          });
+        } catch (cacheErr) {
+          console.error("Failed to cache song details:", cacheErr);
+        }
         res.setHeader('Cache-Control', 'max-age=31536000, immutable');
         return res.status(200).json({
           name: track.name,
@@ -427,7 +458,8 @@ export default async function handler(req, res) {
           getArtistAccessToken
         );
 
-        if (!response.ok) {``
+        if (!response.ok) {
+          ``
           throw new Error("Failed to fetch artist details");
         }
 
