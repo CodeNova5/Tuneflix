@@ -18,6 +18,7 @@ export default async function handler(req, res) {
 
     const uploadedFile = Array.isArray(files.file) ? files.file[0] : files.file;
     const uploadedFileName = Array.isArray(fields.fileName) ? fields.fileName[0] : fields.fileName;
+    const artistName = Array.isArray(fields.artistName) ? fields.artistName[0] : fields.artistName;
 
     if (!uploadedFile || !uploadedFileName) {
       return res.status(400).json({ message: "Missing file or fileName" });
@@ -42,7 +43,7 @@ export default async function handler(req, res) {
 
         const owner = "CodeNova5";
         const repo = "Music-Backend";
-        const path = `public/music/${uploadedFileName}`;
+        const path = `public/music/${artistName}/${uploadedFileName}`;
 
         let sha;
         try {
@@ -66,7 +67,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
           message: "File uploaded successfully",
           data: response.data,
-          path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/music/${uploadedFileName}`,
+          path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/music/${artistName}/${uploadedFileName}`,
         });
       }
       if (type === "commentFile") {
@@ -112,7 +113,9 @@ export default async function handler(req, res) {
           path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${uploadedFileName}`,
         });
       }
-    } catch (error) {
+
+    } 
+    catch (error) {
       console.error("Error uploading file:", error);
       return res.status(500).json({ message: error.message });
     }

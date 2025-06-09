@@ -205,7 +205,8 @@ export default function SongPage() {
 
     // Add this helper to check GitHub for the file
     async function checkGithubFileExists(fileName: string): Promise<string | null> {
-        const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/music/${fileName}`;
+        const artistName = track?.artists[0]?.name || "Unknown Artist";
+        const githubRawUrl = `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/music/${artistName}/${fileName}`;
         try {
             const res = await fetch(githubRawUrl, { method: "HEAD" });
             if (res.ok) {
@@ -218,11 +219,11 @@ export default function SongPage() {
     }
 
     // Add this helper to upload using FormData (for formidable)
-    async function uploadFileToGithub(fileName: string, blob: Blob) {
+    async function uploadFileToGithub(artistName: string, fileName: string, blob: Blob) {
         const formData = new FormData();
         formData.append("file", blob, fileName);
         formData.append("fileName", fileName);
-
+        formData.append("artistName", artistName);
         await fetch("/api/comments/uploadFile?type=music", {
             method: "POST",
             body: formData,
@@ -295,7 +296,8 @@ export default function SongPage() {
                 setDownloadUrl(url);
 
                 // Upload to GitHub using FormData (for formidable)
-                await uploadFileToGithub(fileName, taggedBlob);
+                const artistName = track.artists[0]?.name || "Unknown Artist";
+                await uploadFileToGithub(artistName, fileName, taggedBlob);
 
                 // After upload, check again and set download URL
 

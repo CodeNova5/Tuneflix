@@ -427,7 +427,7 @@ export default async function handler(req, res) {
           getArtistAccessToken
         );
 
-        if (!response.ok) {
+        if (!response.ok) {``
           throw new Error("Failed to fetch artist details");
         }
 
