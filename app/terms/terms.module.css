@@ -1,0 +1,38 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  color: #222;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.paragraph {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.link {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

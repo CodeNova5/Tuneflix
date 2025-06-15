@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google and Facebook Login Demo</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function handleCredentialResponse(response) {
+            if (response.credential) {
+                const data = parseJwt(response.credential);
+                console.log('Decoded Google JWT:', data);
+
+                // Save Google user information in a unified local storage
+                saveUserInfo('google', data);
+
+                // Display Google user info
+                displayGoogleUserInfo(data);
+            } else {
+                console.error("Error: No Google credential received.");
+            }
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+                atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+            );
+            return JSON.parse(jsonPayload);
+        }
+
+        function displayGoogleUserInfo(data) {
+            document.getElementById('google-name').innerText = `Name: ${data.name}`;
+            document.getElementById('google-email').innerText = `Email: ${data.email}`;
+            document.getElementById('google-id').innerText = `Google ID: ${data.sub}`;
+            document.getElementById('google-profile-img').src = data.picture;
+        }
+
+        function saveUserInfo(provider, data) {
+            const userInfo = { provider, data };
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        }
+
+        function checkLocalStorage() {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (userInfo) {
+                if (userInfo.provider === 'google') {
+                    displayGoogleUserInfo(userInfo.data);
+                } else if (userInfo.provider === 'facebook') {
+                    displayFacebookUserInfo(userInfo.data);
+                }
+            }
+        }
+
+        window.onload = function() {
+            checkLocalStorage();
+            google.accounts.id.initialize({
+                client_id: '847644538886-h57vcktcmjhdlj553b33js8tnenlge62', // Replace with your Google Client ID
+                callback: handleCredentialResponse,
+                cancel_on_tap_outside: false,
+            });
+            google.accounts.id.prompt();
+        };
+
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: '2236984449983471', // Replace with your Facebook App ID
+                cookie: true,
+                xfbml: true,
+                version: 'v17.0'
+            });
+
+            // Check login status
+            FB.getLoginStatus(function(response) {
+                if (response.status === 'connected') {
+                    fetchFacebookUserInfo();
+                }
+            });
+        };
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function fetchFacebookUserInfo() {
+            FB.api('/me', { fields: 'id,name,email,picture.width(400).height(400)' }, function(response) {
+                console.log('Facebook User Info:', response);
+
+                // Save Facebook user information in local storage
+                saveUserInfo('facebook', response);
+
+                // Display Facebook user info
+                displayFacebookUserInfo(response);
+            });
+        }
+
+        function displayFacebookUserInfo(data) {
+            document.getElementById('facebook-name').innerText = `Name: ${data.name}`;
+            document.getElementById('facebook-email').innerText = `Email: ${data.email}`;
+            document.getElementById('facebook-id').innerText = `Facebook ID: ${data.id}`;
+            document.getElementById('facebook-profile-img').src = data.picture.data.url;
+        }
+
+        function loginWithFacebook() {
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    fetchFacebookUserInfo();
+                } else {
+                    console.error('User cancelled Facebook login or did not fully authorize.');
+                }
+            }, { scope: 'public_profile,email' });
+        }
+    </script>
+</head>
+<body>
+    <h1>Google and Facebook Login Demo</h1>
+
+    <!-- Google Login Section -->
+    <h2>Google Login</h2>
+    <div id="g_id_onload"
+         data-client_id="847644538886-h57vcktcmjhdlj553b33js8tnenlge62" 
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <div>
+        <p id="google-name">Name: </p>
+        <p id="google-email">Email: </p>
+        <p id="google-id">Google ID: </p>
+        <img id="google-profile-img" alt="Google Profile Image">
+    </div>
+
+    <!-- Facebook Login Section -->
+    <h2>Facebook Login</h2>
+    <button onclick="loginWithFacebook()">Login with Facebook</button>
+    <div>
+        <p id="facebook-name">Name: </p>
+        <p id="facebook-email">Email: </p>
+        <p id="facebook-id">Facebook ID: </p>
+        <img id="facebook-profile-img" alt="Facebook Profile Image">
+    </div>
+</body>
+</html>

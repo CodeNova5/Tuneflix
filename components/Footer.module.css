@@ -1,0 +1,139 @@
+.footer {
+  background-color: #121212;
+  color: #ffffff;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.section {
+  flex: 1 1 250px;
+  text-align: left;
+}
+
+.heading {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.link {
+  color: #1e90ff;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.linkList li {
+  margin-bottom: 0.5rem;
+}
+
+.copyright {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+}
+
+.socialGroups {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+}
+.connectedGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.subheading {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+}
+
+.iconRow {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.icon {
+    color: #ffffff;
+    background: #1a1a1a;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: transform 0.2s ease, background 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.icon:hover {
+    background: #333;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: row;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+  }
+
+  .section {
+    min-width: 200px;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .connectedGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .iconRow {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+  }
+}
