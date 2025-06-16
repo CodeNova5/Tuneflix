@@ -706,19 +706,12 @@ export default async function handler(req, res) {
       try {
         // Fetch trending artists from Last.fm
         const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&limit=20`;
-
-        const response = await fetchWithLastFmKeys(
+        // ...existing code...
+        const { response, data } = await fetchWithLastFmKeys(
           apiUrl,
           () => LAST_FM_API_KEY,
           () => LAST_FM_API_KEY2
         );
-
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch trending artists from Last.fm");
-        }
-
-        const data = await response.json();
 
         if (!data.artists?.artist?.length) {
           return res.status(404).json({ error: "No trending artists found" });
