@@ -705,7 +705,7 @@ export default async function handler(req, res) {
 
       try {
         // Fetch trending artists from Last.fm
-        const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=${LAST_FM_API_KEY}&format=json&limit=20`;
+        const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&limit=20`;
 
         const response = await fetchWithLastFmKeys(
           apiUrl,
