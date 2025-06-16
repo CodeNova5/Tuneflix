@@ -36,6 +36,7 @@ export default function SongPage() {
     const [downloadUrl, setDownloadUrl] = React.useState<string | null>(null);
     const [showSelect, setShowSelect] = React.useState(false);
     const [lyricsHtml, setLyricsHtml] = React.useState<string>("Loading lyrics...");
+    const [relatedSongs, setRelatedSongs] = React.useState<any[]>([]);
     const router = useRouter();
 
     // Google/Facebook scripts (browser-only)
@@ -177,8 +178,29 @@ export default function SongPage() {
             .replace(/(.*?)/g, '<div class="lyrics-section"><strong>[$1]</strong></div>')
             .replace(/\n/g, "<br>");
     }
+    React.useEffect(() => {
+        async function fetchRelatedTracks() {
+            try {
+                const response = await fetch(
+                    `/api/Music/route?type=relatedTracks&artistName=${encodeURIComponent(artist)}&songName=${encodeURIComponent(song)}`
+                );
+                if (!response.ok) {
+                    throw new Error("Failed to fetch related tracks");
+                }
 
-    // Fetch related songs
+                const relatedTracks = await response.json();
+                console.log("Related Tracks:", relatedTracks);
+                setRelatedSongs(relatedTracks);
+            } catch (err) {
+                console.error("Error fetching related tracks:", err);
+            }
+        }
+
+        if (artist && song) {
+            fetchRelatedTracks();
+        }
+    }, [artist, song]);
+    // Fetch songs
     async function fetchSongs(songName: string) {
         try {
             const response = await fetch(
@@ -202,6 +224,8 @@ export default function SongPage() {
             setError("An unexpected error occurred");
         }
     }
+
+
 
     // Add this helper to check GitHub for the file
     async function checkGithubFileExists(fileName: string): Promise<string | null> {
@@ -631,6 +655,45 @@ export default function SongPage() {
                         </Link>
                     </div>
                 ))}
+            </div>
+            {/* Related Tracks Section */}
+            <h1>Related Tracks</h1>
+            <div
+                style={{
+                    display: "flex",
+                    overflowX: "auto",
+                    gap: "20px",
+                    padding: "10px",
+                }}
+            >
+                {relatedSongs.length > 0 ? (
+                    relatedSongs.map((song, index) => (
+                        <div
+                            key={index}
+                            style={{
+                                minWidth: "200px",
+                                textAlign: "center",
+                                border: "1px solid #ddd",
+                                borderRadius: "8px",
+                                padding: "10px",
+                            }}
+                        >
+                            <Link href={`/music/${encodeURIComponent(song.artist)}/${encodeURIComponent(song.name)}`}>
+                                <a style={{ textDecoration: "none", color: "inherit" }}>
+                                    <img
+                                        src={song.image || "/placeholder.jpg"}
+                                        alt={song.name}
+                                        style={{ width: "100%", borderRadius: "8px" }}
+                                    />
+                                    <h3 style={{ fontSize: "16px", margin: "10px 0" }}>{song.name}</h3>
+                                    <p style={{ fontSize: "14px", color: "#555" }}>{song.artist}</p>
+                                </a>
+                            </Link>
+                        </div>
+                    ))
+                ) : (
+                    <p>No related tracks found.</p>
+                )}
             </div>
             <Footer />
         </div>

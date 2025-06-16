@@ -371,7 +371,7 @@ export default async function handler(req, res) {
           decodedArtistName
         )}&track=${encodeURIComponent(decodedSongName)}}&limit=15`;
 
-        const response = await fetchWithLastFmKeys(
+        const { response, data } = await fetchWithLastFmKeys(
           apiUrl,
           () => LAST_FM_API_KEY,
           () => LAST_FM_API_KEY2
@@ -382,7 +382,7 @@ export default async function handler(req, res) {
           throw new Error("Failed to fetch related tracks");
         }
 
-        const data = await response.json();
+
 
         let tracks = data.similartracks?.track;
         if (!tracks) {
