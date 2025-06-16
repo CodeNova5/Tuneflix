@@ -55,6 +55,9 @@ export default function HomePage() {
 
 
 
+    if (error) {
+        return <h1>Error: {error}</h1>;
+    }
 
     return (
         <div style={{ backgroundColor: "#111" }} className="min-h-screen text-white">
