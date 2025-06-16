@@ -373,8 +373,8 @@ export default async function handler(req, res) {
 
         const response = await fetchWithLastFmKeys(
           apiUrl,
-          LAST_FM_API_KEY,
-          LAST_FM_API_KEY2
+          () => LAST_FM_API_KEY,
+          () => LAST_FM_API_KEY2
         );
 
 
@@ -406,8 +406,8 @@ export default async function handler(req, res) {
             try {
               const trackInfoResponse = await fetchWithLastFmKeys(
                 trackInfoUrl,
-                LAST_FM_API_KEY,
-                LAST_FM_API_KEY2
+                () => LAST_FM_API_KEY,
+                () => LAST_FM_API_KEY2
               );
 
               const trackInfoData = await trackInfoResponse.json();
@@ -494,12 +494,12 @@ export default async function handler(req, res) {
           decodedArtistName
         )}&limit=10`;
 
+        // ...existing code...
         const lastFmResponse = await fetchWithLastFmKeys(
           lastFmApiUrl,
-          LAST_FM_API_KEY,
-          LAST_FM_API_KEY2
+          () => LAST_FM_API_KEY,
+          () => LAST_FM_API_KEY2
         );
-
 
         if (!lastFmResponse.ok) {
           throw new Error("Failed to fetch related artists from Last.fm");
@@ -655,8 +655,8 @@ export default async function handler(req, res) {
 
         const { data } = await fetchWithLastFmKeys(
           url,
-          LAST_FM_API_KEY,
-          LAST_FM_API_KEY2
+          () => LAST_FM_API_KEY,
+          () => LAST_FM_API_KEY2
         );
         ;
 
@@ -709,8 +709,8 @@ export default async function handler(req, res) {
 
         const response = await fetchWithLastFmKeys(
           apiUrl,
-          LAST_FM_API_KEY,
-          LAST_FM_API_KEY2
+          () => LAST_FM_API_KEY,
+          () => LAST_FM_API_KEY2
         );
 
 
