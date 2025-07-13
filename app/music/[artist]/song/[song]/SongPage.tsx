@@ -38,7 +38,6 @@ export default function SongPage() {
     const [lyricsHtml, setLyricsHtml] = React.useState<string>("Loading lyrics...");
     const [relatedSongs, setRelatedSongs] = React.useState<any[]>([]);
     const router = useRouter();
-
     // Google/Facebook scripts (browser-only)
     React.useEffect(() => {
         // Google script
@@ -200,6 +199,7 @@ export default function SongPage() {
             fetchRelatedTracks();
         }
     }, [artist, song]);
+    
     // Fetch songs
     async function fetchSongs(songName: string) {
         try {
@@ -253,7 +253,6 @@ export default function SongPage() {
             body: formData,
         });
     }
-
     // Replace your useEffect for MP3 conversion and download with this:
     React.useEffect(() => {
         async function processAudio() {

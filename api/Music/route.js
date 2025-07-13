@@ -369,7 +369,7 @@ export default async function handler(req, res) {
       try {
         const apiUrl = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodeURIComponent(
           decodedArtistName
-        )}&track=${encodeURIComponent(decodedSongName)}}&limit=15`;
+        )}&track=${encodeURIComponent(decodedSongName)}&limit=15`;
 
         const { response, data } = await fetchWithLastFmKeys(
           apiUrl,
@@ -494,7 +494,6 @@ export default async function handler(req, res) {
           decodedArtistName
         )}&limit=10`;
 
-        // ...existing code...
         const lastFmResponse = await fetchWithLastFmKeys(
           lastFmApiUrl,
           () => LAST_FM_API_KEY,
