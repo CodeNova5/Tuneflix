@@ -88,7 +88,6 @@ export default function ArtistPage() {
     const albumsData = await albumsResponse.json();
     setArtistAlbums(albumsData);
   }
-  // Call the function to fetch albums when artistDetails is available
   if (artistDetails) {
     fetchArtistAlbums();
   }
