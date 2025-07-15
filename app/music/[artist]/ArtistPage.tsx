@@ -71,7 +71,7 @@ export default function ArtistPage() {
         }
       }
 
-      fetchArtistData();
+      
     }
   }, [artist]);
 
