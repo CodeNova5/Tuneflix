@@ -113,43 +113,6 @@ export default async function handler(req, res) {
           path: `https://raw.githubusercontent.com/CodeNova5/Music-Backend/main/public/comment/${uploadedFileName}`,
         });
       }
-      if (type === "cachedResponse") {
-        const fileBuffer = await fs.promises.readFile(uploadedFile.filepath);
-        const fileContent = fileBuffer.toString("base64");
-
-        const { Octokit } = await import("@octokit/rest");
-        const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
-        const owner = "CodeNova5";
-        const repo = "Music-Backend";
-        const path = `public/cache/${uploadedFileName}`;
-
-        let sha;
-        try {
-          const { data } = await octokit.rest.repos.getContent({ owner, repo, path });
-          sha = data.sha;
-        } catch (error) {
-          console.log("Cached file does not exist and will be created.");
-        }
-
-        const commitMessage = sha ? "Update cached response" : "Add cached response";
-
-        const response = await octokit.rest.repos.createOrUpdateFileContents({
-          owner,
-          repo,
-          path,
-          message: commitMessage,
-          content: fileContent,
-          sha,
-        });
-
-        return res.status(200).json({
-          message: "Cached response uploaded successfully",
-          data: response.data,
-          path: `https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`,
-        });
-      }
-
     }
     catch (error) {
       console.error("Error uploading file:", error);
