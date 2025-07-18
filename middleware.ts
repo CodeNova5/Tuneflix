@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const blockedBots = [
-    'Googlebot', 'Bingbot', 'Slurp', 'YandexBot', 'DuckDuckBot', 'Baido', 'BingPreview'
+   'Bingbot', 'Slurp', 'YandexBot', 'DuckDuckBot', 'Baido', 'BingPreview'
   ];
 
   const isBot = blockedBots.some((bot) => userAgent.includes(bot));
