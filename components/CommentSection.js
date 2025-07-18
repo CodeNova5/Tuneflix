@@ -12,7 +12,6 @@ const CommentSection = () => {
   const [comments, setComments] = useState([]);
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
-  const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [limit] = useState(100);
@@ -149,25 +148,20 @@ const CommentSection = () => {
 
   // Handle file selection
   const handleFileChange = (e, type) => {
-    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 5MB limit for images
-    const MAX_VIDEO_SIZE = 20 * 1024 * 1024; // 20MB limit for videos
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB limit for images
 
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
     // Check file size
-    if (
-      (type === 'image' && selectedFile.size > MAX_IMAGE_SIZE) ||
-      (type === 'video' && selectedFile.size > MAX_VIDEO_SIZE)
-    ) {
-      alert(`File size exceeds the limit! Max size: ${type === 'image' ? '10MB' : '20MB'}`);
+    if (type === 'image' && selectedFile.size > MAX_IMAGE_SIZE) {
+      alert(`File size exceeds the limit! Max size: 10MB`);
       e.target.value = ''; // Reset input
       return;
     }
 
     // Set file state
     if (type === 'image') setImage(selectedFile);
-    else setVideo(selectedFile);
 
     const previewContainer = document.getElementById('previewContainer');
     previewContainer.innerHTML = ''; // Clear any existing preview
@@ -181,15 +175,6 @@ const CommentSection = () => {
       img.style.height = '100px';
       img.style.width = '100px';
       previewContainer.appendChild(img);
-    } else if (fileType.startsWith('video/')) {
-      // Handle video preview
-      const video = document.createElement('video');
-      video.src = URL.createObjectURL(selectedFile);
-      video.controls = true;
-      video.style.height = '100px';
-      video.style.width = '100px';
-      video.classList.add('preview-video');
-      previewContainer.appendChild(video);
     }
   };
 
@@ -250,20 +235,13 @@ const CommentSection = () => {
     formData.append('userImage', currentUser.picture);
 
     let uploadedImagePath = '';
-    let uploadedVideoPath = '';
 
     if (image) {
       const imagePath = await uploadFileToGitHub(image, 'image');
       uploadedImagePath = imagePath;
     }
 
-    if (video) {
-      const videoPath = await uploadFileToGitHub(video, 'video');
-      uploadedVideoPath = videoPath;
-    }
-
     formData.append('imagePath', uploadedImagePath);
-    formData.append('videoPath', uploadedVideoPath);
 
 
     setLoading(true);
@@ -280,7 +258,6 @@ const CommentSection = () => {
       setComments([newComment, ...comments]);
       setContent('');
       setImage(null);
-      setVideo(null);
 
       // Clear the preview container
       const previewContainer = document.getElementById('previewContainer');
@@ -526,7 +503,6 @@ textarea.focus();
         </div>
         <p class="${styles.commentText}">${comment.content}</p>
         ${comment.image ? `<img class="${styles.commentImage}" src="${comment.image}" alt="Comment Image" />` : ''}
-        ${comment.video ? `<video class="${styles.commentVideo}" src="${comment.video}" controls></video>` : ''}
       `;
       modalBody.appendChild(commentElement);
 
@@ -553,7 +529,6 @@ textarea.focus();
           ${reply.replyTo ? `<span style="color: blue;">@${replyTo}</span> ` : ''}
           <p class="${styles.commentText}">${reply.content}</p>
           ${reply.image ? `<img class="${styles.commentImage}" src="${reply.image}" alt="Reply Image" />` : ''}
-          ${reply.video ? `<video class="${styles.commentVideo}" src="${reply.video}" controls></video>` : ''}
           <div class="${styles.commentActions}">
             <span class="${styles.likeButton}" data-comment-id="${commentId}" data-reply-id="${reply._id}" data-liked="${likedByUser}" style="cursor: pointer; color: ${likedByUser ? 'blue' : 'gray'};">
               ❤️ <span class="like-count">${(reply.likes || []).length}</span>
@@ -641,7 +616,6 @@ textarea.focus();
     adjustHeight(); // Ensure proper height on initial render
   }, []);
   const imageInputRef = useRef(null);
-  const videoInputRef = useRef(null);
 
   return (
     <div className={styles.commentSection}>
@@ -660,17 +634,6 @@ textarea.focus();
           accept="image/*"
           style={{ display: "none" }}
           onChange={(e) => handleFileChange(e, "image")}
-        />
-
-        <label className={styles.commentLabel} onClick={() => videoInputRef.current.click()}>
-          <i className="fas fa-video"></i>
-        </label>
-        <input
-          ref={videoInputRef}
-          type="file"
-          accept="video/*"
-          style={{ display: "none" }}
-          onChange={(e) => handleFileChange(e, "video")}
         />
         <textarea
           ref={textareaRef}
@@ -711,8 +674,6 @@ textarea.focus();
               </div>
               <p className={styles.commentText}>{comment.content}</p>
               {comment.image && <img className={styles.commentImage} src={comment.image} alt="Comment" />}
-
-              {comment.video && <video className={styles.commentVideo} src={comment.video} controls />}
 
               <div className={styles.commentActions}>
 
