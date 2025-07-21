@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta property="og:title" content="Caleb Fabric Designs">
+    <meta property="og:description" content="Discover vibrant and stylish wears made from high-quality products. ">
+    <meta property="og:image" content="https://calebfabrics.github.io/favicon.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://calebfabrics.github.io/">
+    <meta property="og:type" content="website">
+
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Hub</title>
+    <link rel="stylesheet" href="">
+    <style>
+        /* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header */
+.header {
+    background-color: #333;
+    padding: 10px 20px;
+    color: white;
+    text-align: center;
+}
+
+/* Hero Section */
+.hero {
+    background-color: #ff6347;
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.hero .btn {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.hero .btn:hover {
+    background-color: #555;
+}
+
+/* Section Titles */
+h2 {
+    text-align: center;
+    margin: 40px 0 20px;
+    font-size: 2rem;
+    color: #333;
+}
+
+/* Product Cards Section */
+.product-categories {
+    padding: 40px 20px;
+}
+
+.product-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    justify-items: center;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.card p {
+    font-size: 1.2rem;
+    padding: 10px;
+    background-color: #f8f8f8;
+    margin: 0;
+}
+
+/* Card Hover Effect */
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Footer Section */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+footer p {
+    font-size: 1rem;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .product-categories {
+        padding: 20px 10px;
+    }
+
+    .product-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .card p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero p {
+        font-size: 0.9rem;
+    }
+
+    .product-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="header">
+        <nav>
+            <!-- Navigation items (if any) like a logo or menu could go here -->
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Welcome to Caleb Fabric Designs</h1>
+        <p>Discover the latest styles and trends</p>
+        <a href="#casual" class="btn">Shop Now</a>
+    </section>
+
+    <!-- Casual Clothing Section -->
+    <section id="casual" class="product-categories">
+        <h2>Casual Wear</h2>
+        <div class="product-cards">
+            <a href="tracksuit.html">
+                <div class="card">
+                    <img src="images/tracksuit/tracksuit1.jpg" alt="Tracksuit">
+                    <p>Tracksuit</p>
+                </div>
+            </a>
+            <a href="joggers.html">
+                <div class="card">
+                    <img src="images/joggers/joggers1.jpg" alt="Joggers">
+                    <p>Joggers</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Corporate Clothing Section -->
+    <section id="corporate" class="product-categories">
+        <h2>Corporate Wear (Suits)</h2>
+        <div class="product-cards">
+            <a href="corporate.html">
+                <div class="card">
+                    <img src="images/corporate/corporate1.jpg" alt="Corporate Suit">
+                    <p>Corporate Suit</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- School Sport Wear Section -->
+    <section id="school-sport" class="product-categories">
+        <h2>School & Sport Wear</h2>
+        <div class="product-cards">
+            <a href="school-sport.html">
+                <div class="card">
+                    <img src="images/school-sports/sports1.jpg" alt="School Sport Wear">
+                    <p>School Sport Wear</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Cultural Clothing Section -->
+    <section id="cultural" class="product-categories">
+        <h2>Cultural Wear</h2>
+        <div class="product-cards">
+            <a href="agbada.html">
+                <div class="card">
+                    <img src="images/agbada/agbada1.jpg" alt="Agbada Wears">
+                    <p>Agbada Wears</p>
+                </div>
+            </a>
+            <a href="ankara.html">
+                <div class="card">
+                    <img src="images/ankara/ankara1.jpg" alt="Ankara">
+                    <p>Ankara</p>
+                </div>
+            </a>
+            <a href="senator.html">
+                <div class="card">
+                    <img src="images/senator/senator1.jpg" alt="Senator Wears">
+                    <p>Senator Wears</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2025 Fashion Hub. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>
