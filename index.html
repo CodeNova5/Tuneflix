@@ -8,9 +8,9 @@
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://calebfabrics.github.io/">
     <meta property="og:type" content="website">
-
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4306931152368412"
      crossorigin="anonymous"></script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fashion Hub</title>
@@ -30,13 +30,38 @@ body {
     color: #333;
 }
 
-/* Header */
 .header {
     background-color: #333;
     padding: 10px 20px;
     color: white;
     text-align: center;
 }
+
+/* Navigation Styling */
+.header nav {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.05rem;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.header nav a:hover,
+.header nav a.active {
+    background: #ff6347;
+    color: #fff;
+}
+
 
 /* Hero Section */
 .hero {
@@ -171,6 +196,18 @@ footer p {
     }
 }
 
+/* Responsive nav for mobile */
+@media (max-width: 600px) {
+    .header nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .header nav a {
+        width: 100%;
+        text-align: center;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -178,20 +215,45 @@ footer p {
     <!-- Header Section -->
     <header class="header">
         <nav>
-            <!-- Navigation items (if any) like a logo or menu could go here -->
+            <a href="index.html">Home</a>
+            <a href="#casual">Casual Wear</a>
+            <a href="#corporate">Corporate Wear</a>
+            <a href="#school-sport">School & Sport</a>
+            <a href="#cultural">Cultural Wear</a>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="contact.html">Contact</a>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
         <h1>Welcome to Caleb Fabric Designs</h1>
-        <p>Discover the latest styles and trends</p>
+        <p>Discover the latest styles and trends in fashion, crafted with passion and quality. We bring you a wide range of clothing options for every occasion, blending tradition with modernity.</p>
         <a href="#casual" class="btn">Shop Now</a>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" style="max-width: 800px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px;">
+        <h2>About Caleb Fabric Designs</h2>
+        <p>
+            Caleb Fabric Designs is a leading fashion brand dedicated to providing high-quality, stylish clothing for men, women, and children. Our mission is to inspire confidence and comfort through our unique designs and premium fabrics.
+        </p>
+        <p>
+            With years of experience in the fashion industry, we pride ourselves on our attention to detail, customer satisfaction, and commitment to excellence. Whether you are looking for casual wear, corporate attire, school and sport outfits, or cultural garments, we have something for everyone.
+        </p>
+        <p>
+            Our team of skilled designers and tailors work tirelessly to ensure every piece meets our high standards. We believe that fashion should be accessible, comfortable, and expressive. Thank you for choosing Caleb Fabric Designs as your trusted fashion partner.
+        </p>
     </section>
 
     <!-- Casual Clothing Section -->
     <section id="casual" class="product-categories">
         <h2>Casual Wear</h2>
+        <p style="text-align:center; max-width:700px; margin:0 auto 20px;">
+            Our casual wear collection is designed for comfort and style. From trendy tracksuits to versatile joggers, each piece is perfect for everyday activities, lounging, or a casual outing with friends. Explore our range and find your new favorite outfit.
+        </p>
         <div class="product-cards">
             <a href="tracksuit.html">
                 <div class="card">
@@ -211,6 +273,9 @@ footer p {
     <!-- Corporate Clothing Section -->
     <section id="corporate" class="product-categories">
         <h2>Corporate Wear (Suits)</h2>
+        <p style="text-align:center; max-width:700px; margin:0 auto 20px;">
+            Make a statement at work or formal events with our corporate wear collection. Our suits are tailored to perfection, offering a blend of professionalism and elegance. Choose Caleb Fabric Designs for a confident and polished look every day.
+        </p>
         <div class="product-cards">
             <a href="corporate.html">
                 <div class="card">
@@ -224,6 +289,9 @@ footer p {
     <!-- School Sport Wear Section -->
     <section id="school-sport" class="product-categories">
         <h2>School & Sport Wear</h2>
+        <p style="text-align:center; max-width:700px; margin:0 auto 20px;">
+            Our school and sport wear is crafted for durability and comfort, ensuring students and athletes can perform at their best. From sports uniforms to school tracksuits, our collection is both functional and stylish.
+        </p>
         <div class="product-cards">
             <a href="school-sport.html">
                 <div class="card">
@@ -237,6 +305,9 @@ footer p {
     <!-- Cultural Clothing Section -->
     <section id="cultural" class="product-categories">
         <h2>Cultural Wear</h2>
+        <p style="text-align:center; max-width:700px; margin:0 auto 20px;">
+            Celebrate heritage and tradition with our vibrant cultural wear. From Agbada to Ankara and Senator styles, each garment is a masterpiece that honors cultural roots while embracing contemporary fashion trends.
+        </p>
         <div class="product-cards">
             <a href="agbada.html">
                 <div class="card">
@@ -259,9 +330,27 @@ footer p {
         </div>
     </section>
 
+    <!-- Contact Section -->
+    <section class="contact" style="max-width: 800px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px;">
+        <h2>Contact Us</h2>
+        <p>
+            Have questions or need assistance? Reach out to our friendly team! We are here to help you with orders, sizing, or any other inquiries.
+        </p>
+        <ul>
+            <li>Email: <a href="mailto:calebokamgba@gmail.com">calebokamgba@gmail.com</a></li>
+            <li>Phone: +234 802 715 5994</li>
+    
+        </ul>
+    </section>
+
     <!-- Footer Section -->
     <footer>
         <p>&copy; 2025 Fashion Hub. All Rights Reserved.</p>
+        <p>
+            <a href="privacy.html" style="color:#fff;">Privacy Policy</a> |
+            <a href="terms.html" style="color:#fff;">Terms of Service</a> |
+            <a href="contact.html" style="color:#fff;">Contact</a>
+        </p>
     </footer>
 
 </body>
